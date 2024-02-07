@@ -10,6 +10,13 @@ export default {
   'menu.server.dashboard': '仪表盘-服务端',
   'menu.server.workplace': '工作台-服务端',
   'menu.server.monitor': '实时监控-服务端',
+  'menu.user-mgmt': '用户管理',
+  'menu.class-mgmt': '班级管理',
+  'menu.exam-mgmt': '考试管理',
+  'menu.paper-mgmt': '答卷管理',
+  'menu.study-analysis': '学情分析',
+  'menu.personal-center': '个人中心',
+
   'menu.list': '列表页',
   'menu.result': '结果页',
   'menu.exception': '异常页',
