@@ -25,7 +25,11 @@
     <ul class="right-side">
       <li>
         <a-tooltip :content="$t('settings.search')">
-          <a-button class="nav-btn" type="outline" :shape="'circle'">
+          <a-button
+            class="nav-btn"
+            type="outline"
+            :shape="'circle'"
+          >
             <template #icon>
               <icon-search />
             </template>
@@ -45,8 +49,14 @@
             </template>
           </a-button>
         </a-tooltip>
-        <a-dropdown trigger="click" @select="changeLocale as any">
-          <div ref="triggerBtn" class="trigger-btn"></div>
+        <a-dropdown
+          trigger="click"
+          @select="changeLocale as any"
+        >
+          <div
+            ref="triggerBtn"
+            class="trigger-btn"
+          ></div>
           <template #content>
             <a-doption
               v-for="item in locales"
@@ -62,13 +72,7 @@
         </a-dropdown>
       </li>
       <li>
-        <a-tooltip
-          :content="
-            theme === 'light'
-              ? $t('settings.navbar.theme.toDark')
-              : $t('settings.navbar.theme.toLight')
-          "
-        >
+        <a-tooltip :content="theme === 'light' ? $t('settings.navbar.theme.toDark') : $t('settings.navbar.theme.toLight')">
           <a-button
             class="nav-btn"
             type="outline"
@@ -85,7 +89,10 @@
       <li>
         <a-tooltip :content="$t('settings.navbar.alerts')">
           <div class="message-box-trigger">
-            <a-badge :count="9" dot>
+            <a-badge
+              :count="9"
+              dot
+            >
               <a-button
                 class="nav-btn"
                 type="outline"
@@ -103,20 +110,17 @@
           :content-style="{ padding: 0, minWidth: '400px' }"
           content-class="message-popover"
         >
-          <div ref="refBtn" class="ref-btn"></div>
+          <div
+            ref="refBtn"
+            class="ref-btn"
+          ></div>
           <template #content>
             <message-box />
           </template>
         </a-popover>
       </li>
       <li>
-        <a-tooltip
-          :content="
-            isFullscreen
-              ? $t('settings.navbar.screen.toExit')
-              : $t('settings.navbar.screen.toFull')
-          "
-        >
+        <a-tooltip :content="isFullscreen ? $t('settings.navbar.screen.toExit') : $t('settings.navbar.screen.toFull')">
           <a-button
             class="nav-btn"
             type="outline"
@@ -150,7 +154,10 @@
             :size="32"
             :style="{ marginRight: '8px', cursor: 'pointer' }"
           >
-            <img alt="avatar" :src="avatar" />
+            <img
+              alt="avatar"
+              :src="avatar"
+            />
           </a-avatar>
           <template #content>
             <a-doption>
@@ -260,6 +267,10 @@
     Message.success(res as string);
   };
   const toggleDrawerMenu = inject('toggleDrawerMenu') as () => void;
+
+  const directivetest = () => {
+    console.log('hello');
+  };
 </script>
 
 <style scoped lang="less">

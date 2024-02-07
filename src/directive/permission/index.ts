@@ -1,4 +1,4 @@
-import { DirectiveBinding } from 'vue';
+import { DirectiveBinding, ObjectDirective } from 'vue';
 import { useUserStore } from '@/store';
 
 function checkPermission(el: HTMLElement, binding: DirectiveBinding) {
@@ -27,4 +27,4 @@ export default {
   updated(el: HTMLElement, binding: DirectiveBinding) {
     checkPermission(el, binding);
   },
-};
+} as ObjectDirective;

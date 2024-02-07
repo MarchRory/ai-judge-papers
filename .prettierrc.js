@@ -1,9 +1,12 @@
 module.exports = {
   tabWidth: 2,
   semi: true,
-  printWidth: 80,
+  bracketSameLine: false,
+  printWidth: 140,
   singleQuote: true,
   quoteProps: 'consistent',
   htmlWhitespaceSensitivity: 'strict',
   vueIndentScriptAndStyle: true,
+  arrowParens: 'always',
+  singleAttributePerLine: true,
 };
