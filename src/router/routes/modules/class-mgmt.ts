@@ -4,25 +4,13 @@ import { AppRouteRecordRaw } from '../types';
 const CLASS_MGMT: AppRouteRecordRaw = {
   path: '/class-mgmt',
   name: 'class-mgmt',
-  component: DEFAULT_LAYOUT,
+  component: DEFAULT_LAYOUT, // TODO: replace me
   meta: {
-    locale: 'menu.class-mgmt',
+    locale: '班级管理',
     requiresAuth: true,
-    icon: 'icon-user-group', // TODO: replace me
-    order: 2,
+    icon: 'icon-interaction', // TODO: replace me
+    order: 3,
   },
-  children: [
-    {
-      path: 'workplace',
-      name: 'Workplace',
-      component: () => import('@/views/dashboard/workplace/index.vue'),
-      meta: {
-        locale: 'menu.dashboard.workplace',
-        requiresAuth: true,
-        roles: ['*'],
-      },
-    },
-  ],
 };
 
 export default CLASS_MGMT;

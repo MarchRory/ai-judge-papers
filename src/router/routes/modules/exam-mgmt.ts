@@ -6,10 +6,10 @@ const EXAM_MGMT: AppRouteRecordRaw = {
   name: 'exam-mgmt',
   component: DEFAULT_LAYOUT,
   meta: {
-    locale: 'menu.exam-mgmt',
+    locale: '考试管理',
     requiresAuth: true,
     icon: 'icon-subscribed', // TODO: replace me
-    order: 3,
+    order: 5,
   },
   children: [
     {

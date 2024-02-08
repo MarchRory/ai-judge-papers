@@ -4,26 +4,13 @@ import { AppRouteRecordRaw } from '../types';
 const STUDY_ANALYSIS: AppRouteRecordRaw = {
   path: '/study-analysis',
   name: 'study-analysis',
-  component: DEFAULT_LAYOUT,
+  component: DEFAULT_LAYOUT, // TODO: replace me
   meta: {
-    locale: 'menu.study-analysis',
+    locale: '学情分析',
     requiresAuth: true,
     icon: 'icon-check-circle',
-    order: 5,
+    order: 7,
   },
-  children: [
-    {
-      // TODO: replace me
-      path: 'workplace',
-      name: 'Workplace',
-      component: () => import('@/views/dashboard/workplace/index.vue'),
-      meta: {
-        locale: 'menu.dashboard.workplace',
-        requiresAuth: true,
-        roles: ['*'],
-      },
-    },
-  ],
 };
 
 export default STUDY_ANALYSIS;

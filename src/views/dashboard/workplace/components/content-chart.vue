@@ -1,17 +1,23 @@
 <template>
-  <a-spin :loading="loading" style="width: 100%">
+  <a-spin
+    :loading="loading"
+    style="width: 100%"
+  >
     <a-card
       class="general-card"
       :header-style="{ paddingBottom: 0 }"
       :body-style="{
         paddingTop: '20px',
       }"
-      :title="$t('workplace.contentData')"
     >
+      <template #title>考试数据 <span text="sm gray">（近7日）</span></template>
       <template #extra>
         <a-link>{{ $t('workplace.viewMore') }}</a-link>
       </template>
-      <Chart height="289px" :option="chartOption" />
+      <Chart
+        height="289px"
+        :option="chartOption"
+      />
     </a-card>
   </a-spin>
 </template>
@@ -41,10 +47,7 @@
   const { loading, setLoading } = useLoading(true);
   const xAxis = ref<string[]>([]);
   const chartsData = ref<number[]>([]);
-  const graphicElements = ref([
-    graphicFactory({ left: '2.6%' }),
-    graphicFactory({ right: 0 }),
-  ]);
+  const graphicElements = ref([graphicFactory({ left: '2.6%' }), graphicFactory({ right: 0 })]);
   const { chartOption } = useChartOption(() => {
     return {
       grid: {

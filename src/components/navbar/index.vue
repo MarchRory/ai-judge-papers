@@ -10,7 +10,7 @@
           :style="{ margin: 0, fontSize: '18px' }"
           :heading="5"
         >
-          Arco Pro
+          TODO:title
         </a-typography-title>
         <icon-menu-fold
           v-if="!topMenu && appStore.device === 'mobile'"
@@ -36,14 +36,16 @@
           </a-button>
         </a-tooltip>
       </li>
-      <li>
-        <a-tooltip :content="$t('settings.language')">
-          <a-button
+      <!--
+
+        <li>
+          <a-tooltip :content="$t('settings.language')">
+            <a-button
             class="nav-btn"
             type="outline"
             :shape="'circle'"
             @click="setDropDownVisible"
-          >
+            >
             <template #icon>
               <icon-language />
             </template>
@@ -62,7 +64,7 @@
               v-for="item in locales"
               :key="item.value"
               :value="item.value"
-            >
+              >
               <template #icon>
                 <icon-check v-show="item.value === currentLocale" />
               </template>
@@ -71,6 +73,7 @@
           </template>
         </a-dropdown>
       </li>
+    -->
       <li>
         <a-tooltip :content="theme === 'light' ? $t('settings.navbar.theme.toDark') : $t('settings.navbar.theme.toLight')">
           <a-button

@@ -1,31 +1,30 @@
 <template>
-  <a-spin :loading="loading" style="width: 100%">
+  <a-spin
+    :loading="loading"
+    style="width: 100%"
+  >
     <a-card
       class="general-card"
       :header-style="{ paddingBottom: '0' }"
       :body-style="{ padding: '17px 20px 21px 20px' }"
     >
-      <template #title>
-        {{ $t('workplace.popularContent') }}
-      </template>
+      <template #title> 近期考试 </template>
       <template #extra>
         <a-link>{{ $t('workplace.viewMore') }}</a-link>
       </template>
-      <a-space direction="vertical" :size="10" fill>
+      <a-space
+        direction="vertical"
+        :size="10"
+        fill
+      >
         <a-radio-group
           v-model:model-value="type"
           type="button"
           @change="typeChange as any"
         >
-          <a-radio value="text">
-            {{ $t('workplace.popularContent.text') }}
-          </a-radio>
-          <a-radio value="image">
-            {{ $t('workplace.popularContent.image') }}
-          </a-radio>
-          <a-radio value="video">
-            {{ $t('workplace.popularContent.video') }}
-          </a-radio>
+          <a-radio value="text"> 语文 </a-radio>
+          <a-radio value="image"> 数学 </a-radio>
+          <a-radio value="video"> 英语 </a-radio>
         </a-radio-group>
         <a-table
           :data="renderList"
@@ -34,8 +33,14 @@
           :scroll="{ x: '100%', y: '264px' }"
         >
           <template #columns>
-            <a-table-column title="排名" data-index="key"></a-table-column>
-            <a-table-column title="内容标题" data-index="title">
+            <a-table-column
+              title="排名"
+              data-index="key"
+            ></a-table-column>
+            <a-table-column
+              title="考试名称"
+              data-index="title"
+            >
               <template #cell="{ record }">
                 <a-typography-paragraph
                   :ellipsis="{
@@ -46,7 +51,10 @@
                 </a-typography-paragraph>
               </template>
             </a-table-column>
-            <a-table-column title="点击量" data-index="clickNumber">
+            <a-table-column
+              title="点击量"
+              data-index="clickNumber"
+            >
             </a-table-column>
             <a-table-column
               title="日涨幅"
@@ -75,7 +83,7 @@
 <script lang="ts" setup>
   import { ref } from 'vue';
   import useLoading from '@/hooks/loading';
-  import { queryPopularList } from '@/api/dashboard';
+  import { queryRecentlyExam } from '@/api/dashboard';
   import type { TableData } from '@arco-design/web-vue/es/table/interface';
 
   const type = ref('text');
@@ -84,7 +92,7 @@
   const fetchData = async (contentType: string) => {
     try {
       setLoading(true);
-      const { data } = await queryPopularList({ type: contentType });
+      const { data } = await queryRecentlyExam({ type: contentType });
       renderList.value = data;
     } catch (err) {
       // you can report use errorHandler or other
