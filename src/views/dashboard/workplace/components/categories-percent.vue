@@ -1,5 +1,8 @@
 <template>
-  <a-spin :loading="loading" style="width: 100%">
+  <a-spin
+    :loading="loading"
+    style="width: 100%"
+  >
     <a-card
       class="general-card"
       :header-style="{ paddingBottom: '0' }"
@@ -7,10 +10,11 @@
         padding: '20px',
       }"
     >
-      <template #title>
-        {{ $t('workplace.categoriesPercent') }}
-      </template>
-      <Chart height="310px" :option="chartOption" />
+      <template #title> 考试类别占比 </template>
+      <Chart
+        height="310px"
+        :option="chartOption"
+      />
     </a-card>
   </a-spin>
 </template>
@@ -19,6 +23,21 @@
   import useLoading from '@/hooks/loading';
   import useChartOption from '@/hooks/chart-option';
 
+  const props = withDefaults(
+    // TODO: 删除 withDefaults，仅测试
+    // 亦可直接请求数据
+    defineProps<{
+      data: Record<string, number>;
+    }>(),
+    {
+      data: () => ({
+        语文: 123,
+        数学: 456,
+        英语: 789,
+      }),
+    }
+  );
+
   const { loading } = useLoading();
   const { chartOption } = useChartOption((isDark) => {
     // echarts support https://echarts.apache.org/zh/theme-builder.html
@@ -26,7 +45,7 @@
     return {
       legend: {
         left: 'center',
-        data: ['纯文本', '图文类', '视频类'],
+        data: Object.keys(props.data),
         bottom: 0,
         icon: 'circle',
         itemWidth: 8,
@@ -48,7 +67,7 @@
             left: 'center',
             top: '40%',
             style: {
-              text: '内容量',
+              text: '考试场次',
               textAlign: 'center',
               fill: isDark ? '#ffffffb3' : '#4E5969',
               fontSize: 14,
@@ -59,7 +78,8 @@
             left: 'center',
             top: '50%',
             style: {
-              text: '928,531',
+              // 此处计算总考试场次
+              text: Object.values(props.data).reduce((acc, cur) => acc + cur, 0),
               textAlign: 'center',
               fill: isDark ? '#ffffffb3' : '#1D2129',
               fontSize: 16,
@@ -82,29 +102,10 @@
             borderColor: isDark ? '#232324' : '#fff',
             borderWidth: 1,
           },
-          data: [
-            {
-              value: [148564],
-              name: '纯文本',
-              itemStyle: {
-                color: isDark ? '#3D72F6' : '#249EFF',
-              },
-            },
-            {
-              value: [334271],
-              name: '图文类',
-              itemStyle: {
-                color: isDark ? '#A079DC' : '#313CA9',
-              },
-            },
-            {
-              value: [445694],
-              name: '视频类',
-              itemStyle: {
-                color: isDark ? '#6CAAF5' : '#21CCFF',
-              },
-            },
-          ],
+          data: Object.entries(props.data).map(([name, count]) => ({
+            name,
+            value: [count],
+          })),
         },
       ],
     };

@@ -6,10 +6,10 @@ const PAPER_MGMT: AppRouteRecordRaw = {
   name: 'paper-mgmt',
   component: DEFAULT_LAYOUT,
   meta: {
-    locale: 'menu.paper-mgmt',
+    locale: '答卷管理',
     requiresAuth: true,
     icon: 'icon-book', // TODO: replace me
-    order: 4,
+    order: 6,
   },
   children: [
     {

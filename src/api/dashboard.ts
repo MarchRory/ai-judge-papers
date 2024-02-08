@@ -17,6 +17,6 @@ export interface PopularRecord {
   increases: number;
 }
 
-export function queryPopularList(params: { type: string }) {
+export function queryRecentlyExam(params: { type: string }) {
   return axios.get<TableData[]>('/api/popular/list', { params });
 }
