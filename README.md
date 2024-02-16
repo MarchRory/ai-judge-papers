@@ -122,7 +122,7 @@ todo...
    */
   import { StudentType } from '@/types/student';
   const stu: Array<StudentType> = [];
-</script
+</script>
 
 <template>
   <div>

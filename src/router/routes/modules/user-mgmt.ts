@@ -13,12 +13,21 @@ const USER_MGMT: AppRouteRecordRaw = {
   },
   children: [
     {
-      // TODO: replace me
-      path: 'workplace',
-      name: 'Workplace',
-      component: () => import('@/views/dashboard/workplace/index.vue'),
+      path: 'teacher',
+      name: 'teacher',
+      component: () => import('@/views/user-mgmt/teacher/index.vue'),
       meta: {
-        locale: 'menu.dashboard.workplace',
+        locale: '教师管理',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    },
+    {
+      path: 'student',
+      name: 'student',
+      component: () => import('@/views/user-mgmt/student/index.vue'),
+      meta: {
+        locale: '学生管理',
         requiresAuth: true,
         roles: ['*'],
       },
