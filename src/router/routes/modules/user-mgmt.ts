@@ -1,18 +1,19 @@
 import { DEFAULT_LAYOUT } from '../base';
 import { AppRouteRecordRaw } from '../types';
 
-const DASHBOARD: AppRouteRecordRaw = {
-  path: '/dashboard',
-  name: 'dashboard',
+const USER_MGMT: AppRouteRecordRaw = {
+  path: '/user-mgmt',
+  name: 'user-mgmt',
   component: DEFAULT_LAYOUT,
   meta: {
-    locale: '仪表盘',
+    locale: '师生管理',
     requiresAuth: true,
-    icon: 'icon-dashboard',
-    order: 0,
+    icon: 'icon-user-group',
+    order: 2,
   },
   children: [
     {
+      // TODO: replace me
       path: 'workplace',
       name: 'Workplace',
       component: () => import('@/views/dashboard/workplace/index.vue'),
@@ -25,4 +26,4 @@ const DASHBOARD: AppRouteRecordRaw = {
   ],
 };
 
-export default DASHBOARD;
+export default USER_MGMT;

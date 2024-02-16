@@ -1,17 +1,18 @@
 import { DEFAULT_LAYOUT } from '../base';
 import { AppRouteRecordRaw } from '../types';
 
-const DASHBOARD: AppRouteRecordRaw = {
-  path: '/dashboard',
-  name: 'dashboard',
+const PERMISSION_MGMT: AppRouteRecordRaw = {
+  path: '/permission-mgmt',
+  name: 'permission-mgmt',
   component: DEFAULT_LAYOUT,
   meta: {
-    locale: '仪表盘',
+    locale: '权限管理',
     requiresAuth: true,
-    icon: 'icon-dashboard',
-    order: 0,
+    icon: 'icon-lock',
+    order: 1,
   },
   children: [
+    // TODO: replace me
     {
       path: 'workplace',
       name: 'Workplace',
@@ -25,4 +26,4 @@ const DASHBOARD: AppRouteRecordRaw = {
   ],
 };
 
-export default DASHBOARD;
+export default PERMISSION_MGMT;

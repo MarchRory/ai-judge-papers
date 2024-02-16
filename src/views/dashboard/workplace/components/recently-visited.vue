@@ -23,15 +23,15 @@
 <script lang="ts" setup>
   const links = [
     {
-      text: 'workplace.contentManagement',
+      text: 'TODO',
       icon: 'icon-storage',
     },
     {
-      text: 'workplace.contentStatistical',
+      text: 'TODO',
       icon: 'icon-file',
     },
     {
-      text: 'workplace.advanced',
+      text: 'TODO',
       icon: 'icon-settings',
     },
   ];

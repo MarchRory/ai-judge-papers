@@ -1,15 +1,15 @@
 import { DEFAULT_LAYOUT } from '../base';
 import { AppRouteRecordRaw } from '../types';
 
-const DASHBOARD: AppRouteRecordRaw = {
-  path: '/dashboard',
-  name: 'dashboard',
+const PAPER_MGMT: AppRouteRecordRaw = {
+  path: '/paper-mgmt',
+  name: 'paper-mgmt',
   component: DEFAULT_LAYOUT,
   meta: {
-    locale: '仪表盘',
+    locale: '答卷管理',
     requiresAuth: true,
-    icon: 'icon-dashboard',
-    order: 0,
+    icon: 'icon-book', // TODO: replace me
+    order: 6,
   },
   children: [
     {
@@ -25,4 +25,4 @@ const DASHBOARD: AppRouteRecordRaw = {
   ],
 };
 
-export default DASHBOARD;
+export default PAPER_MGMT;

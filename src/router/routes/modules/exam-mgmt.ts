@@ -1,15 +1,15 @@
 import { DEFAULT_LAYOUT } from '../base';
 import { AppRouteRecordRaw } from '../types';
 
-const DASHBOARD: AppRouteRecordRaw = {
-  path: '/dashboard',
-  name: 'dashboard',
+const EXAM_MGMT: AppRouteRecordRaw = {
+  path: '/exam-mgmt',
+  name: 'exam-mgmt',
   component: DEFAULT_LAYOUT,
   meta: {
-    locale: '仪表盘',
+    locale: '考试管理',
     requiresAuth: true,
-    icon: 'icon-dashboard',
-    order: 0,
+    icon: 'icon-subscribed', // TODO: replace me
+    order: 5,
   },
   children: [
     {
@@ -25,4 +25,4 @@ const DASHBOARD: AppRouteRecordRaw = {
   ],
 };
 
-export default DASHBOARD;
+export default EXAM_MGMT;

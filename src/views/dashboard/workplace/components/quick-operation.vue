@@ -1,7 +1,7 @@
 <template>
   <a-card
     class="general-card"
-    :title="$t('workplace.quick.operation')"
+    title="快捷入口"
     :header-style="{ paddingBottom: '0' }"
     :body-style="{ padding: '24px 20px 0 20px' }"
   >
@@ -9,7 +9,12 @@
       <a-link>{{ $t('workplace.quickOperation.setup') }}</a-link>
     </template>
     <a-row :gutter="8">
-      <a-col v-for="link in links" :key="link.text" :span="8" class="wrapper">
+      <a-col
+        v-for="link in links"
+        :key="link.text"
+        :span="8"
+        class="wrapper"
+      >
         <div class="icon">
           <component :is="link.icon" />
         </div>
@@ -18,17 +23,20 @@
         </a-typography-paragraph>
       </a-col>
     </a-row>
-    <a-divider class="split-line" style="margin: 0" />
+    <a-divider
+      class="split-line"
+      style="margin: 0"
+    />
   </a-card>
 </template>
 
 <script lang="ts" setup>
   const links = [
-    { text: 'workplace.contentManagement', icon: 'icon-file' },
-    { text: 'workplace.contentStatistical', icon: 'icon-storage' },
-    { text: 'workplace.advanced', icon: 'icon-settings' },
-    { text: 'workplace.onlinePromotion', icon: 'icon-mobile' },
-    { text: 'workplace.contentPutIn', icon: 'icon-fire' },
+    { text: '班级列表', icon: 'icon-file' },
+    { text: '教师列表', icon: 'icon-storage' },
+    { text: '考试列表', icon: 'icon-settings' },
+    { text: 'TODO', icon: 'icon-mobile' },
+    { text: 'TODO', icon: 'icon-fire' },
   ];
 </script>
 
