@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="arco-template-container">
     <div class="left-side">
       <div class="panel">
         <Banner />
@@ -74,7 +74,7 @@
 </script>
 
 <style lang="less" scoped>
-  .container {
+  .arco-template-container {
     background-color: var(--color-fill-2);
     padding: 16px 20px;
     padding-bottom: 0;

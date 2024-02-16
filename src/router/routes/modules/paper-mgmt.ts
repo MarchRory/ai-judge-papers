@@ -11,18 +11,6 @@ const PAPER_MGMT: AppRouteRecordRaw = {
     icon: 'icon-book', // TODO: replace me
     order: 6,
   },
-  children: [
-    {
-      path: 'workplace',
-      name: 'Workplace',
-      component: () => import('@/views/dashboard/workplace/index.vue'),
-      meta: {
-        locale: 'menu.dashboard.workplace',
-        requiresAuth: true,
-        roles: ['*'],
-      },
-    },
-  ],
 };
 
 export default PAPER_MGMT;
