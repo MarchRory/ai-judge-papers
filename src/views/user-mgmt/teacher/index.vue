@@ -1,0 +1,149 @@
+<script setup lang="ts">
+  /**
+   * TODO:当前仅有结构，无js逻辑
+   * 此组件需要抽取为公共组件，以便复用
+   *
+   * @see https://arco.design/vue/component/form
+   * @see https://arco.design/vue/component/table
+   */
+  import { reactive } from 'vue';
+
+  // form
+  const form = reactive({
+    value1: '',
+    value2: '',
+    value3: '',
+    value4: '',
+    value5: '',
+    value6: '',
+  });
+
+  // table
+  const columns = [];
+  const data = [];
+</script>
+
+<template>
+  <a-layout class="h-full">
+    <a-layout-header class="p4">
+      <a-card class="px-2">
+        <header class="pt-4 pb-8">
+          <strong class="text-2xl"> 查询教师 </strong>
+        </header>
+        <div class="grid grid-cols-[1fr_auto]">
+          <a-form :model="form">
+            <a-row :gutter="16">
+              <a-col :span="8">
+                <a-form-item
+                  field="value1"
+                  label="教工号"
+                  label-col-flex="42px"
+                >
+                  <a-input
+                    v-model="form.value1"
+                    placeholder="请输入教工号"
+                  />
+                </a-form-item>
+              </a-col>
+              <a-col :span="8">
+                <a-form-item
+                  field="value2"
+                  label="教师姓名"
+                  label-col-flex="56px"
+                >
+                  <a-input
+                    v-model="form.value2"
+                    placeholder="请输入教师姓名"
+                  />
+                </a-form-item>
+              </a-col>
+              <a-col :span="8">
+                <a-form-item
+                  field="value3"
+                  label="性别"
+                  label-col-flex="28px"
+                >
+                  <a-select v-model="form.value3">
+                    <a-option value="all">全部</a-option>
+                    <a-option :value="true">男</a-option>
+                    <a-option :value="false">女</a-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+            </a-row>
+            <a-row :gutter="16">
+              <a-col :span="8">
+                <a-form-item
+                  field="value4"
+                  label="科目"
+                  label-col-flex="42px"
+                >
+                  <a-select
+                    v-model="form.value4"
+                    placeholder="请选择"
+                  >
+                    <a-option value="all">全部</a-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+              <a-col :span="8">
+                <a-form-item
+                  field="value5"
+                  label="创建时间"
+                  label-col-flex="56px"
+                >
+                  <a-range-picker
+                    show-time
+                    :time-picker-props="{ defaultValue: ['00:00:00', '09:09:06'] }"
+                    format="YYYY-MM-DD HH:mm"
+                    @change="onChange"
+                    @select="onSelect"
+                    @ok="onOk"
+                  />
+                </a-form-item>
+              </a-col>
+              <a-col :span="8">
+                <a-form-item
+                  field="value6"
+                  label="账号启用"
+                  label-col-flex="56px"
+                >
+                  <a-select
+                    v-model="form.value6"
+                    placeholder="请选择"
+                  >
+                    <a-option value="all">全部</a-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </a-form>
+
+          <aside class="pl-8 ml-8 mb-[20px] flex flex-col justify-between border-l border-l-solid border-[#E5E6EB]">
+            <a-button type="primary">
+              <template #icon>
+                <icon-search />
+              </template>
+              <template #default>查询</template>
+            </a-button>
+
+            <a-button>
+              <template #icon>
+                <icon-refresh />
+              </template>
+              <template #default>重置</template>
+            </a-button>
+          </aside>
+        </div>
+      </a-card>
+    </a-layout-header>
+    <a-layout-content class="px-4">
+      <a-card>
+        <a-table
+          :columns="columns"
+          :data="data"
+        />
+      </a-card>
+    </a-layout-content>
+  </a-layout>
+</template>

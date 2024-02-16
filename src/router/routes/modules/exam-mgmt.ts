@@ -11,18 +11,6 @@ const EXAM_MGMT: AppRouteRecordRaw = {
     icon: 'icon-subscribed', // TODO: replace me
     order: 5,
   },
-  children: [
-    {
-      path: 'workplace',
-      name: 'Workplace',
-      component: () => import('@/views/dashboard/workplace/index.vue'),
-      meta: {
-        locale: 'menu.dashboard.workplace',
-        requiresAuth: true,
-        roles: ['*'],
-      },
-    },
-  ],
 };
 
 export default EXAM_MGMT;

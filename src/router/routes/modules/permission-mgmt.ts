@@ -12,13 +12,32 @@ const PERMISSION_MGMT: AppRouteRecordRaw = {
     order: 1,
   },
   children: [
-    // TODO: replace me
     {
-      path: 'workplace',
-      name: 'Workplace',
-      component: () => import('@/views/dashboard/workplace/index.vue'),
+      path: 'tree',
+      name: 'tree',
+      component: () => import('@/views/permission-mgmt/tree/index.vue'),
       meta: {
-        locale: 'menu.dashboard.workplace',
+        locale: '权限树',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    },
+    {
+      path: 'role',
+      name: 'role',
+      component: () => import('@/views/permission-mgmt/role/index.vue'),
+      meta: {
+        locale: '角色管理',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    },
+    {
+      path: 'user',
+      name: 'user',
+      component: () => import('@/views/permission-mgmt/user/index.vue'),
+      meta: {
+        locale: '用户管理',
         requiresAuth: true,
         roles: ['*'],
       },
