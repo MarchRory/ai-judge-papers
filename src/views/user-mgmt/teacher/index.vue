@@ -6,6 +6,7 @@
    * @see https://arco.design/vue/component/form
    * @see https://arco.design/vue/component/table
    */
+  import { TableColumnData, TableData } from '@arco-design/web-vue';
   import { reactive } from 'vue';
 
   // form
@@ -14,13 +15,13 @@
     value2: '',
     value3: '',
     value4: '',
-    value5: '',
+    value5: [],
     value6: '',
   });
 
   // table
-  const columns = [];
-  const data = [];
+  const columns: TableColumnData[] = [];
+  const data: TableData[] = [];
 </script>
 
 <template>
@@ -65,8 +66,8 @@
                 >
                   <a-select v-model="form.value3">
                     <a-option value="all">全部</a-option>
-                    <a-option :value="true">男</a-option>
-                    <a-option :value="false">女</a-option>
+                    <a-option value="man">男</a-option>
+                    <a-option value="female">女</a-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -93,12 +94,10 @@
                   label-col-flex="56px"
                 >
                   <a-range-picker
+                    v-model="form.value5"
                     show-time
                     :time-picker-props="{ defaultValue: ['00:00:00', '09:09:06'] }"
                     format="YYYY-MM-DD HH:mm"
-                    @change="onChange"
-                    @select="onSelect"
-                    @ok="onOk"
                   />
                 </a-form-item>
               </a-col>
@@ -139,6 +138,18 @@
     </a-layout-header>
     <a-layout-content class="px-4">
       <a-card>
+        <pre>{{ JSON.stringify(form,null,4) }}
+          <!-- TODO: 测试 -->
+        </pre>
+        <header class="py-4 flex gap-4">
+          <a-button type="primary">
+            添加
+            <template #icon>
+              <icon-plus />
+            </template>
+          </a-button>
+          <a-button> 批量导入 </a-button>
+        </header>
         <a-table
           :columns="columns"
           :data="data"
