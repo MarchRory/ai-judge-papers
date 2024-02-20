@@ -20,8 +20,15 @@
   });
 
   // table
-  const columns: TableColumnData[] = [];
-  const data: TableData[] = [];
+  const columns: TableColumnData[] = Object.entries({
+    id: '教工号',
+    name: '教师姓名',
+    sex: '性别',
+    phone: '联系电话',
+    state: '账号启用',
+    $operation: '操作', // virtual
+  }).map(([dataIndex, title]) => ({ dataIndex, title, slotName: dataIndex }));
+  const data: TableData[] = reactive([{ id: 123, name: 'Name', sex: '1', phone: '123', state: false }]);
 </script>
 
 <template>
@@ -153,7 +160,20 @@
         <a-table
           :columns="columns"
           :data="data"
-        />
+          size="small"
+        >
+          <template #state="{ record }">
+            <a-switch v-model="record.state" />
+          </template>
+          <template #$operation>
+            <a-button type="text">详情</a-button>
+            <a-button
+              type="text"
+              status="danger"
+              >删除</a-button
+            >
+          </template>
+        </a-table>
       </a-card>
     </a-layout-content>
   </a-layout>
