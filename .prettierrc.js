@@ -9,4 +9,5 @@ module.exports = {
   vueIndentScriptAndStyle: true,
   arrowParens: 'always',
   singleAttributePerLine: true,
+  endOfLine: 'auto',
 };
