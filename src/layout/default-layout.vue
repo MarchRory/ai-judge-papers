@@ -1,6 +1,12 @@
 <template>
-  <a-layout class="layout" :class="{ mobile: appStore.hideMenu }">
-    <div v-if="navbar" class="layout-navbar">
+  <a-layout
+    class="layout"
+    :class="{ mobile: appStore.hideMenu }"
+  >
+    <div
+      v-if="navbar"
+      class="layout-navbar"
+    >
       <NavBar />
     </div>
     <a-layout>
@@ -32,9 +38,12 @@
         >
           <Menu />
         </a-drawer>
-        <a-layout class="layout-content" :style="paddingStyle">
+        <a-layout
+          class="layout-content"
+          :style="paddingStyle"
+        >
           <TabBar v-if="appStore.tabBar" />
-          <a-layout-content>
+          <a-layout-content p="18px">
             <PageLayout />
           </a-layout-content>
           <Footer v-if="footer" />
@@ -75,10 +84,7 @@
     return appStore.menuCollapse;
   });
   const paddingStyle = computed(() => {
-    const paddingLeft =
-      renderMenu.value && !hideMenu.value
-        ? { paddingLeft: `${menuWidth.value}px` }
-        : {};
+    const paddingLeft = renderMenu.value && !hideMenu.value ? { paddingLeft: `${menuWidth.value}px` } : {};
     const paddingTop = navbar.value ? { paddingTop: navbarHeight } : {};
     return { ...paddingLeft, ...paddingTop };
   });
@@ -89,8 +95,7 @@
   watch(
     () => userStore.role,
     (roleValue) => {
-      if (roleValue && !permission.accessRouter(route))
-        router.push({ name: 'notFound' });
+      if (roleValue && !permission.accessRouter(route)) router.push({ name: 'notFound' });
     }
   );
   const drawerVisible = ref(false);
