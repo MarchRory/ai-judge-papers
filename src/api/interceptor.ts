@@ -5,10 +5,10 @@ import { useUserStore } from '@/store';
 import { getToken } from '@/utils/auth';
 
 export interface HttpResponse<T = unknown> {
-  status: number;
-  msg: string;
+  success: boolean;
   code: number;
   data: T;
+  message: string;
 }
 
 if (import.meta.env.VITE_API_BASE_URL) {
@@ -39,18 +39,19 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
   (response: AxiosResponse<HttpResponse>) => {
     const res = response.data;
-    // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 20000) {
+    // http error response guard
+    if (!res.success) {
       Message.error({
-        content: res.msg || 'Error',
+        content: res.message || 'Error',
         duration: 5 * 1000,
       });
+      // TODO: 这里可能还需要根据后端修改
       // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      if ([50008, 50012, 50014].includes(res.code) && response.config.url !== '/api/user/info') {
+      if ([403].includes(res.code) && response.config.url !== '/api/user/info') {
         Modal.error({
-          title: 'Confirm logout',
-          content: 'You have been logged out, you can cancel to stay on this page, or log in again',
-          okText: 'Re-Login',
+          title: '确认注销',
+          content: '您已经注销，您可以取消并停留在此页面，或者重新登录',
+          okText: '重新登陆',
           async onOk() {
             const userStore = useUserStore();
 
@@ -59,7 +60,7 @@ axios.interceptors.response.use(
           },
         });
       }
-      return Promise.reject(new Error(res.msg || 'Error'));
+      return Promise.reject(new Error(res.message || 'Error'));
     }
     return res;
   },
