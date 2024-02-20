@@ -41,7 +41,10 @@
           </template>
         </a-input-password>
       </a-form-item>
-      <a-space :size="16" direction="vertical">
+      <a-space
+        :size="16"
+        direction="vertical"
+      >
         <div class="login-form-password-actions">
           <a-checkbox
             checked="rememberPassword"
@@ -52,10 +55,19 @@
           </a-checkbox>
           <a-link>{{ $t('login.form.forgetPassword') }}</a-link>
         </div>
-        <a-button type="primary" html-type="submit" long :loading="loading">
+        <a-button
+          type="primary"
+          html-type="submit"
+          long
+          :loading="loading"
+        >
           {{ $t('login.form.login') }}
         </a-button>
-        <a-button type="text" long class="login-form-register-btn">
+        <a-button
+          type="text"
+          long
+          class="login-form-register-btn"
+        >
           {{ $t('login.form.register') }}
         </a-button>
       </a-space>
@@ -82,21 +94,15 @@
 
   const loginConfig = useStorage('login-config', {
     rememberPassword: true,
-    username: 'admin', // 演示默认值
-    password: 'admin', // demo default value
+    username: 'fate', // 演示默认值
+    password: 'fate', // demo default value
   });
   const userInfo = reactive({
     username: loginConfig.value.username,
     password: loginConfig.value.password,
   });
 
-  const handleSubmit = async ({
-    errors,
-    values,
-  }: {
-    errors: Record<string, ValidatedError> | undefined;
-    values: Record<string, any>;
-  }) => {
+  const handleSubmit = async ({ errors, values }: { errors: Record<string, ValidatedError> | undefined; values: Record<string, any> }) => {
     if (loading.value) return;
     if (!errors) {
       setLoading(true);

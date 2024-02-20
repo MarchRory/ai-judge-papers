@@ -1,4 +1,6 @@
 node_modules
+.history
+.vscode
 .DS_Store
 dist
 dist-ssr
