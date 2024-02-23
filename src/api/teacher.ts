@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Paging } from './types';
+import { Paging, withPaging } from './utils';
 
 // TODO:
 export interface Teacher {
@@ -20,15 +20,16 @@ export function deleteTeacher(id: number) {
 }
 
 export function listTeacher(
-  data: Paging<{
-    name: string;
+  data: {
+    name?: string;
     state: Teacher['state'];
-  }>
+  },
+  page = 1
 ) {
   return axios.post<{
     total: number;
     list: Teacher[];
-  }>('/organization/teacher/list', data);
+  }>('/organization/teacher/list', withPaging(data, page));
 }
 
 export function updateTeacher(t: Partial<Teacher>) {
