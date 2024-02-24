@@ -1,8 +1,9 @@
 import axios from 'axios';
+import { TableData } from '@arco-design/web-vue';
 import { withPaging } from './utils';
 
-// TODO:
-export interface Teacher {
+// TODO: {field: value}
+export interface Teacher extends TableData {
   id: number;
   name: string;
   phone: string;
@@ -11,6 +12,19 @@ export interface Teacher {
   graduation: number;
   state: number;
 }
+
+/**
+ * 字段转换为可读格式
+ */
+export const fieldsDescription: { [field in keyof Teacher]: string } = {
+  id: 'id',
+  name: '姓名',
+  phone: '手机',
+  number: 'number',
+  sex: '性别',
+  graduation: 'graduation',
+  state: '账号启用',
+} as const;
 
 export function createTeacher(t: Teacher) {
   return axios.post<Teacher>('/organization/teacher/create', t);

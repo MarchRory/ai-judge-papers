@@ -7,12 +7,15 @@
    * @see https://arco.design/vue/component/table
    */
   import { TableColumnData, TableData, Message } from '@arco-design/web-vue';
-  import { reactive, ref, computed } from 'vue';
-  import { listTeacher } from '@/api/teacher';
+  import { reactive, ref, computed, onMounted } from 'vue';
+  import { listTeacher, fieldsDescription, Teacher } from '@/api/teacher';
   import ButtonAdd from './btn-add.vue';
   import ButtonImport from './btn-import.vue';
 
-  // listTeacher({ state: 0 });
+  onMounted(() => {
+    // listTeacher({ state: 0 });
+  });
+
   // form
 
   const form = reactive<{
@@ -33,20 +36,15 @@
 
   // table
 
-  const rawData: TableData[] = reactive([
+  const rawData: TableData[] = reactive<Teacher[]>([
     // fake data
-    { number: 123, name: 'Name1', sex: 1, phone: '123', state: 1 },
-    { number: 456, name: 'Name2', sex: 0, phone: '543', state: 0 },
-    { number: 789, name: 'Name3', sex: 1, phone: '666', state: 1 },
+    { id: 1, graduation: 2, number: '123', name: 'Name1', sex: 1, phone: '123', state: 1 },
+    { id: 1, graduation: 2, number: '456', name: 'Name2', sex: 0, phone: '543', state: 0 },
+    { id: 1, graduation: 2, number: '789', name: 'Name3', sex: 1, phone: '666', state: 1 },
   ]);
 
   const columns: TableColumnData[] = Object.entries({
-    number: '教工号',
-    name: '教师姓名',
-    sex: '性别',
-    phone: '联系电话',
-    state: '账号启用',
-    // graduation
+    ...fieldsDescription,
     $operation: '操作', // virtual
   }).map(([dataIndex, title]) => ({ dataIndex, title, slotName: dataIndex }));
 

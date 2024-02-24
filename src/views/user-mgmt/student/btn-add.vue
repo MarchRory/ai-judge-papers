@@ -5,7 +5,7 @@
   import { ref, reactive } from 'vue';
   import { createTeacher, Teacher } from '@/api/teacher';
 
-  const title = '添加教师';
+  const title = '添加学生';
   // form
   const form = reactive<Teacher>({
     id: 1,
@@ -53,7 +53,7 @@
     <a-form :model="form">
       <a-form-item
         field="name"
-        tooltip="教师姓名"
+        tooltip="学生姓名"
         label="姓名"
       >
         <a-input
@@ -63,7 +63,7 @@
       </a-form-item>
       <a-form-item
         field="phone"
-        tooltip="教师手机号"
+        tooltip="学生手机号"
         label="手机号"
       >
         <a-input
@@ -73,7 +73,7 @@
       </a-form-item>
       <a-form-item
         field="sex"
-        tooltip="教师性别"
+        tooltip="学生性别"
         label="性别"
       >
         <a-switch v-model="form.sex">
@@ -83,12 +83,12 @@
       </a-form-item>
       <a-form-item
         field="number"
-        tooltip="教师教工号"
-        label="教工号"
+        tooltip="学生学号"
+        label="学号"
       >
         <a-input
           v-model="form.number"
-          placeholder="请输入教工号..."
+          placeholder="请输入学号..."
       /></a-form-item>
     </a-form>
   </a-modal>
