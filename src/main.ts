@@ -1,6 +1,7 @@
-import 'virtual:uno.css'
+import 'virtual:uno.css';
 import { createApp } from 'vue';
-import ArcoVue from '@arco-design/web-vue';
+import ArcoVue, { Message } from '@arco-design/web-vue';
+
 import ArcoVueIcon from '@arco-design/web-vue/es/icon';
 import globalComponents from '@/components';
 import router from './router';
@@ -25,5 +26,7 @@ app.use(store);
 app.use(i18n);
 app.use(globalComponents);
 app.use(directive);
+/* eslint-disable-next-line */
+Message._context = app._context;
 
 app.mount('#app');

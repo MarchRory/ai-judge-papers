@@ -13,7 +13,8 @@ export function debounce(callback: (...args: any[]) => any, delay = 300, immedia
     }
     if (!immediate) {
       timer = setTimeout(() => {
-        callback.apply(this, args);
+        /* eslint-disable-next-line */
+        callback && callback.apply(this, args);
       }, delay);
     } else {
       /* eslint-disable-next-line */
