@@ -20,7 +20,6 @@
       "eslint --fix"
     ],
     "*.vue": [
-      "stylelint --fix",
       "prettier --write",
       "eslint --fix"
     ],

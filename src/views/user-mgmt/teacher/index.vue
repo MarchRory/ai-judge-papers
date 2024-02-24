@@ -6,21 +6,86 @@
    * @see https://arco.design/vue/component/form
    * @see https://arco.design/vue/component/table
    */
-  import { reactive } from 'vue';
+  import { TableColumnData, TableData, Message } from '@arco-design/web-vue';
+  import { reactive, ref, computed } from 'vue';
 
   // form
-  const form = reactive({
+
+  const form = reactive<{
+    value1: string;
+    value2: string;
+    value3: -1 | 0 | 1;
+    value4: string;
+    value5: string[];
+    value6: -1 | 0 | 1;
+  }>({
     value1: '',
     value2: '',
-    value3: '',
+    value3: -1,
     value4: '',
-    value5: '',
-    value6: '',
+    value5: [],
+    value6: -1,
   });
 
   // table
-  const columns = [];
-  const data = [];
+
+  const rawData: TableData[] = reactive([
+    // fake data
+    { id: 123, name: 'Name1', sex: 1, phone: '123', state: 1 },
+    { id: 456, name: 'Name2', sex: 0, phone: '543', state: 0 },
+    { id: 789, name: 'Name3', sex: 1, phone: '666', state: 1 },
+  ]);
+
+  const columns: TableColumnData[] = Object.entries({
+    id: '教工号',
+    name: '教师姓名',
+    sex: '性别',
+    phone: '联系电话',
+    state: '账号启用',
+    $operation: '操作', // virtual
+  }).map(([dataIndex, title]) => ({ dataIndex, title, slotName: dataIndex }));
+
+  const selectedData = ref<TableData[]>(rawData);
+
+  const displayData = computed(() =>
+    selectedData.value.map(
+      // 转换为可读形式
+      ({ sex, state, ...props }) => ({ ...props, sex: ['男', '女'][sex], state: Boolean(state) })
+    )
+  );
+
+  // actions
+
+  function reset() {
+    selectedData.value = rawData;
+    Message.success('已重置');
+  }
+
+  function query() {
+    selectedData.value = rawData.filter(({ name, sex, state }) => {
+      if (form.value2 && !name.startsWith(form.value2)) {
+        return false;
+      }
+      if (form.value3 >= 0) {
+        return form.value3 === sex;
+      }
+      if (form.value6 >= 0) {
+        return form.value6 === state;
+      }
+      return true;
+    });
+    if (selectedData.value.length > 0) {
+      Message.success('查询成功');
+    } else {
+      Message.info('暂无数据');
+    }
+  }
+
+  // modal
+  const addModalVisible = ref(false);
+  const batchImportModalVisible = ref(false);
+  async function handleAdd() {}
+  async function handleBatchImport() {}
 </script>
 
 <template>
@@ -64,9 +129,9 @@
                   label-col-flex="28px"
                 >
                   <a-select v-model="form.value3">
-                    <a-option value="all">全部</a-option>
-                    <a-option :value="true">男</a-option>
-                    <a-option :value="false">女</a-option>
+                    <a-option :value="-1">全部</a-option>
+                    <a-option :value="0">男</a-option>
+                    <a-option :value="1">女</a-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -93,12 +158,10 @@
                   label-col-flex="56px"
                 >
                   <a-range-picker
+                    v-model="form.value5"
                     show-time
                     :time-picker-props="{ defaultValue: ['00:00:00', '09:09:06'] }"
                     format="YYYY-MM-DD HH:mm"
-                    @change="onChange"
-                    @select="onSelect"
-                    @ok="onOk"
                   />
                 </a-form-item>
               </a-col>
@@ -112,7 +175,9 @@
                     v-model="form.value6"
                     placeholder="请选择"
                   >
-                    <a-option value="all">全部</a-option>
+                    <a-option :value="-1">全部</a-option>
+                    <a-option :value="0">禁用</a-option>
+                    <a-option :value="1">启用</a-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -120,14 +185,17 @@
           </a-form>
 
           <aside class="pl-8 ml-8 mb-[20px] flex flex-col justify-between border-l border-l-solid border-[#E5E6EB]">
-            <a-button type="primary">
+            <a-button
+              type="primary"
+              @click="query"
+            >
               <template #icon>
                 <icon-search />
               </template>
               <template #default>查询</template>
             </a-button>
 
-            <a-button>
+            <a-button @click="reset">
               <template #icon>
                 <icon-refresh />
               </template>
@@ -139,10 +207,54 @@
     </a-layout-header>
     <a-layout-content class="px-4">
       <a-card>
+        <pre>{{ JSON.stringify(form,null,4) }}
+          <!-- TODO: 测试 -->
+        </pre>
+        <header class="py-4 flex gap-4">
+          <a-button
+            type="primary"
+            @click="addModalVisible = true"
+          >
+            添加
+            <template #icon>
+              <icon-plus />
+            </template>
+          </a-button>
+          <a-button @click="batchImportModalVisible = true"> 批量导入 </a-button>
+          <a-modal
+            v-model:visible="addModalVisible"
+            @before-ok="handleAdd"
+          >
+            <template #title> 添加 </template>
+            TODO:添加
+          </a-modal>
+          <a-modal
+            v-model:visible="batchImportModalVisible"
+            @before-ok="handleBatchImport"
+          >
+            <template #title> 批量导入 </template>
+            TODO:批量导入
+          </a-modal>
+        </header>
         <a-table
           :columns="columns"
-          :data="data"
-        />
+          :data="displayData"
+          size="small"
+        >
+          <template #state="{ record: { state } }">
+            <a-switch :model-value="state" />
+          </template>
+          <template #$operation>
+            <a-button type="text">详情</a-button>
+            <a-popconfirm content="确认要删除？">
+              <a-button
+                type="text"
+                status="danger"
+                >删除</a-button
+              >
+            </a-popconfirm>
+          </template>
+        </a-table>
       </a-card>
     </a-layout-content>
   </a-layout>

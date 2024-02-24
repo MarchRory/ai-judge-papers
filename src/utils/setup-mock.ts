@@ -1,3 +1,4 @@
+import { HttpResponse } from '@/api/interceptor';
 import debug from './env';
 
 export default ({ mock, setup }: { mock?: boolean; setup: () => void }) => {
@@ -7,17 +8,17 @@ export default ({ mock, setup }: { mock?: boolean; setup: () => void }) => {
 export const successResponseWrap = (data: unknown) => {
   return {
     data,
-    status: 'ok',
-    msg: '请求成功',
-    code: 20000,
-  };
+    success: true,
+    message: '请求成功',
+    code: 200,
+  } satisfies HttpResponse;
 };
 
-export const failResponseWrap = (data: unknown, msg: string, code = 50000) => {
+export const failResponseWrap = (data: unknown, message: string, code = 50000) => {
   return {
     data,
-    status: 'fail',
-    msg,
+    success: false,
+    message,
     code,
-  };
+  } satisfies HttpResponse;
 };

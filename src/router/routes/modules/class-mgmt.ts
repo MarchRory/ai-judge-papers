@@ -11,6 +11,18 @@ const CLASS_MGMT: AppRouteRecordRaw = {
     icon: 'icon-interaction', // TODO: replace me
     order: 3,
   },
+  children: [
+    {
+      path: 'class',
+      name: 'class',
+      component: () => import('@/views/class-mgmt/index.vue'),
+      meta: {
+        locale: '班级管理',
+        requiresAuth: true,
+        roles: ['*'],
+      },
+    },
+  ],
 };
 
 export default CLASS_MGMT;
