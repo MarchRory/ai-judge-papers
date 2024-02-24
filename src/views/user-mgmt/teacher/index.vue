@@ -9,7 +9,10 @@
   import { TableColumnData, TableData, Message } from '@arco-design/web-vue';
   import { reactive, ref, computed } from 'vue';
   import { listTeacher } from '@/api/teacher';
+  import ButtonAdd from './btn-add.vue';
+  import ButtonImport from './btn-import.vue';
 
+  // listTeacher({ state: 0 });
   // form
 
   const form = reactive<{
@@ -32,17 +35,18 @@
 
   const rawData: TableData[] = reactive([
     // fake data
-    { id: 123, name: 'Name1', sex: 1, phone: '123', state: 1 },
-    { id: 456, name: 'Name2', sex: 0, phone: '543', state: 0 },
-    { id: 789, name: 'Name3', sex: 1, phone: '666', state: 1 },
+    { number: 123, name: 'Name1', sex: 1, phone: '123', state: 1 },
+    { number: 456, name: 'Name2', sex: 0, phone: '543', state: 0 },
+    { number: 789, name: 'Name3', sex: 1, phone: '666', state: 1 },
   ]);
 
   const columns: TableColumnData[] = Object.entries({
-    id: '教工号',
+    number: '教工号',
     name: '教师姓名',
     sex: '性别',
     phone: '联系电话',
     state: '账号启用',
+    // graduation
     $operation: '操作', // virtual
   }).map(([dataIndex, title]) => ({ dataIndex, title, slotName: dataIndex }));
 
@@ -81,12 +85,6 @@
       Message.info('暂无数据');
     }
   }
-
-  // modal
-  const addModalVisible = ref(false);
-  const batchImportModalVisible = ref(false);
-  async function handleAdd() {}
-  async function handleBatchImport() {}
 </script>
 
 <template>
@@ -212,30 +210,8 @@
           <!-- TODO: 测试 -->
         </pre>
         <header class="py-4 flex gap-4">
-          <a-button
-            type="primary"
-            @click="addModalVisible = true"
-          >
-            添加
-            <template #icon>
-              <icon-plus />
-            </template>
-          </a-button>
-          <a-button @click="batchImportModalVisible = true"> 批量导入 </a-button>
-          <a-modal
-            v-model:visible="addModalVisible"
-            @before-ok="handleAdd"
-          >
-            <template #title> 添加 </template>
-            TODO:添加
-          </a-modal>
-          <a-modal
-            v-model:visible="batchImportModalVisible"
-            @before-ok="handleBatchImport"
-          >
-            <template #title> 批量导入 </template>
-            TODO:批量导入
-          </a-modal>
+          <button-add />
+          <button-import />
         </header>
         <a-table
           :columns="columns"

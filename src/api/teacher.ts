@@ -1,8 +1,9 @@
 import axios from 'axios';
-import { Paging, withPaging } from './utils';
+import { withPaging } from './utils';
 
 // TODO:
 export interface Teacher {
+  id: number;
   name: string;
   phone: string;
   number: string;
@@ -21,7 +22,7 @@ export function deleteTeacher(id: number) {
 
 export function listTeacher(
   data: {
-    name?: string;
+    name?: Teacher['name'];
     state: Teacher['state'];
   },
   page = 1
