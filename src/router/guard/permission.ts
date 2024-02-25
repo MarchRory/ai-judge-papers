@@ -44,7 +44,7 @@ export default function setupPermissionGuard(router: Router) {
       // eslint-disable-next-line no-lonely-if
       if (permissionsAllow) next();
       else {
-        const destination = Permission.findFirstPermissionRoute(appRoutes, userStore.role) || NOT_FOUND;
+        const destination = Permission.findFirstPermissionRoute(appRoutes, userStore.auth) || NOT_FOUND;
         next(destination);
       }
     }

@@ -19,7 +19,7 @@ const QUESTION_MGMT: AppRouteRecordRaw = {
       meta: {
         locale: '题库列表',
         requiresAuth: true,
-        roles: ['*'],
+        roles: ['root', 'problem'],
       },
     },
   ],

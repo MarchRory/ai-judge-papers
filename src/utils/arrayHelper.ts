@@ -5,10 +5,11 @@ import { NestArr } from '@/api/types';
  * @param target
  * @param key
  */
-export function getSpecificValueArr(target: NestArr<any>[], key: string): any[] {
+export function getSpecificValueArr(target: NestArr<any>[], key: string, cb?: (...args: any[]) => any): any[] {
   const res = [];
   target.forEach((item) => {
-    res.push(item[key]);
+    const resItem = cb ? cb(item[key]) : item[key];
+    res.push(resItem);
     if (Array.isArray(item.children)) {
       res.push(...getSpecificValueArr(item.children, key));
     }
@@ -16,4 +17,19 @@ export function getSpecificValueArr(target: NestArr<any>[], key: string): any[] 
   return res;
 }
 
-export function todo() {}
+/**
+ * 检查否存在交集
+ * @param arr1
+ * @param arr2
+ * @returns boolean
+ */
+export function checkPermissionIntersection(userAuth: string[], needPermissions: string[]) {
+  if (!userAuth.length || !needPermissions.length) {
+    return false;
+  }
+  if (userAuth.includes('root')) {
+    return true;
+  }
+  const s = new Set(userAuth);
+  return needPermissions.some((item) => s.has(item));
+}

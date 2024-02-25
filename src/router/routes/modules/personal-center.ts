@@ -7,7 +7,7 @@ const PERSONAL_CENTER: AppRouteRecordRaw = {
   component: DEFAULT_LAYOUT, // TODO: replace me
   meta: {
     locale: '个人中心',
-    requiresAuth: true,
+    requiresAuth: false,
     icon: 'icon-user',
     order: 8,
   },

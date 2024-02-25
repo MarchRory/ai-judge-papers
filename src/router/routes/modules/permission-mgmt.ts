@@ -19,7 +19,7 @@ const PERMISSION_MGMT: AppRouteRecordRaw = {
       meta: {
         locale: '权限树',
         requiresAuth: true,
-        roles: ['*'],
+        roles: ['root', 'permission'],
       },
     },
     {
@@ -29,7 +29,7 @@ const PERMISSION_MGMT: AppRouteRecordRaw = {
       meta: {
         locale: '角色管理',
         requiresAuth: true,
-        roles: ['*'],
+        roles: ['root', 'role'],
       },
     },
     {
@@ -39,7 +39,7 @@ const PERMISSION_MGMT: AppRouteRecordRaw = {
       meta: {
         locale: '用户管理',
         requiresAuth: true,
-        roles: ['*'],
+        roles: ['root', 'user'],
       },
     },
   ],

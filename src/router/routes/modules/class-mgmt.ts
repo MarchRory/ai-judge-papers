@@ -5,9 +5,11 @@ const CLASS_MGMT: AppRouteRecordRaw = {
   path: '/class-mgmt',
   name: 'class-mgmt',
   component: DEFAULT_LAYOUT, // TODO: replace me
+  redirect: '/class-mgmt/class',
   meta: {
     locale: '班级管理',
     requiresAuth: true,
+    hideChildrenInMenu: true,
     icon: 'icon-interaction', // TODO: replace me
     order: 3,
   },
@@ -19,7 +21,8 @@ const CLASS_MGMT: AppRouteRecordRaw = {
       meta: {
         locale: '班级管理',
         requiresAuth: true,
-        roles: ['*'],
+        activeMenu: 'class-mgmt',
+        roles: ['root', 'class'],
       },
     },
   ],

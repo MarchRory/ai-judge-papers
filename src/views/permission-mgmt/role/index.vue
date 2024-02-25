@@ -58,7 +58,7 @@
       .then((res) => {
         const { code } = res;
         if (code === 200) {
-          Message.success('角色创建成功');
+          Message.success(`角色${formType.value === 'create' ? '创建' : '更新'}成功`);
           loadList();
         }
       })

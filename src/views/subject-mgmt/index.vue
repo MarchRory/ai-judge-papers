@@ -1,10 +1,11 @@
 <script setup lang="ts">
-  import { cloneDeep } from 'lodash';
   import { reactive, ref, watch } from 'vue';
   import { Paging } from '@/api/types';
   import { SubjectItem, createSubjectAPI, deleteSubjectAPI, getSubjectListAPI, updateSubjectAPI } from '@/api/subject';
   import { Message } from '@arco-design/web-vue';
+  import { useRouter } from 'vue-router';
 
+  const router = useRouter();
   const pagination = reactive<Paging<{ key: string }>>({
     page: 1,
     pageSize: 10,
@@ -101,7 +102,12 @@
     }
   );
 
-  function jumpDetail(data: SubjectItem) {}
+  function jumpDetail(query: SubjectItem) {
+    router.push({
+      path: '/subject-mgmt/answerSheet',
+      query,
+    });
+  }
 
   loadList();
 </script>
