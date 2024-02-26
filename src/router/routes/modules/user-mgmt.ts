@@ -2,8 +2,8 @@ import { DEFAULT_LAYOUT } from '../base';
 import { AppRouteRecordRaw } from '../types';
 
 const USER_MGMT: AppRouteRecordRaw = {
-  path: '/user-mgmt',
-  name: 'user-mgmt',
+  path: '/teacher-stu-mgmt',
+  name: 'teacher-stu-mgmt',
   component: DEFAULT_LAYOUT,
   meta: {
     locale: '师生管理',
@@ -19,7 +19,7 @@ const USER_MGMT: AppRouteRecordRaw = {
       meta: {
         locale: '教师管理',
         requiresAuth: true,
-        roles: ['*'],
+        roles: ['root', 'teacher'],
       },
     },
     {
@@ -29,7 +29,7 @@ const USER_MGMT: AppRouteRecordRaw = {
       meta: {
         locale: '学生管理',
         requiresAuth: true,
-        roles: ['*'],
+        roles: ['root', 'stu'],
       },
     },
   ],

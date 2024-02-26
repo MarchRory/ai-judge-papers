@@ -13,4 +13,5 @@ export interface UserState {
   nickname: string;
   email: string;
   auth: string[];
+  permissions: string[];
 }

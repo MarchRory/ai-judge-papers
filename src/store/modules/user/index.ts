@@ -5,6 +5,19 @@ import { removeRouteListener } from '@/utils/route-listener';
 import { UserState } from './types';
 import useAppStore from '../app';
 
+function getPageAuth(originAuth: string[]) {
+  const pageAuth: string[] = [];
+  originAuth.forEach((auth) => {
+    if (auth.includes('-')) {
+      const permissions = auth.split('-');
+      pageAuth.push(...permissions.slice(0, permissions.length - 2));
+    } else {
+      pageAuth.push(auth);
+    }
+  });
+  return pageAuth;
+}
+
 const useUserStore = defineStore('user', {
   state: (): UserState => ({
     username: '',
@@ -12,6 +25,7 @@ const useUserStore = defineStore('user', {
     nickname: '',
     email: '',
     auth: [],
+    permissions: [],
   }),
 
   getters: {
@@ -24,6 +38,8 @@ const useUserStore = defineStore('user', {
     // Set user's information
     setInfo(partial: Partial<UserState>) {
       this.$patch(partial);
+      this.auth = getPageAuth(partial.auth as string[]);
+      this.permissions = partial.auth;
     },
 
     // Reset user's information
@@ -34,6 +50,7 @@ const useUserStore = defineStore('user', {
     // Get user's information
     async info() {
       const { data } = await getUserInfo();
+
       this.setInfo(data);
     },
 

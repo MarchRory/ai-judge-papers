@@ -1,22 +1,28 @@
 import { DirectiveBinding, ObjectDirective } from 'vue';
 import { useUserStore } from '@/store';
+import { checkPermissionIntersection } from '@/utils/arrayHelper';
 
+/**
+ * 鉴权
+ * @param el
+ * @param binding
+ */
 function checkPermission(el: HTMLElement, binding: DirectiveBinding) {
   const { value } = binding;
   const userStore = useUserStore();
-  const { role } = userStore;
+  const { auth } = userStore;
 
   if (Array.isArray(value)) {
     if (value.length > 0) {
       const permissionValues = value;
 
-      const hasPermission = permissionValues.includes(role);
+      const hasPermission = checkPermissionIntersection(auth, permissionValues);
       if (!hasPermission && el.parentNode) {
         el.parentNode.removeChild(el);
       }
     }
   } else {
-    throw new Error(`need roles! Like v-permission="['admin','user']"`);
+    throw new Error('无该权限');
   }
 }
 

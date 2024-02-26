@@ -8,6 +8,7 @@ const EXAM_MGMT: AppRouteRecordRaw = {
   meta: {
     locale: '考试管理',
     requiresAuth: true,
+    roles: ['root', 'exam'],
     icon: 'icon-subscribed', // TODO: replace me
     order: 5,
   },

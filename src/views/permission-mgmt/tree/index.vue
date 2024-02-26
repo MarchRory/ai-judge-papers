@@ -4,22 +4,9 @@
    * @see https://arco.design/vue/component/tree
    */
   import { ref } from 'vue';
-  import { getPermissionTreeAPI } from '@/api/permissions';
+  import useTreeStore from '@/store/modules/tree/index';
 
-  const treeData = ref<any[]>([]);
-
-  function init() {
-    getPermissionTreeAPI().then((res) => {
-      const { data } = res;
-      treeData.value = data.map((node) => {
-        return {
-          title: node.name,
-          key: node.key,
-        };
-      });
-    });
-  }
-  init();
+  const { permissionTree } = useTreeStore();
 </script>
 
 <template>
@@ -31,7 +18,8 @@
       <header class="p2">
         <a-input-search placeholder="搜索权限" />
         <a-tree
-          :data="treeData"
+          size="large"
+          :data="permissionTree"
           :show-line="true"
         />
       </header>

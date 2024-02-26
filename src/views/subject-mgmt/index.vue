@@ -1,26 +1,23 @@
 <script setup lang="ts">
-  import { cloneDeep } from 'lodash';
   import { reactive, ref, watch } from 'vue';
   import { Paging } from '@/api/types';
-  import { createRoleAPI, deleteRoleAPI, getByRoleAPI, getRoleListAPI, updateRoleAPI } from '@/api/permissions';
-  import { BaseRole, PermissionTreeNode } from '@/types/permissions';
-  import useTreeStore from '@/store/modules/tree';
-  import { Message, TreeNodeData } from '@arco-design/web-vue';
-  import { getSpecificValueArr } from '@/utils/arrayHelper';
-  import initPermissionTree from '@/utils/permissions';
+  import { SubjectItem, createSubjectAPI, deleteSubjectAPI, getSubjectListAPI, updateSubjectAPI } from '@/api/subject';
+  import { Message } from '@arco-design/web-vue';
+  import { useRouter } from 'vue-router';
 
+  const router = useRouter();
   const pagination = reactive<Paging<{ key: string }>>({
     page: 1,
     pageSize: 10,
     key: '',
   });
 
-  const tableData = ref<Omit<BaseRole, 'auth'>[]>([]);
+  const tableData = ref<SubjectItem[]>([]);
   const totalAll = ref(0);
   const loading = ref(false);
   function loadList() {
     loading.value = true;
-    getRoleListAPI(pagination)
+    getSubjectListAPI(pagination)
       .then((res) => {
         const { total, list } = res.data;
         totalAll.value = total;
@@ -44,21 +41,21 @@
   const formRef = ref();
   const okLoading = ref(false);
   const formType = ref<'create' | 'edit'>('create');
-  const { permissionSelectTree } = useTreeStore();
-  const form = ref<BaseRole>({
-    key: '',
+  const form = ref<SubjectItem>({
     name: '',
-    desc: '',
-    auth: [],
+    type: 0,
+    state: 0,
+    description: '',
+    icon: '',
   });
   function handleSubmit() {
     okLoading.value = true;
-    const submitFn = formType.value === 'create' ? createRoleAPI : updateRoleAPI;
+    const submitFn = formType.value === 'create' ? createSubjectAPI : updateSubjectAPI;
     submitFn(form.value)
       .then((res) => {
         const { code } = res;
         if (code === 200) {
-          Message.success(`角色${formType.value === 'create' ? '创建' : '更新'}成功`);
+          Message.success('学科创建成功');
           loadList();
         }
       })
@@ -67,38 +64,21 @@
         isFormOpen.value = false;
       });
   }
-  function filterTreeNode(searchValue: string, nodeData: TreeNodeData) {
-    return (nodeData.title as string).includes(searchValue);
-  }
-
-  function getAuth(id: number): Promise<number[]> {
-    return new Promise((resolve) => {
-      getByRoleAPI(id).then(({ data }) => {
-        const { list } = data;
-        const auth = getSpecificValueArr(list, 'id');
-        resolve(auth);
-      });
-    });
-  }
-  async function openForm(type: 'create' | 'edit', data?: BaseRole) {
+  async function openForm(type: 'create' | 'edit', data?: SubjectItem) {
     formType.value = type;
     isFormOpen.value = true;
     if (type === 'edit') {
-      const { id, key, name, desc } = data as BaseRole;
-      form.value.id = id;
-      form.value.key = key;
-      form.value.name = name;
-      form.value.desc = desc;
-      const auth = await getAuth(id as number);
-      form.value.auth = auth;
+      Object.keys(data as SubjectItem).forEach((key) => {
+        form.value[key] = data![key];
+      });
     }
     formType.value = type;
     isFormOpen.value = true;
   }
 
-  function deleteRole(data: BaseRole) {
+  function deleteSubject(data: SubjectItem) {
     const { id } = data;
-    deleteRoleAPI(id as number).then((res) => {
+    deleteSubjectAPI(id as number).then((res) => {
       const { code } = res;
       if (code === 200) {
         Message.success('删除成功');
@@ -121,31 +101,13 @@
       }
     }
   );
-  const detailAuthVisible = ref(false);
-  const deatailAuthModalInfo = reactive<{ roleName: string; auth: PermissionTreeNode[] }>({
-    roleName: '',
-    auth: [],
-  });
-  function showAuth(data: BaseRole) {
-    const { id, name } = data;
-    getByRoleAPI(id as number).then(({ data }) => {
-      const { list } = data;
-      deatailAuthModalInfo.auth = initPermissionTree(list);
-      deatailAuthModalInfo.roleName = name;
-      detailAuthVisible.value = true;
+
+  function jumpDetail(query: SubjectItem) {
+    router.push({
+      path: '/subject-mgmt/answerSheet',
+      query,
     });
   }
-  watch(
-    () => detailAuthVisible.value,
-    (newVal) => {
-      if (!newVal) {
-        setTimeout(() => {
-          deatailAuthModalInfo.auth = [];
-          deatailAuthModalInfo.roleName = '';
-        }, 1000);
-      }
-    }
-  );
 
   loadList();
 </script>
@@ -156,7 +118,7 @@
       <a-layout-header>
         <a-card>
           <header class="pt-4 pb-8">
-            <strong class="text-2xl"> 权限角色 </strong>
+            <strong class="text-2xl"> 学科管理 </strong>
           </header>
           <section
             w="full"
@@ -167,7 +129,7 @@
               <a-input-search
                 v-model="pagination.key"
                 allow-clear
-                placeholder="输入关键字查找角色"
+                placeholder="输入关键字查找学科"
                 search-button
                 @search="loadList"
               />
@@ -181,7 +143,7 @@
                   <icon-plus-circle />
                 </template>
                 <!-- Use the default slot to avoid extra spaces -->
-                <template #default>创建角色</template>
+                <template #default>创建学科</template>
               </a-button>
             </div>
           </section>
@@ -207,44 +169,43 @@
           >
             <template #columns>
               <a-table-column
-                title="序号"
-                data-index="index"
-                :width="80"
-              ></a-table-column>
-              <a-table-column
-                title="角色名"
+                title="学科"
                 data-index="name"
               ></a-table-column>
+              <!-- <a-table-column title="类别">
+                <template #cell="{ record }">
+                  <a-tag
+                    v-if="record.type === 0"
+                    bordered
+                    color="orangered"
+                    >文</a-tag
+                  >
+                  <a-tag
+                    v-else-if="record.type === 1"
+                    bordered
+                    color="arcoblue"
+                    >文</a-tag
+                  >
+                </template>
+              </a-table-column> -->
               <a-table-column
-                title="唯一标识"
-                data-index="key"
+                title="其他信息"
+                data-index="description"
               ></a-table-column>
-              <a-table-column
-                title="角色描述"
-                data-index="desc"
-              ></a-table-column>
+
               <a-table-column title="操作">
                 <template #cell="{ record }">
                   <a-button
                     m="r-2"
                     type="outline"
                     status="success"
-                    @click="showAuth(record)"
-                    >查看</a-button
-                  >
-                  <a-button
-                    v-if="record.id !== 1"
-                    m="r-2"
-                    type="outline"
-                    status="warning"
-                    @click="openForm('edit', record)"
-                    >编辑</a-button
+                    @click="jumpDetail(record)"
+                    >详情</a-button
                   >
                   <a-popconfirm
-                    v-if="record.id !== 1"
-                    content="确定要删除该角色吗？"
+                    content="确定要删除该学科吗？"
                     type="error"
-                    @ok="deleteRole(record)"
+                    @ok="deleteSubject(record)"
                   >
                     <a-button
                       type="primary"
@@ -265,7 +226,7 @@
     </a-layout>
     <a-modal
       v-model:visible="isFormOpen"
-      :title="`${formType === 'create' ? '创建' : '更新'}角色`"
+      :title="`${formType === 'create' ? '创建' : '更新'}学科`"
       :mask-closable="false"
       :ok-loading="okLoading"
       @ok="handleSubmit"
@@ -276,59 +237,17 @@
       >
         <a-form-item
           field="name"
-          label="角色名"
+          label="学科"
         >
           <a-input v-model="form.name" />
         </a-form-item>
         <a-form-item
-          field="key"
-          label="唯一标识"
+          field="description"
+          label="其他信息"
         >
-          <a-input v-model="form.key" />
-        </a-form-item>
-        <a-form-item
-          field="desc"
-          label="角色描述"
-        >
-          <a-input v-model="form.desc" />
-        </a-form-item>
-        <a-form-item
-          field="auth"
-          label="权限配置"
-        >
-          <a-tree-select
-            v-model="form.auth"
-            :allow-search="true"
-            :multiple="true"
-            :allow-clear="true"
-            :tree-checkable="true"
-            :filter-tree-node="filterTreeNode"
-            :tree-check-strictly="true"
-            tree-checked-strategy="parent"
-            :data="permissionSelectTree"
-            placeholder="请分配权限"
-            style="width: 100%"
-          ></a-tree-select>
+          <a-input v-model="form.description" />
         </a-form-item>
       </a-form>
-    </a-modal>
-
-    <a-modal
-      v-model:visible="detailAuthVisible"
-      :mask-closable="false"
-      :title="`${deatailAuthModalInfo.roleName}角色权限`"
-      hide-cancel
-    >
-      <a-card
-        h="2xl"
-        overflow="auto"
-      >
-        <a-tree
-          :data="deatailAuthModalInfo.auth"
-          :show-line="true"
-          size="large"
-        />
-      </a-card>
     </a-modal>
   </div>
 </template>
