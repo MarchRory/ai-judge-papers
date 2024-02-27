@@ -9,6 +9,7 @@
   import { TableColumnData, TableData, Message } from '@arco-design/web-vue';
   import { reactive, ref, computed, onMounted } from 'vue';
   import { listTeacher, fieldsDescription, Teacher } from '@/api/teacher';
+  import DetailButton from '@/components/detail-button/index.vue';
   import ButtonAdd from './btn-add.vue';
   import ButtonImport from './btn-import.vue';
 
@@ -218,16 +219,24 @@
           size="small"
         >
           <template #state="{ record: { state } }">
-            <a-switch :model-value="state" />
+            <!-- TODO -->
+            <a-switch
+              :model-value="state"
+              @change="() => {}"
+            />
           </template>
-          <template #$operation>
-            <a-button type="text">详情</a-button>
+          <template #$operation="{ record }">
+            <detail-button
+              :data="record"
+              :columns="columns"
+            />
             <a-popconfirm content="确认要删除？">
               <a-button
                 type="text"
                 status="danger"
                 >删除</a-button
               >
+              <template #icon></template>
             </a-popconfirm>
           </template>
         </a-table>

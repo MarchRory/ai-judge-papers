@@ -9,6 +9,7 @@
   import { TableColumnData, TableData, Message } from '@arco-design/web-vue';
   import { reactive, ref, computed } from 'vue';
   import { Student, fieldsDescription } from '@/api/student';
+  import DetailButton from '@/components/detail-button/index.vue';
   import ButtonAdd from './btn-add.vue';
   import ButtonImport from './btn-import.vue';
 
@@ -215,8 +216,12 @@
           <template #state="{ record: { state } }">
             <a-switch :model-value="state" />
           </template>
-          <template #$operation>
-            <a-button type="text">详情</a-button>
+          <!-- TODO -->
+          <template #$operation="{ record }">
+            <detail-button
+              :data="record"
+              :columns="columns"
+            />
             <a-popconfirm content="确认要删除？">
               <a-button
                 type="text"
