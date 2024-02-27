@@ -1,0 +1,75 @@
+<script setup lang="ts">
+  /**
+   * 此组件是一个按钮，点击后弹出详情模态窗
+   * 
+   * 就像 table 一样使用
+   * <a-table
+          :columns="columns"
+          :data="displayData"  
+   *
+   * 只不过 data 不是数组，而是数组的一项
+   *
+   * @see https://arco.design/vue/component/descriptions
+   */
+  import { ref, PropType } from 'vue';
+  /**
+   * Better way might be as below,
+   * however, currently vue-compiler does NOT support this
+   */
+  //   import type { DescriptionsInstance } from '@arco-design/web-vue';
+  //   const props = defineProps<DescriptionsInstance['$props']>();
+
+  import type { TableColumnData, TableData } from '@arco-design/web-vue';
+
+  const props = defineProps<{
+    title?: string;
+    data: TableData;
+    columns: TableColumnData[];
+    layout?: PropType<'horizontal' | 'vertical' | 'inline-horizontal' | 'inline-vertical'>;
+    align?: PropType<
+      | 'left'
+      | 'right'
+      | 'center'
+      | {
+          label?: 'left' | 'right' | 'center' | undefined;
+          value?: 'left' | 'right' | 'center' | undefined;
+        }
+    >;
+    size?: PropType<'mini' | 'medium' | 'large' | 'small'>;
+  }>();
+
+  defineSlots<{
+    default: any;
+  }>();
+
+  const descriptionsData = props.columns
+    .filter(({ dataIndex }) => !dataIndex.startsWith('$')) // opt out virtual row
+    .map(({ title, dataIndex }) => ({
+      label: title,
+      value: String(props.data[dataIndex]),
+    }));
+
+  // modal
+  const modalVisible = ref(false);
+</script>
+
+<template>
+  <a-button
+    type="text"
+    @click="modalVisible = true"
+  >
+    <slot>详情</slot>
+  </a-button>
+
+  <!-- modal -->
+
+  <a-modal v-model:visible="modalVisible">
+    <template #title> {{ props.title || '详情' }} </template>
+    <a-descriptions
+      v-bind="props"
+      bordered
+      layout="inline-vertical"
+      :data="descriptionsData"
+    />
+  </a-modal>
+</template>

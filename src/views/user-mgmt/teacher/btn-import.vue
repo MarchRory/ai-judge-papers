@@ -1,4 +1,7 @@
 <script setup lang="ts">
+  /**
+   * 此组件是一个按钮，点击后弹出模态窗
+   */
   import { ref } from 'vue';
   // modal
   const modalVisible = ref(false);
