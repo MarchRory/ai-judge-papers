@@ -1,19 +1,20 @@
 <script setup lang="ts">
   /**
    * TODO: WIP
+   * 此组件是一个按钮，点击后弹出全屏模态窗
    */
   import { ref, reactive } from 'vue';
-  import { createTeacher, Teacher } from '@/api/teacher';
+  import { createStudent, Student } from '@/api/student';
 
   const title = '添加学生';
   // form
-  const form = reactive<Teacher>({
-    id: 1,
+  const form = reactive<Omit<Student, 'id'>>({
+    classId: 2,
+    number: '123',
     name: '',
-    phone: '',
-    number: '',
-    graduation: 0,
-    sex: 0,
+    sex: 1,
+    grade: '123',
+    graduation: 1,
     state: 1,
   });
 
@@ -22,7 +23,7 @@
 
   async function handleClick() {
     try {
-      await createTeacher(form);
+      await createStudent(form);
       // createTeacher({ id: 1, name: 'name', phone: '10086', number: '666', graduation: 3, sex: 1, state: 0 });
 
       return true;
@@ -47,10 +48,19 @@
   <a-modal
     v-model:visible="modalVisible"
     fullscreen
+    ok-text="确认添加"
     @before-ok="handleClick"
   >
     <template #title> {{ title }} </template>
-    <a-form :model="form">
+    <a-alert class="my-4">输入完成后，请点击右下角确认添加</a-alert>
+    <!-- TODO: 测试 -->
+    <pre>{{ form }}</pre>
+    <!-- TODO: 测试 -->
+    <a-form
+      :model="form"
+      layout="vertical"
+      ok-text="确认添加"
+    >
       <a-form-item
         field="name"
         tooltip="学生姓名"

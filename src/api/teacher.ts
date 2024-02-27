@@ -8,8 +8,8 @@ export interface Teacher extends TableData {
   name: string;
   phone: string;
   number: string;
-  sex: number;
   graduation: number;
+  sex: number;
   state: number;
 }
 
@@ -17,17 +17,17 @@ export interface Teacher extends TableData {
  * 字段转换为可读格式
  */
 export const fieldsDescription: { [field in keyof Teacher]: string } = {
-  id: 'id',
+  id: 'ID',
   name: '姓名',
   phone: '手机',
-  number: 'number',
+  number: '教工号',
   sex: '性别',
-  graduation: 'graduation',
+  graduation: '年级',
   state: '账号启用',
 } as const;
 
-export function createTeacher(t: Teacher) {
-  return axios.post<Teacher>('/organization/teacher/create', t);
+export function createTeacher(data: Omit<Teacher, 'id'>) {
+  return axios.post<Teacher>('/organization/teacher/create', data);
 }
 
 export function deleteTeacher(id: number) {
@@ -47,6 +47,6 @@ export function listTeacher(
   }>('/organization/teacher/list', withPaging(data, page));
 }
 
-export function updateTeacher(t: Partial<Teacher>) {
-  return axios.post<Teacher>('/organization/teacher/update', t);
+export function updateTeacher(data: Partial<Teacher>) {
+  return axios.post<Teacher>('/organization/teacher/update', data);
 }

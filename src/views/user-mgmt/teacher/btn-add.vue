@@ -1,14 +1,14 @@
 <script setup lang="ts">
   /**
    * TODO: WIP
+   * 此组件是一个按钮，点击后弹出全屏模态窗
    */
   import { ref, reactive } from 'vue';
   import { createTeacher, Teacher } from '@/api/teacher';
 
   const title = '添加教师';
   // form
-  const form = reactive<Teacher>({
-    id: 1,
+  const form = reactive<Omit<Teacher, 'id'>>({
     name: '',
     phone: '',
     number: '',
@@ -47,10 +47,18 @@
   <a-modal
     v-model:visible="modalVisible"
     fullscreen
+    ok-text="确认添加"
     @before-ok="handleClick"
   >
     <template #title> {{ title }} </template>
-    <a-form :model="form">
+    <a-alert class="my-4">输入完成后，请点击右下角确认添加</a-alert>
+    <!-- TODO: 测试 -->
+    <pre>{{ form }}</pre>
+    <!-- TODO: 测试 -->
+    <a-form
+      :model="form"
+      layout="vertical"
+    >
       <a-form-item
         field="name"
         tooltip="教师姓名"
@@ -76,7 +84,7 @@
         tooltip="教师性别"
         label="性别"
       >
-        <a-switch v-model="form.sex">
+        <a-switch @change="(v) => (form.sex = Number(v))">
           <template #checked>女</template>
           <template #unchecked>男</template>
         </a-switch>
@@ -90,6 +98,19 @@
           v-model="form.number"
           placeholder="请输入教工号..."
       /></a-form-item>
+      <a-form-item
+        field="state"
+        tooltip="状态"
+        label="状态"
+      >
+        <a-select
+          v-model="form.state"
+          placeholder="请选择"
+        >
+          <a-option :value="0">禁用</a-option>
+          <a-option :value="1">启用</a-option>
+        </a-select>
+      </a-form-item>
     </a-form>
   </a-modal>
 </template>
