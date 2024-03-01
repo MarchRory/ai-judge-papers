@@ -10,7 +10,7 @@
     >
       <template #title> 近期考试 </template>
       <template #extra>
-        <a-link>{{ $t('workplace.viewMore') }}</a-link>
+        <a-link>查看更多</a-link>
       </template>
       <a-space
         direction="vertical"

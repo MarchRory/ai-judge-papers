@@ -1,6 +1,5 @@
 <script lang="tsx">
   import { defineComponent, ref, h, compile, computed } from 'vue';
-  import { useI18n } from 'vue-i18n';
   import { useRoute, useRouter, RouteRecordRaw } from 'vue-router';
   import type { RouteMeta } from 'vue-router';
   import { useAppStore } from '@/store';
@@ -11,7 +10,6 @@
   export default defineComponent({
     emit: ['collapse'],
     setup() {
-      const { t } = useI18n();
       const appStore = useAppStore();
       const router = useRouter();
       const route = useRoute();
@@ -72,21 +70,16 @@
       listenerRouteChange((newRoute) => {
         const { requiresAuth, activeMenu, hideInMenu } = newRoute.meta;
         if (requiresAuth && (!hideInMenu || activeMenu)) {
-          const menuOpenKeys = findMenuOpenKeys(
-            (activeMenu || newRoute.name) as string
-          );
+          const menuOpenKeys = findMenuOpenKeys((activeMenu || newRoute.name) as string);
 
           const keySet = new Set([...menuOpenKeys, ...openKeys.value]);
           openKeys.value = [...keySet];
 
-          selectedKey.value = [
-            activeMenu || menuOpenKeys[menuOpenKeys.length - 1],
-          ];
+          selectedKey.value = [activeMenu || menuOpenKeys[menuOpenKeys.length - 1]];
         }
       }, true);
       const setCollapse = (val: boolean) => {
-        if (appStore.device === 'desktop')
-          appStore.updateSettings({ menuCollapse: val });
+        if (appStore.device === 'desktop') appStore.updateSettings({ menuCollapse: val });
       };
 
       const renderSubMenu = () => {
@@ -94,16 +87,14 @@
           if (_route) {
             _route.forEach((element) => {
               // This is demo, modify nodes as needed
-              const icon = element?.meta?.icon
-                ? () => h(compile(`<${element?.meta?.icon}/>`))
-                : null;
+              const icon = element?.meta?.icon ? () => h(compile(`<${element?.meta?.icon}/>`)) : null;
               const node =
                 element?.children && element?.children.length !== 0 ? (
                   <a-sub-menu
                     key={element?.name}
                     v-slots={{
                       icon,
-                      title: () => h(compile(t(element?.meta?.locale || ''))),
+                      title: () => h(compile(element?.meta?.locale || '')),
                     }}
                   >
                     {travel(element?.children)}
@@ -114,7 +105,7 @@
                     v-slots={{ icon }}
                     onClick={() => goto(element)}
                   >
-                    {t(element?.meta?.locale || '')}
+                    {element?.meta?.locale || ''}
                   </a-menu-item>
                 );
               nodes.push(node as never);

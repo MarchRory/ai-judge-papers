@@ -26,7 +26,7 @@ export interface ListResponse<T> {
   list: T[];
 }
 
-export type NestArr<T extends object> = T & {
+export type NestArr<T extends object = Record<string, any>> = T & {
   [key: string]: any;
   children: NestArr<T>[] | null;
 };

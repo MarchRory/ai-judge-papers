@@ -61,5 +61,5 @@ export function deleteUserAPI(id: number) {
 }
 
 export function getUserListAPI(data: Paging<{ key: string }>) {
-  return axios.post<ListResponse<UserItem[]>>(userApi.page, data);
+  return axios.post<ListResponse<UserItem>>(userApi.page, data);
 }

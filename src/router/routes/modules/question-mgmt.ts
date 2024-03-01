@@ -10,6 +10,7 @@ const QUESTION_MGMT: AppRouteRecordRaw = {
     requiresAuth: true,
     icon: 'icon-tags',
     order: 4,
+    roles: ['root', 'problem'],
   },
   children: [
     {

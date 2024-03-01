@@ -14,4 +14,5 @@ export interface UserState {
   email: string;
   auth: string[];
   permissions: string[];
+  removeRouteFns: any[];
 }

@@ -57,11 +57,11 @@ export function getRoleListAPI(data: Paging<{ key: string }>) {
 }
 
 export function getUserRoleAPI(id: number) {
-  return axios.post(RoleApi.linkedUser, { id });
+  return axios.post<ListResponse<Omit<BaseRole, 'auth'>>>(RoleApi.linkedUser, { id });
 }
 
-export function roleBindUserAPI(data: { userId: number; roleId: number }) {
-  return axios.post(RoleApi.bind, data);
+export function roleBindUserAPI(data: { userId: number; roleIds: number[] }) {
+  return axios.post(RoleApi.bind, { ...data, isBind: true });
 }
 
 export function getByRoleAPI(id: number) {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { cloneDeep } from 'lodash';
+  import { clone } from 'lodash';
   import { reactive, ref, watch } from 'vue';
   import { Paging } from '@/api/types';
   import { createRoleAPI, deleteRoleAPI, getByRoleAPI, getRoleListAPI, updateRoleAPI } from '@/api/permissions';
@@ -7,7 +7,8 @@
   import useTreeStore from '@/store/modules/tree';
   import { Message, TreeNodeData } from '@arco-design/web-vue';
   import { getSpecificValueArr } from '@/utils/arrayHelper';
-  import initPermissionTree from '@/utils/permissions';
+  import { initPermissionTree } from '@/utils/permissions';
+  import getConnectedKidPermissions from '@/filter/permissions';
 
   const pagination = reactive<Paging<{ key: string }>>({
     page: 1,
@@ -52,6 +53,7 @@
     auth: [],
   });
   function handleSubmit() {
+    form.value.auth = getConnectedKidPermissions(form.value.auth);
     okLoading.value = true;
     const submitFn = formType.value === 'create' ? createRoleAPI : updateRoleAPI;
     submitFn(form.value)
@@ -81,8 +83,6 @@
     });
   }
   async function openForm(type: 'create' | 'edit', data?: BaseRole) {
-    formType.value = type;
-    isFormOpen.value = true;
     if (type === 'edit') {
       const { id, key, name, desc } = data as BaseRole;
       form.value.id = id;
@@ -303,10 +303,10 @@
             :allow-clear="true"
             :tree-checkable="true"
             :filter-tree-node="filterTreeNode"
-            :tree-check-strictly="true"
+            :tree-check-strictly="false"
             tree-checked-strategy="parent"
             :data="permissionSelectTree"
-            placeholder="请分配权限"
+            placeholder="请配置权限"
             style="width: 100%"
           ></a-tree-select>
         </a-form-item>

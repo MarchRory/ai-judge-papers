@@ -9,6 +9,7 @@ const SUBJECT_MGMT: AppRouteRecordRaw = {
   meta: {
     locale: '学科管理',
     requiresAuth: true,
+    roles: ['root', 'answerSheet', 'subject'],
     icon: 'icon-book', // TODO: replace me
     hideChildrenInMenu: true,
     order: 6,

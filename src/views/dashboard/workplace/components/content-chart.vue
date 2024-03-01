@@ -12,7 +12,7 @@
     >
       <template #title>考试数据 <span text="sm gray">（近7日）</span></template>
       <template #extra>
-        <a-link>{{ $t('workplace.viewMore') }}</a-link>
+        <a-link>查看更多</a-link>
       </template>
       <Chart
         height="289px"

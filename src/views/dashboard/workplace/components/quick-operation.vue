@@ -6,7 +6,7 @@
     :body-style="{ padding: '24px 20px 0 20px' }"
   >
     <template #extra>
-      <a-link>{{ $t('workplace.quickOperation.setup') }}</a-link>
+      <a-link>管理</a-link>
     </template>
     <a-row :gutter="8">
       <a-col
@@ -19,7 +19,7 @@
           <component :is="link.icon" />
         </div>
         <a-typography-paragraph class="text">
-          {{ $t(link.text) }}
+          {{ link.text }}
         </a-typography-paragraph>
       </a-col>
     </a-row>

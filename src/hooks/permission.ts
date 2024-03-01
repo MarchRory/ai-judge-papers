@@ -13,7 +13,7 @@ export default function usePermission() {
         checkPermissionIntersection(userStore.auth, route.meta?.roles)
       );
     },
-    findFirstPermissionRoute(_routers: any, role = ['root']) {
+    findFirstPermissionRoute(_routers: any, role: string[]) {
       const cloneRouters = [..._routers];
       while (cloneRouters.length) {
         const firstElement = cloneRouters.shift();
