@@ -61,7 +61,7 @@
               </a-col>
             </a-row>
           </a-form>
-          <a-side class="pl-8 ml-8 mb-[20px] flex flex-col justify-between border-l border-l-solid border-[#E5E6EB]">
+          <div class="pl-8 ml-8 mb-[20px] flex flex-col justify-between border-l border-l-solid border-[#E5E6EB]">
             <a-button type="primary">
               <template #icon>
                 <icon-search />
@@ -74,7 +74,7 @@
               </template>
               <template #default> 重置 </template>
             </a-button>
-          </a-side>
+          </div>
         </div>
       </a-card>
     </a-layout-header>
@@ -130,8 +130,8 @@
         </a-table>
       </a-card>
     </a-layout-content>
+    <addClassModal v-model:visible="visible"></addClassModal>
   </a-layout>
-  <addClassModal v-model:visible="visible"></addClassModal>
 </template>
 
 <script setup lang="ts">
@@ -145,10 +145,10 @@
     grade: 1 | 2 | 3;
     classes: string;
   }>({
-    subject: '',
-    title: '',
+    state: '',
     grade: 1,
     classes: '',
+    graduation: '',
   });
 
   const columns: TableColumnData[] = Object.entries({
