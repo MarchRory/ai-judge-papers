@@ -1,16 +1,24 @@
 <template>
   <a-card
     class="general-card"
-    :title="$t('workplace.announcement')"
+    title="公告"
     :header-style="{ paddingBottom: '0' }"
     :body-style="{ padding: '15px 20px 13px 20px' }"
   >
     <template #extra>
-      <a-link>{{ $t('workplace.viewMore') }}</a-link>
+      <a-link>查看更多</a-link>
     </template>
     <div>
-      <div v-for="(item, idx) in list" :key="idx" class="item">
-        <a-tag :color="item.type" size="small">{{ item.label }}</a-tag>
+      <div
+        v-for="(item, idx) in list"
+        :key="idx"
+        class="item"
+      >
+        <a-tag
+          :color="item.type"
+          size="small"
+          >{{ item.label }}</a-tag
+        >
         <span class="item-content">
           {{ item.content }}
         </span>

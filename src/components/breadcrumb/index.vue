@@ -3,8 +3,11 @@
     <a-breadcrumb-item>
       <icon-apps />
     </a-breadcrumb-item>
-    <a-breadcrumb-item v-for="item in items" :key="item">
-      {{ $t(item) }}
+    <a-breadcrumb-item
+      v-for="item in items"
+      :key="item"
+    >
+      {{ item }}
     </a-breadcrumb-item>
   </a-breadcrumb>
 </template>

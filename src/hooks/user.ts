@@ -12,10 +12,6 @@ export default function useUser() {
     Message.success('登出成功');
     router.push({
       name: logoutTo && typeof logoutTo === 'string' ? logoutTo : 'login',
-      query: {
-        ...router.currentRoute.value.query,
-        redirect: currentRoute.name as string,
-      },
     });
   };
   return {

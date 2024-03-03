@@ -12,6 +12,7 @@ const CLASS_MGMT: AppRouteRecordRaw = {
     hideChildrenInMenu: true,
     icon: 'icon-interaction', // TODO: replace me
     order: 3,
+    roles: ['root', 'class'],
   },
   children: [
     {

@@ -2,12 +2,22 @@ import { computed } from 'vue';
 import { RouteRecordRaw, RouteRecordNormalized } from 'vue-router';
 import usePermission from '@/hooks/permission';
 import { useAppStore } from '@/store';
-import appClientMenus from '@/router/app-menus';
 import { cloneDeep } from 'lodash';
 
 export default function useMenuTree() {
   const permission = usePermission();
   const appStore = useAppStore();
+  const router = useRouter();
+  const appClientMenus = router.getRoutes().map((el) => {
+    const { name, path, meta, redirect, children } = el;
+    return {
+      name,
+      path,
+      meta,
+      redirect,
+      children,
+    };
+  });
   const appRoute = computed(() => {
     if (appStore.menuFromServer) {
       return appStore.appAsyncMenus;
@@ -35,9 +45,7 @@ export default function useMenuTree() {
         }
 
         // route filter hideInMenu true
-        element.children = element.children.filter(
-          (x) => x.meta?.hideInMenu !== true
-        );
+        element.children = element.children.filter((x) => x.meta?.hideInMenu !== true);
 
         // Associated child node
         const subItem = travel(element.children, layer + 1);

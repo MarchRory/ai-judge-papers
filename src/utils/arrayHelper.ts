@@ -5,9 +5,10 @@ import { NestArr } from '@/api/types';
  * @param target
  * @param key
  */
-export function getSpecificValueArr(target: NestArr<any>[], key: string, cb?: (...args: any[]) => any): any[] {
+export function getSpecificValueArr(target: NestArr<any>, key: string, cb?: (...args: any[]) => any): any[] {
   const res = [];
-  target.forEach((item) => {
+  const origin = Array.isArray(target) ? target : [target];
+  origin.forEach((item) => {
     const resItem = cb ? cb(item[key]) : item[key];
     res.push(resItem);
     if (Array.isArray(item.children)) {
@@ -32,4 +33,24 @@ export function checkPermissionIntersection(userAuth: string[], needPermissions:
   }
   const s = new Set(userAuth);
   return needPermissions.some((item) => s.has(item));
+}
+
+/**
+ * 数组扁平化
+ * @param NestArr 应当有children
+ * @returns
+ */
+export function flatten<T extends object>(NestArr: NestArr<T>): T[] {
+  let res = [] as unknown as NestArr;
+  const out: T[] = [];
+
+  res = res.concat(NestArr);
+  while (res.length) {
+    const fir = res.shift();
+    if (fir.children && fir.children.length) {
+      res = res.concat(fir.children);
+    }
+    out.push(fir);
+  }
+  return out;
 }

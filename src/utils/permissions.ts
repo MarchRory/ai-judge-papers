@@ -1,13 +1,12 @@
 import { NestArr } from '@/api/types';
 import { PermissionItem, PermissionTreeNode } from '@/types/permissions';
 import { TreeSelectProps } from '@arco-design/web-vue/es/tree-select/interface';
-
 /**
  *
  * @param originTree
  * @returns 权限树页面需要的权限树结构
  */
-export default function initPermissionTree(originTree: NestArr<PermissionItem>[]): PermissionTreeNode[] {
+export function initPermissionTree(originTree: NestArr<PermissionItem>[]): PermissionTreeNode[] {
   return originTree.map((node) => {
     return {
       id: node.id,
