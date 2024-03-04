@@ -6,8 +6,9 @@ import { extend } from 'lodash';
 
 /**
  * 默认每页数量
+ * 要获取总页数， Math.floor(total / pageSize)
  */
-const DEFAULT_PAGE_SIZE = 50;
+export const DEFAULT_PAGE_SIZE = 50;
 
 /**
  * 携带分页参数
