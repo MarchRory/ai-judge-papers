@@ -1,17 +1,18 @@
 import axios from 'axios';
 import { Paging } from './types';
+import { queryChatList } from './message';
 
 export interface Question {
   title: string;
   content: string;
-  subject: object;
-  state: object;
-  expectedDifficulty: object;
+  subject: number;
+  state: number;
+  expectedDifficulty: number;
   source: string;
 }
 
 export function createQuestion(q: Question) {
-  return axios.post<Question>('/study/problem/create');
+  return axios.post<Question>('/study/problem/create', q);
 }
 
 export function deleteQuestion(id: number) {
