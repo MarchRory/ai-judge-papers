@@ -8,14 +8,11 @@
    */
   import { TableColumnData, TableData, Message } from '@arco-design/web-vue';
   import { reactive, ref, computed, onMounted } from 'vue';
-  import { listTeacher, fieldsDescription, Teacher } from '@/api/teacher';
+  import { listTeacher, deleteTeacher, updateTeacher, fieldsDescription, Teacher } from '@/api/teacher';
+  import { DEFAULT_PAGE_SIZE } from '@/api/types';
   import DetailButton from '@/components/detail-button/index.vue';
   import ButtonAdd from './btn-add.vue';
   import ButtonImport from './btn-import.vue';
-
-  onMounted(() => {
-    // listTeacher({ state: 0 });
-  });
 
   // form
 
@@ -36,13 +33,25 @@
   });
 
   // table
+  const isLoading = ref(true);
+  const page = ref(1);
 
-  const rawData: TableData[] = reactive<Teacher[]>([
-    // fake data
-    { id: 1, graduation: 2, number: '123', name: 'Name1', sex: 1, phone: '123', state: 1 },
-    { id: 1, graduation: 2, number: '456', name: 'Name2', sex: 0, phone: '543', state: 0 },
-    { id: 1, graduation: 2, number: '789', name: 'Name3', sex: 1, phone: '666', state: 1 },
-  ]);
+  /**
+   * 注意此处使用 reactive，因为类型需要是 TableData[]
+   */
+  const rawData: TableData[] = reactive<Teacher[]>([]);
+
+  /**
+   * 变更数据后需要调用
+   */
+  const loadData = async (p?: number) => {
+    isLoading.value = true;
+    const res = await listTeacher({}, p || page.value);
+    rawData.splice(0, rawData.length, ...res.data.list);
+    isLoading.value = false;
+  };
+
+  onMounted(loadData);
 
   const columns: TableColumnData[] = Object.entries({
     ...fieldsDescription,
@@ -54,7 +63,12 @@
   const displayData = computed(() =>
     selectedData.value.map(
       // 转换为可读形式
-      ({ sex, state, ...props }) => ({ ...props, sex: ['男', '女'][sex], state: Boolean(state) })
+      ({ sex, state, createdAt, ...props }) => ({
+        ...props,
+        sex: ['男', '女'][sex],
+        state: Boolean(state),
+        createdAt: new Date(createdAt).toLocaleString(),
+      })
     )
   );
 
@@ -82,6 +96,17 @@
       Message.success('查询成功');
     } else {
       Message.info('暂无数据');
+    }
+  }
+
+  async function handleDelete(id: number) {
+    try {
+      await deleteTeacher(id);
+      Message.success('已删除');
+      loadData();
+      return true;
+    } catch {
+      return false;
     }
   }
 </script>
@@ -216,13 +241,23 @@
         <a-table
           :columns="columns"
           :data="displayData"
+          :loading="isLoading"
           size="small"
+          :page="page"
+          :page-size="DEFAULT_PAGE_SIZE"
+          @page-change="loadData"
         >
-          <template #state="{ record: { state } }">
-            <!-- TODO -->
+          <template #state="{ record }">
+            <!-- TODO: perf -->
             <a-switch
-              :model-value="state"
-              @change="() => {}"
+              :model-value="record.state"
+              @change="
+                async () => {
+                  const data = rawData.find((data) => data.id === record.id)!;
+                  await updateTeacher({ ...data, state: Number(!data.state) });
+                  await loadData();
+                }
+              "
             />
           </template>
           <template #$operation="{ record }">
@@ -230,13 +265,15 @@
               :data="record"
               :columns="columns"
             />
-            <a-popconfirm content="确认要删除？">
+            <a-popconfirm
+              content="确认要删除？"
+              @before-ok="handleDelete(record.id)"
+            >
               <a-button
                 type="text"
                 status="danger"
                 >删除</a-button
               >
-              <template #icon></template>
             </a-popconfirm>
           </template>
         </a-table>

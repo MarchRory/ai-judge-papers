@@ -1,8 +1,12 @@
 <template>
   <div class="block">
     <h5 class="title">{{ title }}</h5>
-    <div v-for="option in options" :key="option.name" class="switch-wrapper">
-      <span>{{ $t(option.name) }}</span>
+    <div
+      v-for="option in options"
+      :key="option.name"
+      class="switch-wrapper"
+    >
+      <span>{{ option.name }}</span>
       <form-wrapper
         :type="option.type || 'switch'"
         :name="option.key"
@@ -37,13 +41,7 @@
     },
   });
   const appStore = useAppStore();
-  const handleChange = async ({
-    key,
-    value,
-  }: {
-    key: string;
-    value: unknown;
-  }) => {
+  const handleChange = async ({ key, value }: { key: string; value: unknown }) => {
     if (key === 'colorWeak') {
       document.body.style.filter = value ? 'invert(80%)' : 'none';
     }

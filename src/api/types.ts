@@ -6,8 +6,9 @@ import { extend } from 'lodash';
 
 /**
  * 默认每页数量
+ * 要获取总页数， Math.floor(total / pageSize)
  */
-const DEFAULT_PAGE_SIZE = 50;
+export const DEFAULT_PAGE_SIZE = 50;
 
 /**
  * 携带分页参数
@@ -26,7 +27,7 @@ export interface ListResponse<T> {
   list: T[];
 }
 
-export type NestArr<T extends object> = T & {
+export type NestArr<T extends object = Record<string, any>> = T & {
   [key: string]: any;
   children: NestArr<T>[] | null;
 };

@@ -10,12 +10,12 @@ function getPageAuth(originAuth: string[]) {
   originAuth.forEach((auth) => {
     if (auth.includes('-')) {
       const permissions = auth.split('-');
-      pageAuth.push(...permissions.slice(0, permissions.length - 2));
+      pageAuth.push(...permissions.slice(0, permissions.length - 1));
     } else {
       pageAuth.push(auth);
     }
   });
-  return pageAuth;
+  return [...new Set(pageAuth)];
 }
 
 const useUserStore = defineStore('user', {
@@ -26,6 +26,7 @@ const useUserStore = defineStore('user', {
     email: '',
     auth: [],
     permissions: [],
+    removeRouteFns: [],
   }),
 
   getters: {
@@ -50,8 +51,7 @@ const useUserStore = defineStore('user', {
     // Get user's information
     async info() {
       const { data } = await getUserInfo();
-
-      this.setInfo(data);
+      await this.setInfo(data);
     },
 
     // Login
@@ -75,9 +75,18 @@ const useUserStore = defineStore('user', {
     async logout() {
       try {
         await userLogout();
+        this.removeAsyncRoutes();
       } finally {
         this.logoutCallBack();
       }
+    },
+    setRemoveAsyncRouteFns(fns: any[]) {
+      this.removeRouteFns = fns;
+    },
+    removeAsyncRoutes() {
+      this.removeRouteFns.forEach((removeFn) => {
+        removeFn();
+      });
     },
   },
 });

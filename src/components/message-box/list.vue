@@ -9,16 +9,41 @@
       }"
     >
       <template #extra>
-        <a-tag v-if="item.messageType === 0" color="gray">未开始</a-tag>
-        <a-tag v-else-if="item.messageType === 1" color="green">已开通</a-tag>
-        <a-tag v-else-if="item.messageType === 2" color="blue">进行中</a-tag>
-        <a-tag v-else-if="item.messageType === 3" color="red">即将到期</a-tag>
+        <a-tag
+          v-if="item.messageType === 0"
+          color="gray"
+          >未开始</a-tag
+        >
+        <a-tag
+          v-else-if="item.messageType === 1"
+          color="green"
+          >已开通</a-tag
+        >
+        <a-tag
+          v-else-if="item.messageType === 2"
+          color="blue"
+          >进行中</a-tag
+        >
+        <a-tag
+          v-else-if="item.messageType === 3"
+          color="red"
+          >即将到期</a-tag
+        >
       </template>
-      <div class="item-wrap" @click="onItemClick(item)">
+      <div
+        class="item-wrap"
+        @click="onItemClick(item)"
+      >
         <a-list-item-meta>
-          <template v-if="item.avatar" #avatar>
+          <template
+            v-if="item.avatar"
+            #avatar
+          >
             <a-avatar shape="circle">
-              <img v-if="item.avatar" :src="item.avatar" />
+              <img
+                v-if="item.avatar"
+                :src="item.avatar"
+              />
               <icon-desktop v-else />
             </a-avatar>
           </template>
@@ -56,10 +81,10 @@
         :class="{ 'add-border-top': renderList.length < showMax }"
       >
         <div class="footer-wrap">
-          <a-link @click="allRead">{{ $t('messageBox.allRead') }}</a-link>
+          <a-link @click="allRead">全部已读</a-link>
         </div>
         <div class="footer-wrap">
-          <a-link>{{ $t('messageBox.viewMore') }}</a-link>
+          <a-link>查看更多</a-link>
         </div>
       </a-space>
     </template>

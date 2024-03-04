@@ -8,6 +8,7 @@ const USER_MGMT: AppRouteRecordRaw = {
   meta: {
     locale: '师生管理',
     requiresAuth: true,
+    roles: ['root', 'teacher', 'stu'],
     icon: 'icon-user-group',
     order: 2,
   },

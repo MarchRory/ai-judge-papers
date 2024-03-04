@@ -77,7 +77,7 @@
               </template>
               <template #default> 重置 </template>
             </a-button>
-          </a-side>
+          </div>
         </div>
       </a-card>
     </a-layout-header>
@@ -129,6 +129,7 @@
         </a-table>
       </a-card>
     </a-layout-content>
+    <addClassModal v-model:visible="visible"></addClassModal>
   </a-layout>
 </template>
 

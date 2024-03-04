@@ -1,6 +1,7 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { TableData } from '@arco-design/web-vue';
 import { withPaging } from './utils';
+import { DEFAULT_PAGE_SIZE } from './types';
 
 // TODO: {field: value}
 export interface Teacher extends TableData {
@@ -8,9 +9,12 @@ export interface Teacher extends TableData {
   name: string;
   phone: string;
   number: string;
-  graduation: number;
   sex: number;
   state: number;
+  /**
+   * timestamp, use new Date()
+   */
+  createdAt: number;
 }
 
 /**
@@ -19,11 +23,11 @@ export interface Teacher extends TableData {
 export const fieldsDescription: { [field in keyof Teacher]: string } = {
   id: 'ID',
   name: '姓名',
-  phone: '手机',
+  phone: '手机号',
   number: '教工号',
   sex: '性别',
-  graduation: '年级',
   state: '账号启用',
+  createdAt: '创建时间',
 } as const;
 
 export function createTeacher(data: Omit<Teacher, 'id'>) {
@@ -34,17 +38,19 @@ export function deleteTeacher(id: number) {
   return axios.post('/organization/teacher/delete', { id });
 }
 
-export function listTeacher(
+export async function listTeacher(
   data: {
     name?: Teacher['name'];
-    state: Teacher['state'];
-  },
+    state?: Teacher['state'];
+  } = { state: -1 },
   page = 1
 ) {
-  return axios.post<{
-    total: number;
+  const res = await axios.post('/organization/teacher/list', withPaging(data, page));
+
+  return { ...res, data: { ...res.data, totalPage: res.data.total / DEFAULT_PAGE_SIZE } } as AxiosResponse<{
+    totalPage: number;
     list: Teacher[];
-  }>('/organization/teacher/list', withPaging(data, page));
+  }>;
 }
 
 export function updateTeacher(data: Partial<Teacher>) {

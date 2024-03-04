@@ -1,12 +1,25 @@
 <template>
-  <a-spin style="display: block" :loading="loading">
-    <a-tabs v-model:activeKey="messageType" type="rounded" destroy-on-hide>
-      <a-tab-pane v-for="item in tabList" :key="item.key">
+  <a-spin
+    style="display: block"
+    :loading="loading"
+  >
+    <a-tabs
+      v-model:activeKey="messageType"
+      type="rounded"
+      destroy-on-hide
+    >
+      <a-tab-pane
+        v-for="item in tabList"
+        :key="item.key"
+      >
         <template #title>
           <span> {{ item.title }}{{ formatUnreadLength(item.key) }} </span>
         </template>
-        <a-result v-if="!renderList.length" status="404">
-          <template #subtitle> {{ $t('messageBox.noContent') }} </template>
+        <a-result
+          v-if="!renderList.length"
+          status="404"
+        >
+          <template #subtitle> 暂无内容</template>
         </a-result>
         <List
           :render-list="renderList"
@@ -15,8 +28,11 @@
         />
       </a-tab-pane>
       <template #extra>
-        <a-button type="text" @click="emptyList">
-          {{ $t('messageBox.tab.button') }}
+        <a-button
+          type="text"
+          @click="emptyList"
+        >
+          清空
         </a-button>
       </template>
     </a-tabs>
@@ -26,12 +42,7 @@
 <script lang="ts" setup>
   import { ref, reactive, toRefs, computed } from 'vue';
   import { useI18n } from 'vue-i18n';
-  import {
-    queryMessageList,
-    setMessageStatus,
-    MessageRecord,
-    MessageListType,
-  } from '@/api/message';
+  import { queryMessageList, setMessageStatus, MessageRecord, MessageListType } from '@/api/message';
   import useLoading from '@/hooks/loading';
   import List from './list.vue';
 
@@ -54,15 +65,15 @@
   const tabList: TabItem[] = [
     {
       key: 'message',
-      title: t('messageBox.tab.title.message'),
+      title: '消息',
     },
     {
       key: 'notice',
-      title: t('messageBox.tab.title.notice'),
+      title: '通知',
     },
     {
       key: 'todo',
-      title: t('messageBox.tab.title.todo'),
+      title: '待办',
     },
   ];
   async function fetchSourceData() {
@@ -82,17 +93,13 @@
     fetchSourceData();
   }
   const renderList = computed(() => {
-    return messageData.messageList.filter(
-      (item) => messageType.value === item.type
-    );
+    return messageData.messageList.filter((item) => messageType.value === item.type);
   });
   const unreadCount = computed(() => {
     return renderList.value.filter((item) => !item.status).length;
   });
   const getUnreadList = (type: string) => {
-    const list = messageData.messageList.filter(
-      (item) => item.type === type && !item.status
-    );
+    const list = messageData.messageList.filter((item) => item.type === type && !item.status);
     return list;
   };
   const formatUnreadLength = (type: string) => {

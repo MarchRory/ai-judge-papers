@@ -10,7 +10,7 @@
       @click="goto(itemData)"
     >
       <span class="tag-link">
-        {{ $t(itemData.title) }}
+        {{ itemData.title }}
       </span>
       <span
         class="arco-icon-hover arco-tag-icon-hover arco-icon-hover-size-medium arco-tag-close-btn"
@@ -20,7 +20,10 @@
       </span>
     </span>
     <template #content>
-      <a-doption :disabled="disabledReload" :value="Eaction.reload">
+      <a-doption
+        :disabled="disabledReload"
+        :value="Eaction.reload"
+      >
         <icon-refresh />
         <span>重新加载</span>
       </a-doption>
@@ -32,7 +35,10 @@
         <icon-close />
         <span>关闭当前标签页</span>
       </a-doption>
-      <a-doption :disabled="disabledLeft" :value="Eaction.left">
+      <a-doption
+        :disabled="disabledLeft"
+        :value="Eaction.left"
+      >
         <icon-to-left />
         <span>关闭左侧标签页</span>
       </a-doption>

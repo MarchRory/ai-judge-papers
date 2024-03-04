@@ -8,6 +8,7 @@ const PERMISSION_MGMT: AppRouteRecordRaw = {
   meta: {
     locale: '权限管理',
     requiresAuth: true,
+    roles: ['root', 'permission', 'role', 'user'],
     icon: 'icon-lock',
     order: 1,
   },
