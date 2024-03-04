@@ -4,15 +4,15 @@
    * 此组件是一个按钮，点击后弹出全屏模态窗
    */
   import { ref, reactive } from 'vue';
-  import { createTeacher, Teacher } from '@/api/teacher';
+  import { Message } from '@arco-design/web-vue';
+  import { createTeacher, Teacher, fieldsDescription } from '@/api/teacher';
 
   const title = '添加教师';
   // form
-  const form = reactive<Omit<Teacher, 'id'>>({
+  const form = reactive<Omit<Teacher, 'id' | 'createdAt'>>({
     name: '',
     phone: '',
     number: '',
-    graduation: 0,
     sex: 0,
     state: 1,
   });
@@ -23,8 +23,7 @@
   async function handleClick() {
     try {
       await createTeacher(form);
-      // createTeacher({ id: 1, name: 'name', phone: '10086', number: '666', graduation: 3, sex: 1, state: 0 });
-
+      Message.success('成功');
       return true;
     } catch {
       return false;
@@ -61,8 +60,8 @@
     >
       <a-form-item
         field="name"
+        :label="fieldsDescription.name"
         tooltip="教师姓名"
-        label="姓名"
       >
         <a-input
           v-model="form.name"
@@ -71,8 +70,8 @@
       </a-form-item>
       <a-form-item
         field="phone"
+        :label="fieldsDescription.phone"
         tooltip="教师手机号"
-        label="手机号"
       >
         <a-input
           v-model="form.phone"
@@ -81,18 +80,21 @@
       </a-form-item>
       <a-form-item
         field="sex"
+        :label="fieldsDescription.sex"
         tooltip="教师性别"
-        label="性别"
       >
-        <a-switch @change="(v) => (form.sex = Number(v))">
+        <a-switch
+          :model-value="Boolean(form.sex)"
+          @change="(v) => (form.sex = Number(v))"
+        >
           <template #checked>女</template>
           <template #unchecked>男</template>
         </a-switch>
       </a-form-item>
       <a-form-item
         field="number"
+        :label="fieldsDescription.number"
         tooltip="教师教工号"
-        label="教工号"
       >
         <a-input
           v-model="form.number"
@@ -100,8 +102,8 @@
       /></a-form-item>
       <a-form-item
         field="state"
+        :label="fieldsDescription.state"
         tooltip="状态"
-        label="状态"
       >
         <a-select
           v-model="form.state"

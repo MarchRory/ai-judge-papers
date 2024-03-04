@@ -7,8 +7,9 @@
    * @see https://arco.design/vue/component/table
    */
   import { TableColumnData, TableData, Message } from '@arco-design/web-vue';
-  import { reactive, ref, computed } from 'vue';
-  import { Student, fieldsDescription } from '@/api/student';
+  import { reactive, ref, computed, onMounted } from 'vue';
+  import { Student, deleteStudent, fieldsDescription, listStudent, updateStudent } from '@/api/student';
+  import { DEFAULT_PAGE_SIZE } from '@/api/types';
   import DetailButton from '@/components/detail-button/index.vue';
   import ButtonAdd from './btn-add.vue';
   import ButtonImport from './btn-import.vue';
@@ -32,13 +33,19 @@
   });
 
   // table
+  const isLoading = ref(true);
+  const page = ref(1);
 
-  const rawData: TableData[] = reactive<Student[]>([
-    // fake data
-    { id: 1, classId: 2, number: '123', name: 'Name1', sex: 1, grade: '123', graduation: 1, state: 1 },
-    { id: 1, classId: 2, number: '456', name: 'Name2', sex: 0, grade: '543', graduation: 1, state: 0 },
-    { id: 1, classId: 2, number: '789', name: 'Name3', sex: 1, grade: '666', graduation: 1, state: 1 },
-  ]);
+  const rawData: TableData[] = reactive<Student[]>([]);
+
+  const loadData = async (p?: number) => {
+    isLoading.value = true;
+    const res = await listStudent({}, p || page.value);
+    rawData.splice(0, rawData.length, ...res.data.list);
+    isLoading.value = false;
+  };
+
+  onMounted(loadData);
 
   const columns: TableColumnData[] = Object.entries({
     ...fieldsDescription,
@@ -78,6 +85,17 @@
       Message.success('查询成功');
     } else {
       Message.info('暂无数据');
+    }
+  }
+
+  async function handleDelete(id: number) {
+    try {
+      await deleteStudent(id);
+      Message.success('已删除');
+      loadData();
+      return true;
+    } catch {
+      return false;
     }
   }
 </script>
@@ -211,10 +229,23 @@
         <a-table
           :columns="columns"
           :data="displayData"
+          :loading="isLoading"
           size="small"
+          :page="page"
+          :page-size="DEFAULT_PAGE_SIZE"
+          @page-change="loadData"
         >
-          <template #state="{ record: { state } }">
-            <a-switch :model-value="state" />
+          <template #state="{ record }">
+            <a-switch
+              :model-value="record.state"
+              @change="
+                async () => {
+                  const data = rawData.find((data) => data.id === record.id)!;
+                  await updateStudent({ ...data, state: Number(!data.state) });
+                  await loadData();
+                }
+              "
+            />
           </template>
           <!-- TODO -->
           <template #$operation="{ record }">
@@ -222,7 +253,10 @@
               :data="record"
               :columns="columns"
             />
-            <a-popconfirm content="确认要删除？">
+            <a-popconfirm
+              content="确认要删除？"
+              @before-ok="handleDelete(record.id)"
+            >
               <a-button
                 type="text"
                 status="danger"
