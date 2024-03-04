@@ -39,9 +39,9 @@
                   label-col-flex="32px"
                 >
                   <a-select placeholder="请选择">
-                    <a-option :value="3">2021</a-option>
-                    <a-option :value="2">2022</a-option>
-                    <a-option :value="1">2023</a-option>
+                    <a-option :value="2021">2021</a-option>
+                    <a-option :value="2022">2022</a-option>
+                    <a-option :value="2023">2023</a-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -49,12 +49,12 @@
             <a-row :gutter="16">
               <a-col :span="8">
                 <a-form-item
-                  field="classes"
+                  field="name"
                   label="班级"
                   label-col-flex="32px"
                 >
                   <a-input
-                    v-model="form.classes"
+                    v-model="form.name"
                     placeholder="请选择班级"
                   ></a-input>
                 </a-form-item>
@@ -62,13 +62,16 @@
             </a-row>
           </a-form>
           <a-side class="pl-8 ml-8 mb-[20px] flex flex-col justify-between border-l border-l-solid border-[#E5E6EB]">
-            <a-button type="primary">
+            <a-button
+              type="primary"
+              @click="query"
+            >
               <template #icon>
                 <icon-search />
               </template>
               <template #default> 查询 </template>
             </a-button>
-            <a-button>
+            <a-button @click="reset">
               <template #icon>
                 <icon-refresh />
               </template>
@@ -81,22 +84,15 @@
     <a-layout-content class="px-4">
       <a-card>
         <header class="py-4 flex gap-4">
-          <a-button
-            type="primary"
-            @click="openModal"
-          >
-            <template #icon>
-              <icon-plus />
-            </template>
-            <template #default> 添加 </template>
-          </a-button>
+          <addClassModalButton></addClassModalButton>
           <a-button>批量导入</a-button>
         </header>
         <a-table
           :columns="columns"
           :data="selectedData"
+          :loading="loading"
         >
-          <template #state="{ record: { state } }">
+          <!-- <template #state="{ record: { state } }">
             <a-tag
               v-if="state === '在校'"
               checkable
@@ -115,10 +111,13 @@
               color="#ffb400"
               >{{ state }}</a-tag
             >
-          </template>
-          <template #$operation>
+          </template> -->
+          <template #optional="{ record }">
             <a-button type="text">详情</a-button>
-            <a-popconfirm content="确认要删除？">
+            <a-popconfirm
+              content="确认要删除？"
+              @ok="classDelete(record)"
+            >
               <a-button
                 type="text"
                 status="danger"
@@ -131,49 +130,109 @@
       </a-card>
     </a-layout-content>
   </a-layout>
-  <addClassModal v-model:visible="visible"></addClassModal>
 </template>
 
 <script setup lang="ts">
   import { TableColumnData, TableData, Message } from '@arco-design/web-vue';
-  import { ref, reactive } from 'vue';
-  import addClassModal from '@/views/class-mgmt/components/addClassModal.vue';
+  import { ref, reactive, watch } from 'vue';
+  import addClassModalButton from '@/views/class-mgmt/components/addClassModalButton.vue';
+  import { listClass, deleteClass } from '@/api/class';
+  import { Paging } from '@/api/types';
 
+  const loading = ref(false);
+  const totalAll = ref(0);
   const form = reactive<{
     state: string;
     graduation: string;
-    grade: 1 | 2 | 3;
-    classes: string;
+    grade: string;
+    name: string;
   }>({
-    subject: '',
-    title: '',
-    grade: 1,
-    classes: '',
+    state: '',
+    graduation: '',
+    grade: '2021',
+    name: '',
   });
 
   const columns: TableColumnData[] = Object.entries({
     id: '序号',
     graduation: '毕业届数',
-    classes: '班级',
+    name: '班级',
     grade: '当前年级',
-    studentNumber: '学生人数',
+    memberCount: '学生人数',
     classType: '班级类型',
     state: '班级状态',
-    $operation: '操作',
+    optional: '操作',
   }).map(([dataIndex, title]) => ({ dataIndex, title, slotName: dataIndex }));
 
-  const rawData: TableData[] = reactive([
-    { id: '1', graduation: '2025', classes: '6', grade: '2021', studentNumber: '36', classType: '实验班', state: '在校' },
-    { id: '2', graduation: '2021', classes: '6', grade: '2019', studentNumber: '36', classType: '实验班', state: '已毕业' },
-    { id: '3', graduation: '2024', classes: '6', grade: '2020', studentNumber: '36', classType: '实验班', state: '毕业班' },
-  ]);
+  const rawData: TableData[] = reactive([]);
 
-  const selectedData = ref<TableData[]>(rawData);
+  const selectedData = ref<TableData[]>();
 
-  const visible = ref(false);
+  const pagination = reactive<Paging<{ key: string; grade: string }>>({
+    page: 1,
+    pageSize: 10,
+    key: '',
+    grade: '',
+  });
 
-  const openModal = () => {
-    visible.value = true;
-  };
   // 获取班级列表数据
+  function LoadList() {
+    loading.value = true;
+    listClass(pagination)
+      .then((res) => {
+        // console.log(res);
+        const { list, total } = res.data;
+        totalAll.value = total;
+        selectedData.value = list;
+      })
+      .finally(() => {
+        loading.value = false;
+      });
+  }
+  watch(
+    () => pagination,
+    (newVal, oldVal) => {
+      if (!newVal.key || newVal.page !== oldVal.page || newVal.pageSize !== oldVal.pageSize) {
+        LoadList();
+      }
+    },
+    { deep: true }
+  );
+  // 查询
+  function query() {
+    loading.value = true;
+    pagination.grade = form.grade;
+    pagination.key = form.name;
+    listClass(pagination)
+      .then((res) => {
+        const { list, total } = res.data;
+        totalAll.value = total;
+        selectedData.value = list;
+      })
+      .finally(() => {
+        loading.value = false;
+      });
+  }
+  // 重置
+  function reset() {
+    pagination.grade = '';
+    pagination.key = '';
+    form.grade = '';
+    form.name = '';
+    LoadList();
+    Message.success('已重置');
+  }
+  // 删除
+  function classDelete(record) {
+    const { id } = record;
+    deleteClass(id as number).then((res) => {
+      const { message } = res;
+      if (message === 'success') {
+        Message.success('删除成功');
+        LoadList();
+      }
+    });
+  }
+
+  LoadList();
 </script>

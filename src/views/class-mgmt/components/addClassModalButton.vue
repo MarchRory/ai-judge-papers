@@ -1,7 +1,16 @@
 <template>
   <!-- 拆分 -->
+  <a-button
+    type="primary"
+    @click="openModal"
+  >
+    <template #icon>
+      <icon-plus />
+    </template>
+    <template #default> 添加 </template>
+  </a-button>
   <a-modal
-    v-model:visible="isShow"
+    v-model:visible="visible"
     title="添加班级"
     @cancel="handleCancel"
     @ok="handleOk"
@@ -25,15 +34,14 @@
 
 <script setup lang="ts">
   import { reactive, ref, watch, toRaw } from 'vue';
-  import { createClass } from '@/api/class';
   import { Message } from '@arco-design/web-vue';
+  import { createClass } from '@/api/class';
 
-  const props = defineProps({
-    visible: {
-      required: true,
-      type: Boolean,
-    },
-  });
+  const visible = ref(false);
+
+  const openModal = () => {
+    visible.value = true;
+  };
 
   const form = reactive<{
     name: string;
@@ -45,31 +53,19 @@
     teacherId: 0,
   });
 
-  const emit = defineEmits(['update:visible']);
-
-  const isShow = ref<any>(props.visible);
-
-  watch(
-    () => props.visible,
-    (newValue: boolean) => {
-      isShow.value = newValue;
-    }
-  );
+  function addClass() {
+    createClass(form).then((res: { message: string }) => {
+      const { message } = res;
+      if (message === 'success') {
+        Message.success('添加成功');
+      }
+    });
+  }
 
   const handleCancel = () => {
-    isShow.value = false;
-    emit('update:visible', isShow.value);
+    visible.value = false;
   };
-  const handleOk = async () => {
-    console.log(form);
-    const { message } = await createClass(toRaw(form));
-    console.log(message);
-    if (message === 'success') {
-      Message.success('添加成功');
-      isShow.value = false;
-      emit('update:visible', isShow.value);
-    } else {
-      Message.error('添加失败');
-    }
+  const handleOk = () => {
+    addClass();
   };
 </script>
