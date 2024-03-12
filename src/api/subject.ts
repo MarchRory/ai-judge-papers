@@ -1,4 +1,4 @@
-import axios from 'axios';
+import request from '@/utils/request/index'
 import { ListResponse, Paging } from './types';
 
 const schema = 'study/subject';
@@ -21,17 +21,17 @@ export interface SubjectItem {
 }
 
 export function createSubjectAPI(data: SubjectItem) {
-  return axios.post(SubjectApi.create, data);
+  return request.post(SubjectApi.create, data);
 }
 
 export function updateSubjectAPI(data: SubjectItem) {
-  return axios.post(SubjectApi.update, data);
+  return request.post(SubjectApi.update, data);
 }
 
 export function getSubjectListAPI(data: Paging<{ key: string }>) {
-  return axios.post<ListResponse<SubjectItem>>(SubjectApi.page, data);
+  return request.post<ListResponse<SubjectItem>>(SubjectApi.page, data, {}, { cache: true });
 }
 
 export function deleteSubjectAPI(id: number) {
-  return axios.post(SubjectApi.delete, { id });
+  return request.post(SubjectApi.delete, { id });
 }

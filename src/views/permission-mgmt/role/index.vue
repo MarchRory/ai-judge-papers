@@ -298,6 +298,7 @@
         >
           <a-tree-select
             v-model="form.auth"
+            size="large"
             :allow-search="true"
             :multiple="true"
             :allow-clear="true"

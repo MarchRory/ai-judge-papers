@@ -5,7 +5,7 @@ const CLASS_MGMT: AppRouteRecordRaw = {
   path: '/class-mgmt',
   name: 'class-mgmt',
   component: DEFAULT_LAYOUT, // TODO: replace me
-  redirect: '/class-mgmt/class',
+  redirect: '/class-mgmt/classIndex',
   meta: {
     locale: '班级管理',
     requiresAuth: true,
@@ -16,8 +16,8 @@ const CLASS_MGMT: AppRouteRecordRaw = {
   },
   children: [
     {
-      path: 'class',
-      name: 'class',
+      path: 'classIndex',
+      name: 'classIndex',
       component: () => import('@/views/class-mgmt/index.vue'),
       meta: {
         locale: '班级管理',
