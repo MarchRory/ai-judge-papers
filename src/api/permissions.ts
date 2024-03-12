@@ -1,4 +1,4 @@
-import axios from 'axios';
+import request from '@/utils/request/index';
 import { PermissionType } from '@/store/modules/user/types';
 import { BaseRole, PermissionItem } from '@/types/permissions';
 import { ListResponse, NestArr, Paging } from './types';
@@ -25,45 +25,45 @@ const enum RoleApi {
 }
 
 export function createPermissionAPI(data: PermissionType) {
-  return axios.post(PermissionsApi.create, data);
+  return request.post(PermissionsApi.create, data);
 }
 
 export function getPermissionTreeAPI() {
-  return axios.post<NestArr<PermissionItem>[]>(PermissionsApi.tree);
+  return request.post<NestArr<PermissionItem>[]>(PermissionsApi.tree);
 }
 
 export function updatePermissionAPI(data: PermissionType) {
-  return axios.post(PermissionsApi.update, data);
+  return request.post(PermissionsApi.update, data);
 }
 
 export function deletePermissionAPI(ids: { id: any }) {
-  return axios.post(PermissionsApi.delete, ids);
+  return request.post(PermissionsApi.delete, ids);
 }
 
 export function createRoleAPI(data: BaseRole) {
-  return axios.post(RoleApi.create, data);
+  return request.post(RoleApi.create, data);
 }
 
 export function deleteRoleAPI(id: number) {
-  return axios.post(RoleApi.delete, { id, force: true });
+  return request.post(RoleApi.delete, { id, force: true });
 }
 
 export function updateRoleAPI(data: BaseRole) {
-  return axios.post(RoleApi.update, data);
+  return request.post(RoleApi.update, data);
 }
 
 export function getRoleListAPI(data: Paging<{ key: string }>) {
-  return axios.post<ListResponse<Omit<BaseRole, 'auth'>>>(RoleApi.page, data);
+  return request.post<ListResponse<Omit<BaseRole, 'auth'>>>(RoleApi.page, data);
 }
 
 export function getUserRoleAPI(id: number) {
-  return axios.post<ListResponse<Omit<BaseRole, 'auth'>>>(RoleApi.linkedUser, { id });
+  return request.post<ListResponse<Omit<BaseRole, 'auth'>>>(RoleApi.linkedUser, { id });
 }
 
 export function roleBindUserAPI(data: { userId: number; roleIds: number[] }) {
-  return axios.post(RoleApi.bind, { ...data, isBind: true });
+  return request.post(RoleApi.bind, { ...data, isBind: true });
 }
 
 export function getByRoleAPI(id: number) {
-  return axios.post<ListResponse<NestArr<PermissionItem>>>(PermissionsApi.getByRole, { id });
+  return request.post<ListResponse<NestArr<PermissionItem>>>(PermissionsApi.getByRole, { id });
 }

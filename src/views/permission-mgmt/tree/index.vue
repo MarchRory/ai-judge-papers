@@ -19,6 +19,7 @@
         <a-input-search placeholder="搜索权限" />
         <a-tree
           size="large"
+          :default-expand-all="false"
           :data="permissionTree"
           :show-line="true"
         />

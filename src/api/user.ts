@@ -1,4 +1,4 @@
-import axios from 'axios';
+import request from '@/utils/request/index';
 import type { RouteRecordNormalized } from 'vue-router';
 import { UserState } from '@/store/modules/user/types';
 import { ListResponse, Paging } from './types';
@@ -33,33 +33,33 @@ export interface LoginRes {
   token: string;
 }
 export function login(data: LoginData) {
-  return axios.post<LoginRes>(userApi.Login, data);
+  return request.post<LoginRes>(userApi.Login, data);
 }
 
 export function logout() {
-  return axios.post<LoginRes>(userApi.Logout);
+  return request.post<LoginRes>(userApi.Logout);
 }
 
 export function getUserInfo() {
-  return axios.post<UserState>(userApi.Info);
+  return request.post<UserState>(userApi.Info);
 }
 
 export function getMenuList() {
-  return axios.post<RouteRecordNormalized[]>('/api/user/menu');
+  return request.post<RouteRecordNormalized[]>('/api/user/menu');
 }
 
 export function createUserAPI(data: UserItem) {
-  return axios.post(userApi.create, data);
+  return request.post(userApi.create, data);
 }
 
 export function updateUserAPI(data: UserItem) {
-  return axios.post(userApi.update, data);
+  return request.post(userApi.update, data);
 }
 
 export function deleteUserAPI(id: number) {
-  return axios.post(userApi.delete, { id });
+  return request.post(userApi.delete, { id });
 }
 
 export function getUserListAPI(data: Paging<{ key: string }>) {
-  return axios.post<ListResponse<UserItem>>(userApi.page, data);
+  return request.post<ListResponse<UserItem>>(userApi.page, data);
 }

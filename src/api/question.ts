@@ -1,6 +1,5 @@
-import axios from 'axios';
+import request from '@/utils/request/index';
 import { Paging } from './types';
-import { queryChatList } from './message';
 
 export interface Question {
   title: string;
@@ -12,11 +11,11 @@ export interface Question {
 }
 
 export function createQuestion(q: Question) {
-  return axios.post<Question>('/study/problem/create', q);
+  return request.post<Question>('/study/problem/create', q);
 }
 
 export function deleteQuestion(id: number) {
-  return axios.post('/study/problem/delete', { id });
+  return request.post('/study/problem/delete', { id });
 }
 
 export function listQuestion(
@@ -25,16 +24,16 @@ export function listQuestion(
     examId: number;
   }>
 ) {
-  return axios.post<{
+  return request.post<{
     total: number;
     list: Question[];
   }>('/study/problem/list', data);
 }
 
 export function getQuestionDetail(id: number) {
-  return axios.post('/study/problem/detail', { id });
+  return request.post('/study/problem/detail', { id });
 }
 
 export function updateQuestion(q: Question) {
-  return axios.post('/study/problem/detail', q);
+  return request.post('/study/problem/detail', q);
 }
