@@ -1,4 +1,4 @@
-import request from '@/utils/request/index'
+import request from '@/utils/request/index';
 import { ListResponse, Paging } from './types';
 
 const schema = 'study/subject';
@@ -29,7 +29,7 @@ export function updateSubjectAPI(data: SubjectItem) {
 }
 
 export function getSubjectListAPI(data: Paging<{ key: string }>) {
-  return request.post<ListResponse<SubjectItem>>(SubjectApi.page, data, {}, { cache: true });
+  return request.post<ListResponse<SubjectItem>>(SubjectApi.page, data, {});
 }
 
 export function deleteSubjectAPI(id: number) {

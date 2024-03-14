@@ -32,6 +32,10 @@ class LRUCache {
       this.cacheMap.delete(deletedKey);
     }
   }
+
+  clear() {
+    this.cacheMap.clear();
+  }
 }
 
 export default LRUCache;

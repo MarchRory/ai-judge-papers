@@ -26,6 +26,28 @@ const EXAM_MGMT: AppRouteRecordRaw = {
         roles: ['root', 'exam'],
       },
     },
+    {
+      path: 'examDetail',
+      name: 'examDetail',
+      component: () => import('@/views/exam-mgmt/children/detail.vue'),
+      meta: {
+        locale: '考试详情',
+        requiresAuth: true,
+        activeMenu: 'exam-mgmt',
+        roles: ['root', 'exam'],
+      },
+    },
+    {
+      path: 'judgePlatform',
+      name: 'judgePlatform',
+      component: () => import('@/views/exam-mgmt/children/judgePlatform.vue'),
+      meta: {
+        locale: '阅卷平台',
+        requiresAuth: true,
+        activeMenu: 'exam-mgmt',
+        roles: ['root', 'exam'],
+      },
+    },
   ],
 };
 

@@ -29,7 +29,7 @@ export function createPermissionAPI(data: PermissionType) {
 }
 
 export function getPermissionTreeAPI() {
-  return request.post<NestArr<PermissionItem>[]>(PermissionsApi.tree);
+  return request.post<NestArr<PermissionItem>[]>(PermissionsApi.tree, null, {}, { cache: true });
 }
 
 export function updatePermissionAPI(data: PermissionType) {

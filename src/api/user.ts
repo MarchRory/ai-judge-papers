@@ -33,7 +33,7 @@ export interface LoginRes {
   token: string;
 }
 export function login(data: LoginData) {
-  return request.post<LoginRes>(userApi.Login, data);
+  return request.post<LoginRes>(userApi.Login, data, {}, { cache: true });
 }
 
 export function logout() {
@@ -41,7 +41,7 @@ export function logout() {
 }
 
 export function getUserInfo() {
-  return request.post<UserState>(userApi.Info);
+  return request.post<UserState>(userApi.Info, null, {}, { cache: true });
 }
 
 export function getMenuList() {

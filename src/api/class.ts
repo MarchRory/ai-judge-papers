@@ -1,4 +1,4 @@
-import request from '@/utils/request/index'
+import request from '@/utils/request/index';
 import { Paging } from './types';
 
 export interface Class {

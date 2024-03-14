@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosRequestHeaders, AxiosResponse } from 'axios';
-import { Message, Modal } from '@arco-design/web-vue';
+import { FileItem, Message, Modal } from '@arco-design/web-vue';
 import { useUserStore } from '@/store';
 import { getToken } from '@/utils/auth';
 import LRUCache from '@/dataStruct/LRUCache';
@@ -23,10 +23,6 @@ const errorCodeMap: Record<number, string> = {
   503: '密码错误',
   10010: '功能正在开发中',
 };
-
-if (import.meta.env.VITE_API_BASE_URL) {
-  axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL;
-}
 
 class HttpRequest {
   // axios实例
@@ -52,6 +48,10 @@ class HttpRequest {
             config.headers = {};
           }
           config.headers.Authorization = `Bearer ${token}`;
+        }
+        // 登出时清空缓存
+        if (config.url === 'user/logout') {
+          this.cacheMap.clear();
         }
         return config;
       },
@@ -106,6 +106,7 @@ class HttpRequest {
       if (opts?.cache) {
         const cache = this.cacheMap.get(config.url as string);
         if (cache) {
+          console.log(cache);
           return resolve(cache as HttpResponse<T>);
         }
       }
@@ -134,13 +135,19 @@ class HttpRequest {
 
   upload<T = string>(
     url: string,
-    fileItem: File,
+    fileItem: FileItem,
     otherParams: Record<string, number | string>,
     config: Omit<AxiosRequestConfig, 'url' | 'data' | 'method'>
   ) {
     const data = getFileFormData(fileItem, otherParams);
-    (config.headers as AxiosRequestHeaders)['Content-Type'] = 'multipart/form-data';
-    return this.request<T>({ url, data, ...config });
+    const requestConfig: AxiosRequestConfig = {
+      ...config,
+      headers: {
+        ...config.headers,
+        'Content-Type': 'multipart/form-data',
+      },
+    };
+    return this.request<T>({ url, data, ...requestConfig });
   }
 }
 

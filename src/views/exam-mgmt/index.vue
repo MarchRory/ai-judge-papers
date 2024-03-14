@@ -42,34 +42,16 @@
   );
 
   const isFormOpen = ref(false);
-
-  const okLoading = ref(false);
   const formType = ref<'create' | 'edit'>('create');
   const form = ref<ExamFormData>({
     description: '',
     name: '',
-    state: 0,
-    subject: 0,
-    time: 0,
+    state: undefined,
+    subject: undefined,
+    time: undefined,
     timeLimit: 0,
-    type: 0,
+    type: undefined,
   });
-  function handleSubmit() {
-    okLoading.value = true;
-    const submitFn = formType.value === 'create' ? createExamApi : updateExamApi;
-    submitFn(form.value)
-      .then((res) => {
-        const { code } = res;
-        if (code === 200) {
-          Message.success('学科创建成功');
-          loadList();
-        }
-      })
-      .finally(() => {
-        okLoading.value = false;
-        isFormOpen.value = false;
-      });
-  }
   async function openForm(type: 'create' | 'edit', data?: ExamFormData) {
     formType.value = type;
     isFormOpen.value = true;
@@ -93,10 +75,15 @@
 
   function jumpDetail(query) {
     router.push({
-      path: '/subject-mgmt/answerSheet',
+      path: '/exam-mgmt/examDetail',
       query,
     });
   }
+
+  const handleSubmitSuccess = () => {
+    isFormOpen.value = false;
+    loadList();
+  };
 
   loadList();
 </script>
@@ -165,7 +152,8 @@
                 title="学科"
                 data-index="subject"
                 :width="100"
-              ></a-table-column>
+              >
+              </a-table-column>
               <a-table-column title="分类">
                 <template #cell="{ record }">
                   <a-tag
@@ -211,7 +199,10 @@
                 data-index="description"
               ></a-table-column>
 
-              <a-table-column title="操作">
+              <a-table-column
+                title="操作"
+                :width="250"
+              >
                 <template #cell="{ record }">
                   <a-button
                     m="r-2"
@@ -219,6 +210,13 @@
                     status="success"
                     @click="jumpDetail(record)"
                     >详情</a-button
+                  >
+                  <a-button
+                    m="r-2"
+                    type="outline"
+                    status="warning"
+                    @click="openForm('edit', record)"
+                    >更新</a-button
                   >
                   <a-popconfirm
                     content="确定要删除该学科吗？"
@@ -245,8 +243,9 @@
     <FormModal
       :create="formType"
       :visible="isFormOpen"
-      :form="form"
+      :form-data="form"
       @on-cancel="isFormOpen = false"
+      @on-succes="handleSubmitSuccess"
     />
   </div>
 </template>

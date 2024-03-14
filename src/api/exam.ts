@@ -1,5 +1,6 @@
 import request from '@/utils/request';
 import getFileFormData from '@/utils/file';
+import { FileItem } from '@arco-design/web-vue';
 import { ListResponse, Paging } from './types';
 
 const schema = '/study/exam';
@@ -9,7 +10,7 @@ const enum ExamApi {
   delete = `${schema}/delete`,
   list = `${schema}/list`,
   addProblem = `${schema}/addProblem`,
-  uploadTemplate = `addProblem/upload`, // 上传考试excel模板
+  uploadTemplate = `${schema}/upload`, // 上传考试excel模板
 }
 
 /**
@@ -19,16 +20,16 @@ export interface ExamFormData {
   description: string;
   id?: number;
   name: string;
-  state: number;
-  subject: number;
-  time: number;
+  state: number | undefined;
+  subject: number | undefined;
+  time: number | undefined;
   timeLimit: number;
-  type: number;
+  type: number | undefined;
   [property: string]: any;
 }
 
 export interface ExamFileParams {
-  file: File;
+  file: FileItem;
   sheet?: string;
   examId: number;
 }
