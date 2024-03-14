@@ -1,7 +1,8 @@
-import axios, { AxiosResponse } from 'axios';
+import request, { HttpResponse } from '@/utils/request/index'
 import { TableData } from '@arco-design/web-vue';
 import { withPaging } from './utils';
 import { DEFAULT_PAGE_SIZE } from './types';
+import { AxiosResponse } from 'axios';
 
 export interface Student extends TableData {
   id: number;
@@ -26,11 +27,11 @@ export const fieldsDescription: { [field in keyof Student]: string } = {
 };
 
 export function createStudent(data: Omit<Student, 'id'>) {
-  return axios.post<Student>('/organization/student/create', data);
+  return request.post<Student>('/organization/student/create', data);
 }
 
 export function deleteStudent(id: number) {
-  return axios.post('/organization/student/delete', { id });
+  return request.post('/organization/student/delete', { id });
 }
 
 export async function listStudent(
@@ -40,14 +41,14 @@ export async function listStudent(
   } = { state: -1 },
   page = 1
 ) {
-  const res = await axios.post('/organization/student/list', withPaging(data, page));
+  const res = await request.post('/organization/student/list', withPaging(data, page));
 
-  return { ...res, data: { ...res.data, totalPage: res.data.total / DEFAULT_PAGE_SIZE } } as AxiosResponse<{
+  return { ...res, data: { ...res.data, totalPage: res.data.total / DEFAULT_PAGE_SIZE } } as HttpResponse<{
     totalPage: number;
     list: Student[];
   }>;
 }
 
 export function updateStudent(t: Partial<Student>) {
-  return axios.post<Student>('/organization/student/update', t);
+  return request.post<Student>('/organization/student/update', t);
 }

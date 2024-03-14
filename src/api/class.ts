@@ -1,4 +1,4 @@
-import axios from 'axios';
+import request from '@/utils/request/index';
 import { Paging } from './types';
 
 export interface Class {
@@ -8,11 +8,11 @@ export interface Class {
 }
 
 export function createClass(c: Class) {
-  return axios.post<Class>('/organization/class/create', c);
+  return request.post<Class>('/organization/class/create', c);
 }
 
 export function deleteClass(id: number) {
-  return axios.post('/organization/class/delete', { id });
+  return request.post('/organization/class/delete', { id });
 }
 
 export function listClass(
@@ -21,12 +21,12 @@ export function listClass(
     grade: string;
   }>
 ) {
-  return axios.post<{
+  return request.post<{
     total: number;
     list: Class[];
   }>('/organization/class/list', data);
 }
 
 export function updateClass(c: Class) {
-  return axios.post('/organization/class/update', c);
+  return request.post('/organization/class/update', c);
 }

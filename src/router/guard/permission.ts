@@ -10,7 +10,7 @@ export default function setupPermissionGuard(router: Router) {
     const userStore = useUserStore();
     const Permission = usePermission();
     const permissionsAllow = Permission.accessRouter(to);
-    // todo: 有tree权限再去请求完整树
+    // 有tree权限再去请求完整树
     if (userStore.permissions.includes('permission-tree')) {
       useTreeStore().init();
     }

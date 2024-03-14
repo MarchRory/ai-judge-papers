@@ -1,5 +1,6 @@
-import axios, { AxiosResponse } from 'axios';
+import request, { HttpResponse } from '@/utils/request/index';
 import { TableData } from '@arco-design/web-vue';
+import { AxiosResponse } from 'axios';
 import { withPaging } from './utils';
 import { DEFAULT_PAGE_SIZE } from './types';
 
@@ -31,11 +32,11 @@ export const fieldsDescription: { [field in keyof Teacher]: string } = {
 } as const;
 
 export function createTeacher(data: Omit<Teacher, 'id'>) {
-  return axios.post<Teacher>('/organization/teacher/create', data);
+  return request.post<Teacher>('/organization/teacher/create', data);
 }
 
 export function deleteTeacher(id: number) {
-  return axios.post('/organization/teacher/delete', { id });
+  return request.post('/organization/teacher/delete', { id });
 }
 
 export async function listTeacher(
@@ -45,14 +46,14 @@ export async function listTeacher(
   } = { state: -1 },
   page = 1
 ) {
-  const res = await axios.post('/organization/teacher/list', withPaging(data, page));
+  const res = await request.post('/organization/teacher/list', withPaging(data, page));
 
-  return { ...res, data: { ...res.data, totalPage: res.data.total / DEFAULT_PAGE_SIZE } } as AxiosResponse<{
+  return { ...res, data: { ...res.data, totalPage: res.data.total / DEFAULT_PAGE_SIZE } } as HttpResponse<{
     totalPage: number;
     list: Teacher[];
   }>;
 }
 
 export function updateTeacher(data: Partial<Teacher>) {
-  return axios.post<Teacher>('/organization/teacher/update', data);
+  return request.post<Teacher>('/organization/teacher/update', data);
 }

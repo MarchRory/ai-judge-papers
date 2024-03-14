@@ -1,6 +1,9 @@
 <template>
   <div class="tab-bar-container">
-    <a-affix ref="affixRef" :offset-top="offsetTop">
+    <a-affix
+      ref="affixRef"
+      :offset-top="offsetTop"
+    >
       <div class="tab-bar-box">
         <div class="tab-bar-scroll">
           <div class="tags-wrap">
@@ -21,10 +24,7 @@
 <script lang="ts" setup>
   import { ref, computed, watch, onUnmounted } from 'vue';
   import type { RouteLocationNormalized } from 'vue-router';
-  import {
-    listenerRouteChange,
-    removeRouteListener,
-  } from '@/utils/route-listener';
+  import { listenerRouteChange, removeRouteListener } from '@/utils/route-listener';
   import { useAppStore, useTabBarStore } from '@/store';
   import tabItem from './tab-item.vue';
 
@@ -46,10 +46,7 @@
     }
   );
   listenerRouteChange((route: RouteLocationNormalized) => {
-    if (
-      !route.meta.noAffix &&
-      !tagList.value.some((tag) => tag.fullPath === route.fullPath)
-    ) {
+    if (!route.meta.noAffix && !tagList.value.some((tag) => tag.fullPath === route.fullPath)) {
       tabBarStore.updateTabList(route);
     }
   }, true);

@@ -24,7 +24,6 @@
       "eslint --fix"
     ],
     "*.{less,css}": [
-      "stylelint --fix",
       "prettier --write"
     ]
   },
