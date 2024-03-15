@@ -8,6 +8,8 @@
           :data="displayData"  
    *
    * 只不过 data 不是数组，而是数组的一项
+   * 
+   *! 注意： 组件的 columns 属性中，列名为 $ 开头的不会显示，表示该列是虚拟的，在数据 data 中不存在
    *
    * @see https://arco.design/vue/component/descriptions
    */
@@ -43,10 +45,10 @@
   }>();
 
   const descriptionsData = props.columns
-    .filter(({ dataIndex }) => !dataIndex.startsWith('$')) // opt out virtual row
+    .filter(({ dataIndex }) => !dataIndex?.startsWith('$')) // opt out virtual row
     .map(({ title, dataIndex }) => ({
       label: title,
-      value: String(props.data[dataIndex]),
+      value: String(props.data[dataIndex!]),
     }));
 
   // modal

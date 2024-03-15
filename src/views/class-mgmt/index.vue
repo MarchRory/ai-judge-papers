@@ -112,8 +112,11 @@
               >{{ state }}</a-tag
             >
           </template> -->
-          <template #optional="{ record }">
-            <a-button type="text">详情</a-button>
+          <template #$operation="{ record }">
+            <detail-button
+              :data="record"
+              :columns="columns"
+            />
             <a-popconfirm
               content="确认要删除？"
               @ok="classDelete(record)"
@@ -137,6 +140,7 @@
   import { TableColumnData, TableData, Message } from '@arco-design/web-vue';
   import { ref, reactive, watch } from 'vue';
   import addClassModalButton from '@/views/class-mgmt/components/addClassModalButton.vue';
+  import DetailButton from '@/components/detail-button/index.vue';
   import { listClass, deleteClass } from '@/api/class';
   import { Paging } from '@/api/types';
 
@@ -162,7 +166,7 @@
     memberCount: '学生人数',
     classType: '班级类型',
     state: '班级状态',
-    optional: '操作',
+    $operation: '操作', // 伪列
   }).map(([dataIndex, title]) => ({ dataIndex, title, slotName: dataIndex }));
 
   const rawData: TableData[] = reactive([]);
