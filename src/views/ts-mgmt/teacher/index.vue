@@ -1,8 +1,5 @@
 <script setup lang="ts">
   /**
-   * TODO:当前仅有结构，无js逻辑
-   * 此组件需要抽取为公共组件，以便复用
-   *
    * @see https://arco.design/vue/component/form
    * @see https://arco.design/vue/component/table
    */
@@ -17,19 +14,19 @@
   // form
 
   const form = reactive<{
-    value1: string;
-    value2: string;
-    value3: -1 | 0 | 1;
-    value4: string;
-    value5: string[];
-    value6: -1 | 0 | 1;
+    number: string;
+    name: string;
+    sex: -1 | 0 | 1;
+    phone: string;
+    createdAt: [string, string];
+    state: -1 | 0 | 1;
   }>({
-    value1: '',
-    value2: '',
-    value3: -1,
-    value4: '',
-    value5: [],
-    value6: -1,
+    number: '',
+    name: '',
+    sex: -1,
+    phone: '',
+    createdAt: [] as any,
+    state: -1,
   });
 
   // table
@@ -80,15 +77,26 @@
   }
 
   function query() {
-    selectedData.value = rawData.filter(({ name, sex, state }) => {
-      if (form.value2 && !name.startsWith(form.value2)) {
+    selectedData.value = rawData.filter(({ number, name, sex, state, phone, createdAt }) => {
+      if (form.number && !number.startsWith(form.number)) {
         return false;
       }
-      if (form.value3 >= 0) {
-        return form.value3 === sex;
+      if (form.name && !name.startsWith(form.name)) {
+        return false;
       }
-      if (form.value6 >= 0) {
-        return form.value6 === state;
+      if (form.phone && !phone.startsWith(form.phone)) {
+        return false;
+      }
+      if (form.sex >= 0) {
+        return form.sex === sex;
+      }
+      if (form.state >= 0) {
+        return form.state === state;
+      }
+      const [begin, end] = form.createdAt;
+      if (begin && end) {
+        const now = new Date(createdAt);
+        return now >= new Date(begin) && now <= new Date(end);
       }
       return true;
     });
@@ -123,35 +131,35 @@
             <a-row :gutter="16">
               <a-col :span="8">
                 <a-form-item
-                  field="value1"
+                  field="number"
                   label="教工号"
                   label-col-flex="42px"
                 >
                   <a-input
-                    v-model="form.value1"
+                    v-model="form.number"
                     placeholder="请输入教工号"
                   />
                 </a-form-item>
               </a-col>
               <a-col :span="8">
                 <a-form-item
-                  field="value2"
+                  field="name"
                   label="教师姓名"
                   label-col-flex="56px"
                 >
                   <a-input
-                    v-model="form.value2"
+                    v-model="form.name"
                     placeholder="请输入教师姓名"
                   />
                 </a-form-item>
               </a-col>
               <a-col :span="8">
                 <a-form-item
-                  field="value3"
+                  field="sex"
                   label="性别"
                   label-col-flex="28px"
                 >
-                  <a-select v-model="form.value3">
+                  <a-select v-model="form.sex">
                     <a-option :value="-1">全部</a-option>
                     <a-option :value="0">男</a-option>
                     <a-option :value="1">女</a-option>
@@ -162,40 +170,36 @@
             <a-row :gutter="16">
               <a-col :span="8">
                 <a-form-item
-                  field="value4"
-                  label="科目"
+                  field="phone"
+                  label="手机号"
                   label-col-flex="42px"
                 >
-                  <a-select
-                    v-model="form.value4"
-                    placeholder="请选择"
-                  >
-                    <a-option value="all">全部</a-option>
-                  </a-select>
-                </a-form-item>
-              </a-col>
-              <a-col :span="8">
-                <a-form-item
-                  field="value5"
-                  label="创建时间"
-                  label-col-flex="56px"
-                >
-                  <a-range-picker
-                    v-model="form.value5"
-                    show-time
-                    :time-picker-props="{ defaultValue: ['00:00:00', '09:09:06'] }"
-                    format="YYYY-MM-DD HH:mm"
+                  <a-input
+                    v-model="form.phone"
+                    placeholder="请输入手机号"
                   />
                 </a-form-item>
               </a-col>
               <a-col :span="8">
                 <a-form-item
-                  field="value6"
+                  field="createdAt"
+                  label="创建时间"
+                  label-col-flex="56px"
+                >
+                  <a-range-picker
+                    v-model="form.createdAt"
+                    show-time
+                  />
+                </a-form-item>
+              </a-col>
+              <a-col :span="8">
+                <a-form-item
+                  field="state"
                   label="账号启用"
                   label-col-flex="56px"
                 >
                   <a-select
-                    v-model="form.value6"
+                    v-model="form.state"
                     placeholder="请选择"
                   >
                     <a-option :value="-1">全部</a-option>

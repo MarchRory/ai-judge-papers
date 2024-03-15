@@ -1,9 +1,13 @@
 import { DEFAULT_LAYOUT } from '../base';
 import { AppRouteRecordRaw } from '../types';
 
-const USER_MGMT: AppRouteRecordRaw = {
-  path: '/teacher-stu-mgmt',
-  name: 'teacher-stu-mgmt',
+/**
+ * TS is teacher&student
+ */
+
+const TS_MGMT: AppRouteRecordRaw = {
+  path: '/ts-mgmt',
+  name: 'ts-mgmt',
   component: DEFAULT_LAYOUT,
   meta: {
     locale: '师生管理',
@@ -16,7 +20,7 @@ const USER_MGMT: AppRouteRecordRaw = {
     {
       path: 'teacher',
       name: 'teacher',
-      component: () => import('@/views/user-mgmt/teacher/index.vue'),
+      component: () => import('@/views/ts-mgmt/teacher/index.vue'),
       meta: {
         locale: '教师管理',
         requiresAuth: true,
@@ -26,7 +30,7 @@ const USER_MGMT: AppRouteRecordRaw = {
     {
       path: 'student',
       name: 'student',
-      component: () => import('@/views/user-mgmt/student/index.vue'),
+      component: () => import('@/views/ts-mgmt/student/index.vue'),
       meta: {
         locale: '学生管理',
         requiresAuth: true,
@@ -36,4 +40,4 @@ const USER_MGMT: AppRouteRecordRaw = {
   ],
 };
 
-export default USER_MGMT;
+export default TS_MGMT;

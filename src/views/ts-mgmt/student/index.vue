@@ -1,8 +1,5 @@
 <script setup lang="ts">
   /**
-   * TODO:当前仅有结构，无js逻辑
-   * 此组件需要抽取为公共组件，以便复用
-   *
    * @see https://arco.design/vue/component/form
    * @see https://arco.design/vue/component/table
    */

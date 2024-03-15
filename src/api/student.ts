@@ -1,8 +1,8 @@
-import request, { HttpResponse } from '@/utils/request/index'
+import request, { HttpResponse } from '@/utils/request/index';
 import { TableData } from '@arco-design/web-vue';
+import { AxiosResponse } from 'axios';
 import { withPaging } from './utils';
 import { DEFAULT_PAGE_SIZE } from './types';
-import { AxiosResponse } from 'axios';
 
 export interface Student extends TableData {
   id: number;
