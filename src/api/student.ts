@@ -1,7 +1,7 @@
 import request, { HttpResponse } from '@/utils/request/index';
 import { TableData, PaginationProps } from '@arco-design/web-vue';
 import { AxiosResponse } from 'axios';
-import { withPaging } from './utils';
+import { createFormData, withPaging } from './utils';
 import { DEFAULT_PAGE_SIZE } from './types';
 
 export interface Student extends TableData {
@@ -60,4 +60,8 @@ export async function listStudent(
 
 export function updateStudent(t: Partial<Student>) {
   return request.post<Student>('/organization/student/update', t);
+}
+
+export function uploadStudent(file: File, sheet?: string, password?: string) {
+  return request.post('/organization/student/upload', createFormData({ file, sheet, password }));
 }

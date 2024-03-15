@@ -1,7 +1,7 @@
 import request, { HttpResponse } from '@/utils/request/index';
 import { PaginationProps, TableData } from '@arco-design/web-vue';
 import { AxiosResponse } from 'axios';
-import { withPaging } from './utils';
+import { createFormData, withPaging } from './utils';
 import { DEFAULT_PAGE_SIZE } from './types';
 
 // TODO: {field: value}
@@ -65,4 +65,8 @@ export async function listTeacher(
 
 export function updateTeacher(data: Partial<Teacher>) {
   return request.post<Teacher>('/organization/teacher/update', data);
+}
+
+export function uploadTeacher(file: File, sheet?: string, password?: string) {
+  return request.post('/organization/teacher/upload', createFormData({ file, sheet, password }));
 }
