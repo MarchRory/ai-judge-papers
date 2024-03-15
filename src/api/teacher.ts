@@ -1,5 +1,5 @@
 import request, { HttpResponse } from '@/utils/request/index';
-import { TableData } from '@arco-design/web-vue';
+import { PaginationProps, TableData } from '@arco-design/web-vue';
 import { AxiosResponse } from 'axios';
 import { withPaging } from './utils';
 import { DEFAULT_PAGE_SIZE } from './types';
@@ -48,9 +48,18 @@ export async function listTeacher(
 ) {
   const res = await request.post('/organization/teacher/list', withPaging(data, page));
 
-  return { ...res, data: { ...res.data, totalPage: res.data.total / DEFAULT_PAGE_SIZE } } as HttpResponse<{
-    totalPage: number;
+  return {
+    ...res,
+    data: {
+      ...res.data,
+      pagination: {
+        total: res.data.total,
+        pageSize: DEFAULT_PAGE_SIZE,
+      },
+    },
+  } as HttpResponse<{
     list: Teacher[];
+    pagination: PaginationProps;
   }>;
 }
 

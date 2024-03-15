@@ -3,10 +3,9 @@
    * @see https://arco.design/vue/component/form
    * @see https://arco.design/vue/component/table
    */
-  import { TableColumnData, TableData, Message } from '@arco-design/web-vue';
+  import { TableColumnData, TableData, Message, PaginationProps } from '@arco-design/web-vue';
   import { reactive, ref, computed, onMounted } from 'vue';
   import { listTeacher, deleteTeacher, updateTeacher, fieldsDescription, Teacher } from '@/api/teacher';
-  import { DEFAULT_PAGE_SIZE } from '@/api/types';
   import DetailButton from '@/components/detail-button/index.vue';
   import ButtonAdd from './btn-add.vue';
   import ButtonImport from './btn-import.vue';
@@ -32,6 +31,7 @@
   // table
   const isLoading = ref(true);
   const page = ref(1);
+  const pagination = ref<PaginationProps>({});
 
   /**
    * 注意此处使用 reactive，因为类型需要是 TableData[]
@@ -43,8 +43,11 @@
    */
   const loadData = async (p?: number) => {
     isLoading.value = true;
+
     const res = await listTeacher({}, p || page.value);
     rawData.splice(0, rawData.length, ...res.data.list);
+    pagination.value = res.data.pagination;
+
     isLoading.value = false;
   };
 
@@ -248,7 +251,7 @@
           :loading="isLoading"
           size="small"
           :page="page"
-          :page-size="DEFAULT_PAGE_SIZE"
+          :pagination="pagination"
           @page-change="loadData"
         >
           <template #state="{ record }">
