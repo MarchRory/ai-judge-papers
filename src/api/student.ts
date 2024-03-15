@@ -1,8 +1,8 @@
-import request, { HttpResponse } from '@/utils/request/index'
-import { TableData } from '@arco-design/web-vue';
-import { withPaging } from './utils';
-import { DEFAULT_PAGE_SIZE } from './types';
+import request, { HttpResponse } from '@/utils/request/index';
+import { TableData, PaginationProps } from '@arco-design/web-vue';
 import { AxiosResponse } from 'axios';
+import { createFormData, withPaging } from './utils';
+import { DEFAULT_PAGE_SIZE } from './types';
 
 export interface Student extends TableData {
   id: number;
@@ -43,12 +43,25 @@ export async function listStudent(
 ) {
   const res = await request.post('/organization/student/list', withPaging(data, page));
 
-  return { ...res, data: { ...res.data, totalPage: res.data.total / DEFAULT_PAGE_SIZE } } as HttpResponse<{
-    totalPage: number;
+  return {
+    ...res,
+    data: {
+      ...res.data,
+      pagination: {
+        total: res.data.total,
+        pageSize: DEFAULT_PAGE_SIZE,
+      },
+    },
+  } as HttpResponse<{
     list: Student[];
+    pagination: PaginationProps;
   }>;
 }
 
 export function updateStudent(t: Partial<Student>) {
   return request.post<Student>('/organization/student/update', t);
+}
+
+export function uploadStudent(file: File, sheet?: string, password?: string) {
+  return request.post('/organization/student/upload', createFormData({ file, sheet, password }));
 }

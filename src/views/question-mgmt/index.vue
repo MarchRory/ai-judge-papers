@@ -81,8 +81,11 @@
           :data="selectedData"
           :loading="loading"
         >
-          <template #optional="{ record }">
-            <a-button type="text">详情</a-button>
+          <template #$operation="{ record }">
+            <detail-button
+              :data="record"
+              :columns="columns"
+            />
             <a-popconfirm
               content="确认要删除？"
               @ok="QuestionDelete(record)"
@@ -106,6 +109,7 @@
   import { TableColumnData, TableData, Message } from '@arco-design/web-vue';
   import { ref, reactive, watch } from 'vue';
   import { Paging } from '@/api/types';
+  import DetailButton from '@/components/detail-button/index.vue';
   import { listQuestion, deleteQuestion } from '@/api/question';
   import addQuestionModalButton from './components/addQuestionModalButton.vue';
 
@@ -127,7 +131,7 @@
     title: '题目',
     expectedDifficulty: '难易程度',
     source: '来源',
-    optional: '操作',
+    $operation: '操作',
   }).map(([dataIndex, title]) => ({ dataIndex, title, slotName: dataIndex }));
 
   const rawData: TableData[] = reactive([]);

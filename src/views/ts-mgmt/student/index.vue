@@ -1,15 +1,11 @@
 <script setup lang="ts">
   /**
-   * TODO:当前仅有结构，无js逻辑
-   * 此组件需要抽取为公共组件，以便复用
-   *
    * @see https://arco.design/vue/component/form
    * @see https://arco.design/vue/component/table
    */
-  import { TableColumnData, TableData, Message } from '@arco-design/web-vue';
+  import { TableColumnData, TableData, Message, PaginationProps } from '@arco-design/web-vue';
   import { reactive, ref, computed, onMounted } from 'vue';
   import { Student, deleteStudent, fieldsDescription, listStudent, updateStudent } from '@/api/student';
-  import { DEFAULT_PAGE_SIZE } from '@/api/types';
   import DetailButton from '@/components/detail-button/index.vue';
   import ButtonAdd from './btn-add.vue';
   import ButtonImport from './btn-import.vue';
@@ -35,13 +31,17 @@
   // table
   const isLoading = ref(true);
   const page = ref(1);
+  const pagination = ref<PaginationProps>({});
 
   const rawData: TableData[] = reactive<Student[]>([]);
 
   const loadData = async (p?: number) => {
     isLoading.value = true;
+
     const res = await listStudent({}, p || page.value);
     rawData.splice(0, rawData.length, ...res.data.list);
+    pagination.value = res.data.pagination;
+
     isLoading.value = false;
   };
 
@@ -232,7 +232,7 @@
           :loading="isLoading"
           size="small"
           :page="page"
-          :page-size="DEFAULT_PAGE_SIZE"
+          :pagination="pagination"
           @page-change="loadData"
         >
           <template #state="{ record }">
