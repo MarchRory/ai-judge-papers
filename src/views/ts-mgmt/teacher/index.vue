@@ -49,6 +49,8 @@
     pagination.value = res.data.pagination;
 
     isLoading.value = false;
+
+    return res.data.list;
   };
 
   onMounted(loadData);
@@ -237,10 +239,7 @@
     </a-layout-header>
     <a-layout-content class="px-4">
       <a-card>
-        <!-- TODO: 测试 -->
-        <pre>{{ JSON.stringify(form,null,4) }}
-          <!-- TODO: 测试 -->
-        </pre>
+        <!-- <pre>{{ JSON.stringify(form,null,4) }}</pre> -->
         <header class="py-4 flex gap-4">
           <button-add />
           <button-import />

@@ -22,8 +22,8 @@ export const fieldsDescription: { [field in keyof Student]: string } = {
   sex: '性别',
   class: '班级',
   grade: '年级',
-  graduation: 'graduation',
-  state: '状态',
+  graduation: '毕业',
+  state: '账号启用',
 };
 
 export function createStudent(data: Omit<Student, 'id'>) {

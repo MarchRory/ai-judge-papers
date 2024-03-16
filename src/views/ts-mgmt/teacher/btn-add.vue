@@ -1,6 +1,5 @@
 <script setup lang="ts">
   /**
-   * TODO: WIP
    * 此组件是一个按钮，点击后弹出全屏模态窗
    */
   import { ref, reactive } from 'vue';
@@ -45,7 +44,6 @@
 
   <a-modal
     v-model:visible="modalVisible"
-    fullscreen
     ok-text="确认添加"
     @before-ok="handleClick"
   >
@@ -54,14 +52,11 @@
     <!-- TODO: 测试 -->
     <pre>{{ form }}</pre>
     <!-- TODO: 测试 -->
-    <a-form
-      :model="form"
-      layout="vertical"
-    >
+    <a-form :model="form">
       <a-form-item
         field="name"
         :label="fieldsDescription.name"
-        tooltip="教师姓名"
+        :tooltip="`教师${fieldsDescription.name}`"
       >
         <a-input
           v-model="form.name"
@@ -71,7 +66,7 @@
       <a-form-item
         field="phone"
         :label="fieldsDescription.phone"
-        tooltip="教师手机号"
+        :tooltip="`教师${fieldsDescription.phone}`"
       >
         <a-input
           v-model="form.phone"
@@ -81,7 +76,7 @@
       <a-form-item
         field="sex"
         :label="fieldsDescription.sex"
-        tooltip="教师性别"
+        :tooltip="`教师${fieldsDescription.sex}`"
       >
         <a-switch
           :model-value="Boolean(form.sex)"
@@ -94,7 +89,7 @@
       <a-form-item
         field="number"
         :label="fieldsDescription.number"
-        tooltip="教师教工号"
+        :tooltip="`教师${fieldsDescription.number}`"
       >
         <a-input
           v-model="form.number"
@@ -103,7 +98,7 @@
       <a-form-item
         field="state"
         :label="fieldsDescription.state"
-        tooltip="状态"
+        :tooltip="`教师${fieldsDescription.state}`"
       >
         <a-select
           v-model="form.state"
