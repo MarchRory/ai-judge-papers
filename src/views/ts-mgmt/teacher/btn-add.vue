@@ -6,6 +6,13 @@
   import { Message } from '@arco-design/web-vue';
   import { createTeacher, Teacher, fieldsDescription } from '@/api/teacher';
 
+  const emit = defineEmits<{
+    /**
+     * 添加成功，那么就需要重新请求列表
+     */
+    success: [];
+  }>();
+
   const title = '添加教师';
   // form
   const form = reactive<Omit<Teacher, 'id' | 'createdAt'>>({
@@ -22,7 +29,8 @@
   async function handleClick() {
     try {
       await createTeacher(form);
-      Message.success('成功');
+      Message.success('添加成功');
+      emit('success');
       return true;
     } catch {
       return false;
@@ -49,9 +57,6 @@
   >
     <template #title> {{ title }} </template>
     <a-alert class="my-4">输入完成后，请点击右下角确认添加</a-alert>
-    <!-- TODO: 测试 -->
-    <pre>{{ form }}</pre>
-    <!-- TODO: 测试 -->
     <a-form :model="form">
       <a-form-item
         field="name"

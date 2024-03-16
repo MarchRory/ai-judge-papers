@@ -4,6 +4,14 @@
    */
   import { ref, reactive } from 'vue';
   import { createStudent, Student, fieldsDescription } from '@/api/student';
+  import { Message } from '@arco-design/web-vue';
+
+  const emit = defineEmits<{
+    /**
+     * 添加成功，那么就需要重新请求列表
+     */
+    success: [];
+  }>();
 
   const title = '添加学生';
   // form
@@ -23,6 +31,8 @@
   async function handleClick() {
     try {
       await createStudent(form);
+      Message.success('添加成功');
+      emit('success');
       return true;
     } catch {
       return false;
