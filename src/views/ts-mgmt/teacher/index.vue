@@ -49,6 +49,8 @@
     pagination.value = res.data.pagination;
 
     isLoading.value = false;
+
+    return res.data.list;
   };
 
   onMounted(loadData);
@@ -127,7 +129,7 @@
     <a-layout-header class="p4">
       <a-card class="px-2">
         <header class="pt-4 pb-8">
-          <strong class="text-2xl"> 查询教师 </strong>
+          <strong class="text-2xl">查询教师</strong>
         </header>
         <div class="grid grid-cols-[1fr_auto]">
           <a-form :model="form">
@@ -237,13 +239,10 @@
     </a-layout-header>
     <a-layout-content class="px-4">
       <a-card>
-        <!-- TODO: 测试 -->
-        <pre>{{ JSON.stringify(form,null,4) }}
-          <!-- TODO: 测试 -->
-        </pre>
+        <!-- <pre>{{ JSON.stringify(form,null,4) }}</pre> -->
         <header class="py-4 flex gap-4">
-          <button-add />
-          <button-import />
+          <button-add @success="loadData" />
+          <button-import @success="loadData" />
         </header>
         <a-table
           :columns="columns"
