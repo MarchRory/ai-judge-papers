@@ -1,9 +1,9 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { Message, Modal } from '@arco-design/web-vue';
+import { FileItem, Message, Modal } from '@arco-design/web-vue';
 import { useUserStore } from '@/store';
 import { getToken } from '@/utils/auth';
 import LRUCache from '@/dataStruct/LRUCache';
-import { createFormData } from '@/api/utils';
+import getFileFormData from '../file';
 import { Optimization } from './Optimizations';
 
 export interface HttpResponse<T = unknown> {
@@ -13,7 +13,7 @@ export interface HttpResponse<T = unknown> {
   message: string;
 }
 
-const MAX_CACHE_SIZE = 20;
+const MAX_CACHE_SIZE = 10;
 
 const errorCodeMap: Record<number, string> = {
   1403: '用户不存在',
@@ -98,7 +98,7 @@ class HttpRequest {
     );
   }
 
-  private request<T = any>(config: AxiosRequestConfig, opts?: Optimization): Promise<HttpResponse<T>> {
+  request<T = any>(config: AxiosRequestConfig, opts?: Optimization): Promise<HttpResponse<T>> {
     /**
      * TODO: execute other methods according to config
      */
@@ -106,21 +106,26 @@ class HttpRequest {
       if (opts?.cache) {
         const cache = this.cacheMap.get(config.url as string);
         if (cache) {
+          console.log(cache);
           resolve(cache as HttpResponse<T>);
         }
       }
-      this.service
-        .request<AxiosResponse<T>>(config)
-        .then((res: AxiosResponse['data']) => {
-          if (opts?.cache) {
-            this.cacheMap.set(config.url as string, res);
-          }
-          resolve(res as HttpResponse<T>);
-        })
-        .catch((err) => {
-          // do something
-          reject(err);
-        });
+      try {
+        this.service
+          .request<AxiosResponse<T>>(config)
+          .then((res: AxiosResponse['data']) => {
+            if (opts?.cache) {
+              this.cacheMap.set(config.url as string, res);
+            }
+            resolve(res as HttpResponse<T>);
+          })
+          .catch((err) => {
+            // do something
+            reject(err);
+          });
+      } catch (err) {
+        reject(err);
+      }
     });
   }
 
@@ -130,11 +135,11 @@ class HttpRequest {
 
   upload<T = string>(
     url: string,
-    file: Blob,
-    otherParams: Record<string, string>,
-    config: Omit<AxiosRequestConfig, 'url' | 'data' | 'method'> = {}
+    fileItem: FileItem,
+    otherParams: Record<string, number | string>,
+    config: Omit<AxiosRequestConfig, 'url' | 'data' | 'method'>
   ) {
-    const data = createFormData({ file, ...otherParams }, true);
+    const data = getFileFormData(fileItem, otherParams);
     const requestConfig: AxiosRequestConfig = {
       ...config,
       headers: {
@@ -142,7 +147,7 @@ class HttpRequest {
         'Content-Type': 'multipart/form-data',
       },
     };
-    return this.post<T>(url, data, { ...requestConfig });
+    return this.request<T>({ url, data, ...requestConfig });
   }
 }
 

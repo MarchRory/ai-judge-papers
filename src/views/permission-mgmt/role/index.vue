@@ -207,6 +207,11 @@
           >
             <template #columns>
               <a-table-column
+                title="序号"
+                data-index="index"
+                :width="80"
+              ></a-table-column>
+              <a-table-column
                 title="角色名"
                 data-index="name"
               ></a-table-column>

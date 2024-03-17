@@ -43,11 +43,14 @@
    */
   const loadData = async (p?: number) => {
     isLoading.value = true;
+
     const res = await listTeacher({}, p || page.value);
     rawData.splice(0, rawData.length, ...res.data.list);
     pagination.value = res.data.pagination;
 
     isLoading.value = false;
+
+    return res.data.list;
   };
 
   onMounted(loadData);
@@ -102,7 +105,6 @@
       }
       return true;
     });
-
     if (selectedData.value.length > 0) {
       Message.success('查询成功');
     } else {
@@ -127,7 +129,7 @@
     <a-layout-header class="p4">
       <a-card class="px-2">
         <header class="pt-4 pb-8">
-          <strong class="text-2xl"> 查询教师 </strong>
+          <strong class="text-2xl">查询教师</strong>
         </header>
         <div class="grid grid-cols-[1fr_auto]">
           <a-form :model="form">
@@ -237,9 +239,10 @@
     </a-layout-header>
     <a-layout-content class="px-4">
       <a-card>
+        <!-- <pre>{{ JSON.stringify(form,null,4) }}</pre> -->
         <header class="py-4 flex gap-4">
-          <button-add />
-          <button-import />
+          <button-add @success="loadData" />
+          <button-import @success="loadData" />
         </header>
         <a-table
           :columns="columns"

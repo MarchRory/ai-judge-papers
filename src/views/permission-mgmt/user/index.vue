@@ -205,6 +205,11 @@
           >
             <template #columns>
               <a-table-column
+                title="id"
+                data-index="id"
+                :width="80"
+              ></a-table-column>
+              <a-table-column
                 title="头像"
                 :width="150"
               >

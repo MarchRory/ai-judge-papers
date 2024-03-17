@@ -1,4 +1,6 @@
 import request from '@/utils/request';
+import getFileFormData from '@/utils/file';
+import { FileItem } from '@arco-design/web-vue';
 import { ListResponse, Paging } from './types';
 
 const schema = '/study/exam';
@@ -27,7 +29,7 @@ export interface ExamFormData {
 }
 
 export interface ExamFileParams {
-  file: File;
+  file: FileItem;
   sheet?: string;
   examId: number;
 }
@@ -69,7 +71,7 @@ export function getExamListApi(data: Paging & { key: string }) {
 }
 
 export function uploadExamTemplateApi({ file, sheet = '', examId }: ExamFileParams) {
-  return request.upload(ExamApi.uploadTemplate, file, { sheet, examId });
+  return request.upload(ExamApi.uploadTemplate, file, { sheet, examId }, {});
 }
 
 export function addProblemApi(data: addProblemParams) {

@@ -1,10 +1,17 @@
 <script setup lang="ts">
   /**
-   * TODO: WIP
    * 此组件是一个按钮，点击后弹出全屏模态窗
    */
   import { ref, reactive } from 'vue';
   import { createStudent, Student, fieldsDescription } from '@/api/student';
+  import { Message } from '@arco-design/web-vue';
+
+  const emit = defineEmits<{
+    /**
+     * 添加成功，那么就需要重新请求列表
+     */
+    success: [];
+  }>();
 
   const title = '添加学生';
   // form
@@ -12,7 +19,7 @@
     class: '',
     number: '',
     name: '',
-    sex: 1,
+    sex: 0,
     grade: '',
     graduation: 1,
     state: 1,
@@ -24,6 +31,8 @@
   async function handleClick() {
     try {
       await createStudent(form);
+      Message.success('添加成功');
+      emit('success');
       return true;
     } catch {
       return false;
@@ -45,44 +54,39 @@
 
   <a-modal
     v-model:visible="modalVisible"
-    fullscreen
     ok-text="确认添加"
     @before-ok="handleClick"
   >
     <template #title> {{ title }} </template>
     <a-alert class="my-4">输入完成后，请点击右下角确认添加</a-alert>
-    <!-- TODO: 测试 -->
-    <!-- <pre>{{ form }}</pre> -->
-    <!-- TODO: 测试 -->
     <a-form
       :model="form"
-      layout="vertical"
       ok-text="确认添加"
     >
       <a-form-item
         field="name"
+        :tooltip="`学生${fieldsDescription.name}`"
         :label="fieldsDescription.name"
-        tooltip="学生姓名"
       >
         <a-input
           v-model="form.name"
-          placeholder="请输入姓名..."
+          :placeholder="`请输入${fieldsDescription.name}...`"
         />
       </a-form-item>
       <a-form-item
         field="number"
+        :tooltip="`学生${fieldsDescription.number}`"
         :label="fieldsDescription.number"
-        tooltip="学生学号"
       >
         <a-input
           v-model="form.number"
-          placeholder="请输入学号..."
+          :placeholder="`请输入${fieldsDescription.number}...`"
         />
       </a-form-item>
       <a-form-item
         field="sex"
+        :tooltip="`学生${fieldsDescription.sex}`"
         :label="fieldsDescription.sex"
-        tooltip="学生性别"
       >
         <a-switch
           :model-value="Boolean(form.sex)"
@@ -95,37 +99,36 @@
       <a-form-item
         field="class"
         :label="fieldsDescription.class"
-        tooltip="学生班级"
+        :tooltip="`学生${fieldsDescription.class}`"
       >
         <a-input
           v-model="form.class"
-          placeholder="请输入班级..."
+          :placeholder="`请输入${fieldsDescription.class}...`"
       /></a-form-item>
       <a-form-item
         field="grade"
-        tooltip="学生年级"
-        label="年级"
+        :label="fieldsDescription.grade"
+        :tooltip="`学生${fieldsDescription.grade}`"
       >
         <a-input
           v-model="form.grade"
-          placeholder="请输入年级..."
+          :placeholder="`请输入${fieldsDescription.grade}...`"
       /></a-form-item>
-      <!-- TODO -->
       <a-form-item
         field="graduation"
+        :tooltip="`学生${fieldsDescription.graduation}`"
         :label="fieldsDescription.graduation"
-        tooltip="graduation"
       >
         <a-input-number
           v-model="form.graduation"
-          placeholder="请输入graduation..."
+          :placeholder="`请输入${fieldsDescription.graduation}...`"
           mode="button"
         />
       </a-form-item>
       <a-form-item
         field="state"
+        :tooltip="`学生${fieldsDescription.state}`"
         :label="fieldsDescription.state"
-        tooltip="状态"
       >
         <a-select
           v-model="form.state"
