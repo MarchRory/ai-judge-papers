@@ -80,6 +80,7 @@
           :columns="columns"
           :data="selectedData"
           :loading="loading"
+          :pagination="false"
         >
           <template #$operation="{ record }">
             <detail-button
@@ -99,6 +100,15 @@
             </a-popconfirm>
           </template>
         </a-table>
+        <a-pagination
+          class="mt-4 relative"
+          :current="pagination.page"
+          :page-size="pagination.pageSize"
+          :show-total="true"
+          :total="totalAll"
+          @change="(newPage) => (pagination.page = newPage)"
+          @page-size-change="(newSize) => (pagination.pageSize = newSize)"
+        />
       </a-card>
     </a-layout-content>
     <addQuestionModal v-model:visible="visible"></addQuestionModal>
@@ -126,7 +136,7 @@
   });
 
   const columns: TableColumnData[] = Object.entries({
-    id: '序号',
+    id: 'id',
     subject: '学科',
     title: '题目',
     expectedDifficulty: '难易程度',
@@ -150,10 +160,14 @@
     loading.value = true;
     listQuestion(pagination)
       .then((res) => {
-        console.log(res);
         const { list, total } = res.data;
         totalAll.value = total;
-        selectedData.value = list;
+        selectedData.value = list.map((item) => {
+          return {
+            ...item,
+            subject: item.subject.title,
+          };
+        });
       })
       .finally(() => {
         loading.value = false;

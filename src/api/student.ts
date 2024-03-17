@@ -1,6 +1,5 @@
 import request, { HttpResponse } from '@/utils/request/index';
 import { TableData, PaginationProps } from '@arco-design/web-vue';
-import { AxiosResponse } from 'axios';
 import { createFormData, withPaging } from './utils';
 import { DEFAULT_PAGE_SIZE } from './types';
 
@@ -22,8 +21,8 @@ export const fieldsDescription: { [field in keyof Student]: string } = {
   sex: '性别',
   class: '班级',
   grade: '年级',
-  graduation: '毕业',
-  state: '账号启用',
+  graduation: 'graduation',
+  state: '状态',
 };
 
 export function createStudent(data: Omit<Student, 'id'>) {

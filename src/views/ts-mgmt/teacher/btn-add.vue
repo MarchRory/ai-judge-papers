@@ -1,17 +1,11 @@
 <script setup lang="ts">
   /**
+   * TODO: WIP
    * 此组件是一个按钮，点击后弹出全屏模态窗
    */
   import { ref, reactive } from 'vue';
   import { Message } from '@arco-design/web-vue';
   import { createTeacher, Teacher, fieldsDescription } from '@/api/teacher';
-
-  const emit = defineEmits<{
-    /**
-     * 添加成功，那么就需要重新请求列表
-     */
-    success: [];
-  }>();
 
   const title = '添加教师';
   // form
@@ -29,8 +23,7 @@
   async function handleClick() {
     try {
       await createTeacher(form);
-      Message.success('添加成功');
-      emit('success');
+      Message.success('成功');
       return true;
     } catch {
       return false;
@@ -52,16 +45,23 @@
 
   <a-modal
     v-model:visible="modalVisible"
+    fullscreen
     ok-text="确认添加"
     @before-ok="handleClick"
   >
     <template #title> {{ title }} </template>
     <a-alert class="my-4">输入完成后，请点击右下角确认添加</a-alert>
-    <a-form :model="form">
+    <!-- TODO: 测试 -->
+    <!-- <pre>{{ form }}</pre> -->
+    <!-- TODO: 测试 -->
+    <a-form
+      :model="form"
+      layout="vertical"
+    >
       <a-form-item
         field="name"
         :label="fieldsDescription.name"
-        :tooltip="`教师${fieldsDescription.name}`"
+        tooltip="教师姓名"
       >
         <a-input
           v-model="form.name"
@@ -71,7 +71,7 @@
       <a-form-item
         field="phone"
         :label="fieldsDescription.phone"
-        :tooltip="`教师${fieldsDescription.phone}`"
+        tooltip="教师手机号"
       >
         <a-input
           v-model="form.phone"
@@ -81,7 +81,7 @@
       <a-form-item
         field="sex"
         :label="fieldsDescription.sex"
-        :tooltip="`教师${fieldsDescription.sex}`"
+        tooltip="教师性别"
       >
         <a-switch
           :model-value="Boolean(form.sex)"
@@ -94,7 +94,7 @@
       <a-form-item
         field="number"
         :label="fieldsDescription.number"
-        :tooltip="`教师${fieldsDescription.number}`"
+        tooltip="教师教工号"
       >
         <a-input
           v-model="form.number"
@@ -103,7 +103,7 @@
       <a-form-item
         field="state"
         :label="fieldsDescription.state"
-        :tooltip="`教师${fieldsDescription.state}`"
+        tooltip="状态"
       >
         <a-select
           v-model="form.state"

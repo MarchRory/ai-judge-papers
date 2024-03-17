@@ -1,18 +1,23 @@
 <script setup lang="ts">
   import { ExamListItem, uploadExamTemplateApi } from '@/api/exam';
   import { useRoute, useRouter } from 'vue-router';
-  import { RequestOption, UploadRequest } from '@arco-design/web-vue';
+  import { FileItem, Message, RequestOption } from '@arco-design/web-vue';
   import { examStateMap } from '../config';
 
   const route = useRoute();
   const router = useRouter();
   const query = route.query as unknown as ExamListItem;
 
-  const uploadPaperTemplate = (options: RequestOption) => {
-    uploadExamTemplateApi({ file: options.fileItem, sheet: undefined, examId: query.id }).then((res) => {
-      // 等后端开发结束
-      console.log('res', res);
-    });
+  const uploadPaperTemplate = (fileList: FileItem[]) => {
+    const { file } = fileList[0];
+    // eslint-disable-next-line
+    file &&
+      uploadExamTemplateApi({ file, sheet: '', examId: query.id }).then((res) => {
+        const { code, success } = res;
+        if (success) {
+          Message.success('考卷上传成功');
+        }
+      });
   };
 
   const jumpToJudge = () => {
@@ -50,10 +55,9 @@
                   font="bold"
                   >{{ query.name }}</li
                 ><br />
-                <!--这里 /1000 是因为数据有问题, 到时候去除/1000就行-->
-                <li text="1.5em"
-                  >{{ new Date(query.time / 1000).toISOString().slice(0, 10) }} |
-                  {{ (query.timeLimit - query.time / 1000) / (1000 * 60) }}分钟
+                <li text="1.5em">
+                  {{ new Date(+query.time).toISOString().slice(0, 10) }}
+                  | {{ (+query.timeLimit - +query.time) / (1000 * 60) }}分钟 | {{ query.subject }}
                 </li>
               </ul>
             </div>
@@ -62,7 +66,7 @@
         </a-card>
       </a-layout-header>
       <a-layout-content>
-        <a-card title="上传接口有问题, 待毛修复">
+        <a-card>
           <section>
             <header class="pt-4 pb-8">
               <strong class="text-2xl"> 考卷信息 </strong>
@@ -70,19 +74,25 @@
             <div flex="~ items-center justify-around">
               <div w="3/7"
                 ><a-upload
+                  v-if="query.state == 1"
                   tip="请上传试题卷Excel"
                   :limit="1"
                   accept=".xlsx"
                   draggable
-                  :custom-request="uploadPaperTemplate"
+                  :auto-upload="false"
+                  @change="uploadPaperTemplate"
               /></div>
               <div w="3/7"
                 ><a-upload
+                  v-if="query.state == 1"
                   tip="请上传学生答卷压缩包"
+                  :limit="1"
+                  :auto-upload="false"
                   accept=".zip"
                   draggable
-                  action="/"
-              /></div>
+                  @change="uploadPaperTemplate"
+                />
+              </div>
             </div>
           </section>
           <section>
@@ -93,9 +103,13 @@
             <div w="1/1">
               <a-steps
                 type="arrow"
-                :current="3"
+                :current="query.state"
               >
-                <a-step v-for="item in examStateMap">{{ item.text }}</a-step>
+                <a-step
+                  v-for="(item, index) in examStateMap"
+                  :key="index"
+                  >{{ item.text }}</a-step
+                >
               </a-steps>
 
               <!-- v-if="query.state === 3" -->
@@ -107,6 +121,13 @@
                 >去阅卷</a-button
               >
             </div>
+          </section>
+        </a-card>
+        <a-card>
+          <section>
+            <header class="pt-4 pb-8">
+              <strong class="text-2xl"> 数据分析 </strong>
+            </header>
           </section>
         </a-card>
       </a-layout-content>

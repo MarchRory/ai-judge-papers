@@ -13,19 +13,19 @@
   // form
 
   const form = reactive<{
-    number: string;
-    name: string;
-    sex: -1 | 0 | 1;
-    grade: string;
-    class: string;
-    state: -1 | 0 | 1;
+    value1: string;
+    value2: string;
+    value3: -1 | 0 | 1;
+    value4: string;
+    value5: string[];
+    value6: -1 | 0 | 1;
   }>({
-    number: '',
-    name: '',
-    sex: -1,
-    grade: '',
-    class: '',
-    state: -1,
+    value1: '',
+    value2: '',
+    value3: -1,
+    value4: '',
+    value5: [],
+    value6: -1,
   });
 
   // table
@@ -43,8 +43,6 @@
     pagination.value = res.data.pagination;
 
     isLoading.value = false;
-
-    return res.data.list;
   };
 
   onMounted(loadData);
@@ -71,24 +69,15 @@
   }
 
   function query() {
-    selectedData.value = rawData.filter(({ name, number, grade, class: class_, sex, state }) => {
-      if (form.number && !number.startsWith(form.number)) {
+    selectedData.value = rawData.filter(({ name, sex, state }) => {
+      if (form.value2 && !name.startsWith(form.value2)) {
         return false;
       }
-      if (form.name && !name.startsWith(form.name)) {
-        return false;
+      if (form.value3 >= 0) {
+        return form.value3 === sex;
       }
-      if (form.grade && !grade.startsWith(form.grade)) {
-        return false;
-      }
-      if (form.class && !class_.startsWith(form.class)) {
-        return false;
-      }
-      if (form.sex >= 0) {
-        return form.sex === sex;
-      }
-      if (form.state >= 0) {
-        return form.state === state;
+      if (form.value6 >= 0) {
+        return form.value6 === state;
       }
       return true;
     });
@@ -116,42 +105,42 @@
     <a-layout-header class="p4">
       <a-card class="px-2">
         <header class="pt-4 pb-8">
-          <strong class="text-2xl">查询学生</strong>
+          <strong class="text-2xl"> 查询学生 </strong>
         </header>
         <div class="grid grid-cols-[1fr_auto]">
           <a-form :model="form">
             <a-row :gutter="16">
               <a-col :span="8">
                 <a-form-item
-                  field="number"
+                  field="value1"
                   label="学号"
                   label-col-flex="42px"
                 >
                   <a-input
-                    v-model="form.number"
+                    v-model="form.value1"
                     placeholder="请输入学号"
                   />
                 </a-form-item>
               </a-col>
               <a-col :span="8">
                 <a-form-item
-                  field="name"
+                  field="value2"
                   label="学生姓名"
                   label-col-flex="56px"
                 >
                   <a-input
-                    v-model="form.name"
+                    v-model="form.value2"
                     placeholder="请输入姓名"
                   />
                 </a-form-item>
               </a-col>
               <a-col :span="8">
                 <a-form-item
-                  field="sex"
+                  field="value3"
                   label="性别"
                   label-col-flex="28px"
                 >
-                  <a-select v-model="form.sex">
+                  <a-select v-model="form.value3">
                     <a-option :value="-1">全部</a-option>
                     <a-option :value="0">男</a-option>
                     <a-option :value="1">女</a-option>
@@ -162,36 +151,40 @@
             <a-row :gutter="16">
               <a-col :span="8">
                 <a-form-item
-                  field="grade"
-                  label="年级"
+                  field="value4"
+                  label="科目"
                   label-col-flex="42px"
                 >
-                  <a-input
-                    v-model="form.grade"
-                    placeholder="请输入年级"
-                  />
+                  <a-select
+                    v-model="form.value4"
+                    placeholder="请选择"
+                  >
+                    <a-option value="all">全部</a-option>
+                  </a-select>
                 </a-form-item>
               </a-col>
               <a-col :span="8">
                 <a-form-item
-                  field="class"
-                  label="班级"
+                  field="value5"
+                  label="创建时间"
                   label-col-flex="56px"
                 >
-                  <a-input
-                    v-model="form.class"
-                    placeholder="请输入班级"
+                  <a-range-picker
+                    v-model="form.value5"
+                    show-time
+                    :time-picker-props="{ defaultValue: ['00:00:00', '09:09:06'] }"
+                    format="YYYY-MM-DD HH:mm"
                   />
                 </a-form-item>
               </a-col>
               <a-col :span="8">
                 <a-form-item
-                  field="state"
+                  field="value6"
                   label="账号启用"
                   label-col-flex="56px"
                 >
                   <a-select
-                    v-model="form.state"
+                    v-model="form.value6"
                     placeholder="请选择"
                   >
                     <a-option :value="-1">全部</a-option>
@@ -227,8 +220,8 @@
     <a-layout-content class="px-4">
       <a-card>
         <header class="py-4 flex gap-4">
-          <button-add @success="loadData" />
-          <button-import @success="loadData" />
+          <button-add />
+          <button-import />
         </header>
         <a-table
           :columns="columns"

@@ -2,8 +2,6 @@
  * Share utilities for API
  */
 
-import { extend } from 'lodash';
-
 /**
  * 默认每页数量
  * 要获取总页数， Math.floor(total / pageSize)

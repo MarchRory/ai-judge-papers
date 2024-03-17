@@ -6,16 +6,8 @@
   import { type FileItem, Message } from '@arco-design/web-vue';
   import { uploadTeacher } from '@/api/teacher';
 
-  const emit = defineEmits<{
-    /**
-     * 上传成功，那么就需要重新请求列表
-     */
-    success: [];
-  }>();
-
   // modal
   const modalVisible = ref(false);
-  const title = '批量导入';
 
   const form = reactive<{ sheet: string; password: string }>({ sheet: '', password: '' });
   /**
@@ -30,8 +22,6 @@
     }
     try {
       await uploadTeacher(file.value.file, form.sheet, form.password);
-      Message.info('上传成功');
-      emit('success');
       return true;
     } catch {
       return false;
@@ -48,7 +38,7 @@
 </script>
 
 <template>
-  <a-button @click="modalVisible = true">{{ title }}</a-button>
+  <a-button @click="modalVisible = true"> 批量导入 </a-button>
   <!-- modal -->
 
   <a-modal
@@ -56,7 +46,7 @@
     ok-text="确认导入"
     @before-ok="handleUpload"
   >
-    <template #title>{{ title }}</template>
+    <template #title>批量导入</template>
 
     <a-form
       :model="form"
@@ -85,7 +75,7 @@
       <a-form-item
         field="file"
         label="Excel文件"
-        tooltip="此处上传Excel文件（.xlsx）"
+        tooltip="此处上传Excel文件"
       >
         <a-alert
           v-if="file"
