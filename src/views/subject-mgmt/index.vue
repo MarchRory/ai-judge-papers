@@ -1,41 +1,20 @@
 <script setup lang="ts">
-  import { reactive, ref, watch } from 'vue';
-  import { Paging } from '@/api/types';
+  import { ref, watch } from 'vue';
   import { SubjectItem, createSubjectAPI, deleteSubjectAPI, getSubjectListAPI, updateSubjectAPI } from '@/api/subject';
   import { Message } from '@arco-design/web-vue';
   import { useRouter } from 'vue-router';
+  import useTable from '@/hooks/table/useTable';
 
-  const router = useRouter();
-  const pagination = reactive<Paging<{ key: string }>>({
-    page: 1,
-    pageSize: 10,
-    key: '',
+  const otherSearchParams = { key: '' };
+  const { tableData, pagination, loading, loadList, handlePageChange, handleSizeChange, key } = useTable<
+    SubjectItem,
+    typeof otherSearchParams
+  >({
+    requestApi: getSubjectListAPI,
+    otherSearchParams,
   });
 
-  const tableData = ref<SubjectItem[]>([]);
-  const totalAll = ref(0);
-  const loading = ref(false);
-  function loadList() {
-    loading.value = true;
-    getSubjectListAPI(pagination)
-      .then((res) => {
-        const { total, list } = res.data;
-        totalAll.value = total;
-        tableData.value = list;
-      })
-      .finally(() => {
-        loading.value = false;
-      });
-  }
-  watch(
-    () => pagination,
-    (newVal, oldVal) => {
-      if (!newVal.key || newVal.page !== oldVal.page || newVal.pageSize !== oldVal.pageSize) {
-        loadList();
-      }
-    },
-    { deep: true }
-  );
+  const router = useRouter();
 
   const isFormOpen = ref(false);
   const formRef = ref();
@@ -127,7 +106,7 @@
           >
             <div w="1/4">
               <a-input-search
-                v-model="pagination.key"
+                v-model="key"
                 allow-clear
                 placeholder="输入关键字查找学科"
                 search-button
@@ -157,15 +136,10 @@
             stripe
             :loading="loading"
             page-position="br"
-            :pagination="{
-              total: totalAll,
-              pageSize: pagination.pageSize,
-              showJumper: true,
-              showPageSize: true,
-            }"
+            :pagination="pagination"
             sticky-header
-            @page-size-change="(newSize) => (pagination.pageSize = newSize)"
-            @page-change="(newPage) => (pagination.page = newPage)"
+            @page-size-change="handleSizeChange"
+            @page-change="handlePageChange"
           >
             <template #columns>
               <a-table-column

@@ -95,7 +95,11 @@
                 type="arrow"
                 :current="3"
               >
-                <a-step v-for="item in examStateMap">{{ item.text }}</a-step>
+                <a-step
+                  v-for="(item, index) in examStateMap"
+                  :key="index"
+                  >{{ item.text }}</a-step
+                >
               </a-steps>
 
               <!-- v-if="query.state === 3" -->

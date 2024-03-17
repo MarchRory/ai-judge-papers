@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosRequestHeaders, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { FileItem, Message, Modal } from '@arco-design/web-vue';
 import { useUserStore } from '@/store';
 import { getToken } from '@/utils/auth';
@@ -107,7 +107,7 @@ class HttpRequest {
         const cache = this.cacheMap.get(config.url as string);
         if (cache) {
           console.log(cache);
-          return resolve(cache as HttpResponse<T>);
+          resolve(cache as HttpResponse<T>);
         }
       }
       try {
@@ -117,14 +117,14 @@ class HttpRequest {
             if (opts?.cache) {
               this.cacheMap.set(config.url as string, res);
             }
-            return resolve(res as HttpResponse<T>);
+            resolve(res as HttpResponse<T>);
           })
           .catch((err) => {
             // do something
-            return reject(err);
+            reject(err);
           });
       } catch (err) {
-        return reject(err);
+        reject(err);
       }
     });
   }
