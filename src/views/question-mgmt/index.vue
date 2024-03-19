@@ -101,7 +101,6 @@
         </a-table>
       </a-card>
     </a-layout-content>
-    <addQuestionModal v-model:visible="visible"></addQuestionModal>
   </a-layout>
 </template>
 

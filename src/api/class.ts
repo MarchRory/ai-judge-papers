@@ -1,5 +1,6 @@
 import request from '@/utils/request/index';
 import { Paging } from './types';
+import { createFormData } from './utils';
 
 export interface Class {
   name: string;
@@ -29,4 +30,8 @@ export function listClass(
 
 export function updateClass(c: Class) {
   return request.post('/organization/class/update', c);
+}
+
+export function uploadClass(file: File, sheet?: string) {
+  return request.post('/organization/class/upload', createFormData({ file, sheet }));
 }
