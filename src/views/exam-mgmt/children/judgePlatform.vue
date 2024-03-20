@@ -1,8 +1,9 @@
 <script setup lang="ts">
   /**
-   * TODO：草稿
+   * TODO：草稿，因此不同题型，例如选择或填空，暂时硬编码
+   *
    */
-
+  import { reactive } from 'vue';
   import { useRoute } from 'vue-router';
   import CollapsePanel from '../components/collapsePanel.vue';
   import SingleAnswer from '../components/singleAnswer.vue';
@@ -10,6 +11,12 @@
 
   const route = useRoute();
   const query = route.query as unknown as ExamListItem;
+
+  const testData = reactive([
+    { number: 1, aiScore: 2.5, humanScore: undefined, reviewPassed: false, totalScore: 10 },
+    { number: 1, aiScore: 2.5, humanScore: undefined, reviewPassed: false, totalScore: 10 },
+    { number: 1, aiScore: 2.5, humanScore: undefined, reviewPassed: false, totalScore: 10 },
+  ]);
 </script>
 
 <template>
@@ -17,16 +24,14 @@
     <a-page-header @back="$router.back()">
       <template #title> {{ query.name }}&nbsp;{{ query.subject }} </template>
       <template #subtitle>
-        <span>
-          {{ new Date(Number(query.time)).toISOString().slice(0, 10) }}（{{ (query.timeLimit - query.time) / (1000 * 60) }}分钟）
-        </span>
+        {{ new Date(Number(query.time)).toISOString().slice(0, 10) }}（{{ (query.timeLimit - query.time) / (1000 * 60) }}分钟）
       </template>
 
       <template #extra>
-        <a-button-group>
+        <a-space>
           <a-button type="primary">提交</a-button>
           <a-button type="outline">全部</a-button>
-        </a-button-group>
+        </a-space>
       </template>
     </a-page-header>
 
@@ -48,25 +53,26 @@
       </aside>
 
       <!-- 题目区域 -->
-      <aside class="flex-1 overflow-auto px-3">
+
+      <a-scrollbar class="flex-1 h-full overflow-auto px-2">
         <!-- TODO: 若实际上题目真的非常多再考虑虚拟列表 -->
         <div>
-          <h2 class="px-4 pt-4 pb-12 bg-slate-100 rounded-2xl">一、选择题</h2>
+          <h2 class="px-4 pt-4 pb-12 bg-slate-100 rounded-2xl border-solid b-blue-100 b-1">一、选择题</h2>
           <single-answer
-            v-for="(_, index) in new Array(10)"
+            v-for="(_, index) in testData"
             :key="index"
-            :number="index"
+            v-model="testData[index]"
           />
         </div>
         <div>
-          <h2 class="px-4 pt-4 pb-12 bg-slate-100 rounded-2xl">二、阅读理解</h2>
+          <h2 class="px-4 pt-4 pb-12 bg-slate-100 rounded-2xl border-solid b-blue-100 b-1">二、阅读理解</h2>
           <single-answer
-            v-for="(_, index) in new Array(10)"
+            v-for="(_, index) in testData"
             :key="index"
-            :number="index"
+            v-model="testData[index]"
           />
         </div>
-      </aside>
+      </a-scrollbar>
     </div>
   </a-layout>
 </template>
