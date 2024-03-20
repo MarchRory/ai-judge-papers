@@ -1,21 +1,37 @@
 <script setup lang="ts">
   /**
-   * TODO：草稿
+   * TODO：草稿，因此不同题型，例如选择或填空，暂时硬编码
+   *
    */
-  import collapsePanel from '../components/collapsePanel.vue';
+  import { reactive } from 'vue';
+  import { useRoute } from 'vue-router';
+  import CollapsePanel from '../components/collapsePanel.vue';
+  import SingleAnswer from '../components/singleAnswer.vue';
+  import { ExamListItem } from '../../../api/exam';
+
+  const route = useRoute();
+  const query = route.query as unknown as ExamListItem;
+
+  const testData = reactive([
+    { number: 1, aiScore: 2.5, humanScore: undefined, reviewPassed: false, totalScore: 10 },
+    { number: 1, aiScore: 2.5, humanScore: undefined, reviewPassed: false, totalScore: 10 },
+    { number: 1, aiScore: 2.5, humanScore: undefined, reviewPassed: false, totalScore: 10 },
+  ]);
 </script>
 
 <template>
   <a-layout class="h-full">
-    <a-page-header
-      title="语文"
-      subtitle="xxx考试"
-    >
+    <a-page-header @back="$router.back()">
+      <template #title> {{ query.name }}&nbsp;{{ query.subject }} </template>
+      <template #subtitle>
+        {{ new Date(Number(query.time)).toISOString().slice(0, 10) }}（{{ (query.timeLimit - query.time) / (1000 * 60) }}分钟）
+      </template>
+
       <template #extra>
-        <a-button-group>
+        <a-space>
           <a-button type="primary">提交</a-button>
           <a-button type="outline">全部</a-button>
-        </a-button-group>
+        </a-space>
       </template>
     </a-page-header>
 
@@ -37,25 +53,26 @@
       </aside>
 
       <!-- 题目区域 -->
-      <aside class="flex-1 overflow-auto">
-        <!-- 测试 -->
-        <div
-          v-for="i in new Array(100)"
-          :key="i"
-          class="flex justify-between gap-4 mx-2 mb-4"
-        >
-          <div class="flex-1">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Perferendis possimus optio modi, sit facilis aliquid sapiente aperiam
-            nulla, laboriosam illo iste veniam voluptatem accusantium iure nisi ex, repudiandae consequatur? Magni?
-          </div>
 
-          <div>
-            <a-button>复审通过</a-button>
-            <a-button>人工批改</a-button>
-            <div></div>
-          </div>
+      <a-scrollbar class="flex-1 h-full overflow-auto px-2">
+        <!-- TODO: 若实际上题目真的非常多再考虑虚拟列表 -->
+        <div>
+          <h2 class="px-4 pt-4 pb-12 bg-slate-100 rounded-2xl border-solid b-blue-100 b-1">一、选择题</h2>
+          <single-answer
+            v-for="(_, index) in testData"
+            :key="index"
+            v-model="testData[index]"
+          />
         </div>
-      </aside>
+        <div>
+          <h2 class="px-4 pt-4 pb-12 bg-slate-100 rounded-2xl border-solid b-blue-100 b-1">二、阅读理解</h2>
+          <single-answer
+            v-for="(_, index) in testData"
+            :key="index"
+            v-model="testData[index]"
+          />
+        </div>
+      </a-scrollbar>
     </div>
   </a-layout>
 </template>

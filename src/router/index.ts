@@ -3,6 +3,7 @@ import NProgress from 'nprogress'; // progress bar
 import 'nprogress/nprogress.css';
 import { REDIRECT_MAIN, NOT_FOUND_ROUTE, DEFAULT_LAYOUT } from './routes/base';
 import createRouteGuard from './guard';
+import formatModules from './routes';
 
 NProgress.configure({ showSpinner: false }); // NProgress Configuration
 
@@ -52,6 +53,8 @@ const router = createRouter({
         },
       ],
     },
+    // @ts-ignore TODO: 下面这行处于调试目的，待权限系统完成可删
+    ...formatModules(import.meta.glob('./routes/modules/*.ts', { eager: true }), []),
     // REDIRECT_MAIN,
     NOT_FOUND_ROUTE,
   ],
