@@ -2,15 +2,26 @@
   /**
    * TODO：草稿
    */
-  import collapsePanel from '../components/collapsePanel.vue';
+
+  import { useRoute } from 'vue-router';
+  import CollapsePanel from '../components/collapsePanel.vue';
+  import SingleAnswer from '../components/singleAnswer.vue';
+  import { ExamListItem } from '../../../api/exam';
+
+  const route = useRoute();
+  const query = route.query as unknown as ExamListItem;
 </script>
 
 <template>
   <a-layout class="h-full">
-    <a-page-header
-      title="语文"
-      subtitle="xxx考试"
-    >
+    <a-page-header @back="$router.back()">
+      <template #title> {{ query.name }}&nbsp;{{ query.subject }} </template>
+      <template #subtitle>
+        <span>
+          {{ new Date(Number(query.time)).toISOString().slice(0, 10) }}（{{ (query.timeLimit - query.time) / (1000 * 60) }}分钟）
+        </span>
+      </template>
+
       <template #extra>
         <a-button-group>
           <a-button type="primary">提交</a-button>
@@ -37,23 +48,23 @@
       </aside>
 
       <!-- 题目区域 -->
-      <aside class="flex-1 overflow-auto">
-        <!-- 测试 -->
-        <div
-          v-for="i in new Array(100)"
-          :key="i"
-          class="flex justify-between gap-4 mx-2 mb-4"
-        >
-          <div class="flex-1">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Perferendis possimus optio modi, sit facilis aliquid sapiente aperiam
-            nulla, laboriosam illo iste veniam voluptatem accusantium iure nisi ex, repudiandae consequatur? Magni?
-          </div>
-
-          <div>
-            <a-button>复审通过</a-button>
-            <a-button>人工批改</a-button>
-            <div></div>
-          </div>
+      <aside class="flex-1 overflow-auto px-3">
+        <!-- TODO: 若实际上题目真的非常多再考虑虚拟列表 -->
+        <div>
+          <h2 class="px-4 pt-4 pb-12 bg-slate-100 rounded-2xl">一、选择题</h2>
+          <single-answer
+            v-for="(_, index) in new Array(10)"
+            :key="index"
+            :number="index"
+          />
+        </div>
+        <div>
+          <h2 class="px-4 pt-4 pb-12 bg-slate-100 rounded-2xl">二、阅读理解</h2>
+          <single-answer
+            v-for="(_, index) in new Array(10)"
+            :key="index"
+            :number="index"
+          />
         </div>
       </aside>
     </div>

@@ -50,10 +50,9 @@
                   font="bold"
                   >{{ query.name }}</li
                 ><br />
-                <!--这里 /1000 是因为数据有问题, 到时候去除/1000就行-->
+                <!-- 目前 time 和 timeLimit 是 string 类型，不过也最好转换为数字以便传参 -->
                 <li text="1.5em"
-                  >{{ new Date(query.time / 1000).toISOString().slice(0, 10) }} |
-                  {{ (query.timeLimit - query.time / 1000) / (1000 * 60) }}分钟
+                  >{{ new Date(Number(query.time)).toISOString().slice(0, 10) }} | {{ (query.timeLimit - query.time) / (1000 * 60) }}分钟
                 </li>
               </ul>
             </div>
