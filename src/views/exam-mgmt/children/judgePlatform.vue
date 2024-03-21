@@ -5,12 +5,23 @@
    */
   import { reactive } from 'vue';
   import { useRoute } from 'vue-router';
+  import { ExamListItem } from '@/api/exam';
+  import { useUserStore } from '@/store';
+  import * as api from '@/api/judge';
   import CollapsePanel from '../components/collapsePanel.vue';
   import SingleAnswer from '../components/singleAnswer.vue';
-  import { ExamListItem } from '../../../api/exam';
 
   const route = useRoute();
   const query = route.query as unknown as ExamListItem;
+  const user = useUserStore();
+
+  // TODO:
+  // api.getPaperDetail({
+  //   examId: Number(query.id),
+  //   userId: /* user.id */ 2,
+  //   current: 0,
+  //   pageSize: 100,
+  // });
 
   const testData = reactive([
     { number: 1, aiScore: 2.5, humanScore: undefined, reviewPassed: false, totalScore: 10 },
