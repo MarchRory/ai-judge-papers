@@ -1,5 +1,6 @@
 import request from '@/utils/request/index';
 import { Paging } from './types';
+import { createFormData } from './utils';
 
 export interface Question {
   title: string;
@@ -36,4 +37,8 @@ export function getQuestionDetail(id: number) {
 
 export function updateQuestion(q: Question) {
   return request.post('/study/problem/detail', q);
+}
+
+export function uploadQuestion(file: File, sheet?: string) {
+  return request.post('/study/problem/upload', createFormData({ file, sheet }));
 }
