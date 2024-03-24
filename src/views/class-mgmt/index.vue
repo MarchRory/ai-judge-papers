@@ -85,7 +85,7 @@
       <a-card>
         <header class="py-4 flex gap-4">
           <addClassModalButton></addClassModalButton>
-          <a-button>批量导入</a-button>
+          <importBtn></importBtn>
         </header>
         <a-table
           :columns="columns"
@@ -132,7 +132,6 @@
         </a-table>
       </a-card>
     </a-layout-content>
-    <addClassModal v-model:visible="visible"></addClassModal>
   </a-layout>
 </template>
 
@@ -140,6 +139,7 @@
   import { TableColumnData, TableData, Message } from '@arco-design/web-vue';
   import { ref, reactive, watch } from 'vue';
   import addClassModalButton from '@/views/class-mgmt/components/addClassModalButton.vue';
+  import importBtn from '@/views/class-mgmt/components/importBtn.vue';
   import DetailButton from '@/components/detail-button/index.vue';
   import { listClass, deleteClass } from '@/api/class';
   import { Paging } from '@/api/types';
