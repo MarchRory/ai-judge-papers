@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { clone } from 'lodash';
+  import useTable from '@/hooks/table/useTable';
   import { reactive, ref, watch } from 'vue';
   import { Paging } from '@/api/types';
   import { createRoleAPI, deleteRoleAPI, getByRoleAPI, getRoleListAPI, updateRoleAPI } from '@/api/permissions';
@@ -10,36 +10,14 @@
   import { initPermissionTree } from '@/utils/permissions';
   import getConnectedKidPermissions from '@/filter/permissions';
 
-  const pagination = reactive<Paging<{ key: string }>>({
-    page: 1,
-    pageSize: 10,
-    key: '',
+  const otherSearchParams = { key: '' };
+  const { key, page, loading, tableData, loadList, handlePageChange, handleSizeChange, pagination } = useTable<
+    Omit<BaseRole, 'auth'>,
+    typeof otherSearchParams
+  >({
+    requestApi: getRoleListAPI,
+    otherSearchParams,
   });
-
-  const tableData = ref<Omit<BaseRole, 'auth'>[]>([]);
-  const totalAll = ref(0);
-  const loading = ref(false);
-  function loadList() {
-    loading.value = true;
-    getRoleListAPI(pagination)
-      .then((res) => {
-        const { total, list } = res.data;
-        totalAll.value = total;
-        tableData.value = list;
-      })
-      .finally(() => {
-        loading.value = false;
-      });
-  }
-  watch(
-    () => pagination,
-    (newVal, oldVal) => {
-      if (!newVal.key || newVal.page !== oldVal.page || newVal.pageSize !== oldVal.pageSize) {
-        loadList();
-      }
-    },
-    { deep: true }
-  );
 
   const isFormOpen = ref(false);
   const formRef = ref();
@@ -52,6 +30,11 @@
     desc: '',
     auth: [],
   });
+  function reset() {
+    key.value = '';
+    page.value = 1;
+    loadList();
+  }
   function handleSubmit() {
     form.value.auth = getConnectedKidPermissions(form.value.auth);
     okLoading.value = true;
@@ -163,14 +146,22 @@
             p="x-4"
             flex="~ justify-between items-center"
           >
-            <div w="1/4">
+            <div
+              w="1/4"
+              flex="~"
+            >
               <a-input-search
-                v-model="pagination.key"
+                v-model="key"
                 allow-clear
                 placeholder="输入关键字查找角色"
                 search-button
                 @search="loadList"
               />
+              <a-button
+                m="l-2"
+                @click="reset"
+                >重置</a-button
+              >
             </div>
             <div w="1/4">
               <a-button
@@ -195,15 +186,10 @@
             stripe
             :loading="loading"
             page-position="br"
-            :pagination="{
-              total: totalAll,
-              pageSize: pagination.pageSize,
-              showJumper: true,
-              showPageSize: true,
-            }"
+            :pagination="pagination"
             sticky-header
-            @page-size-change="(newSize) => (pagination.pageSize = newSize)"
-            @page-change="(newPage) => (pagination.page = newPage)"
+            @page-size-change="handleSizeChange"
+            @page-change="handlePageChange"
           >
             <template #columns>
               <a-table-column

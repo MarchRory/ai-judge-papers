@@ -3,9 +3,13 @@ import { Paging } from './types';
 import { createFormData } from './utils';
 
 export interface Class {
+  id: number;
   name: string;
   grade: string;
-  teacherId: object;
+  number: string;
+  state: number;
+  numberCount: number;
+  graduation: number;
 }
 
 export function createClass(c: Class) {

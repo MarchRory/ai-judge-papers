@@ -3,11 +3,22 @@
     <a-layout-header class="p4">
       <a-card class="px-2">
         <header class="pt-4 pb-8">
-          <strong class="text-2xl"> 查询试题 </strong>
+          <strong class="text-2xl"> 试题库 </strong>
         </header>
         <div class="grid grid-cols-[1fr_auto]">
           <a-form :model="form">
             <a-row :gutter="16">
+              <a-col :span="10">
+                <a-form-item
+                  field="title"
+                  label="请输入题目关键词"
+                >
+                  <a-input
+                    v-model="form.title"
+                    placeholder="请输入题目关键词"
+                  ></a-input>
+                </a-form-item>
+              </a-col>
               <a-col :span="8">
                 <a-form-item
                   filed="subject"
@@ -18,31 +29,6 @@
                     v-model="form.subject"
                     placeholder="请选择学科"
                   ></a-input>
-                </a-form-item>
-              </a-col>
-              <a-col :span="8">
-                <a-form-item
-                  field="title"
-                  label="题目"
-                  label-col-flex="60px"
-                >
-                  <a-input
-                    v-model="form.title"
-                    placeholder="请输入题目"
-                  ></a-input>
-                </a-form-item>
-              </a-col>
-              <a-col :span="8">
-                <a-form-item
-                  filed="grade"
-                  label="年级"
-                  label-col-flex="32px"
-                >
-                  <a-select placeholder="请选择">
-                    <a-option :value="3">2021</a-option>
-                    <a-option :value="2">2022</a-option>
-                    <a-option :value="1">2023</a-option>
-                  </a-select>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -78,25 +64,59 @@
         </header>
         <a-table
           :columns="columns"
-          :data="selectedData"
+          :data="tableData"
+          stripe
           :loading="loading"
+          page-position="br"
+          :pagination="pagination"
+          sticky-header
+          @page-size-change="handleSizeChange"
+          @page-change="handlePageChange"
         >
-          <template #$operation="{ record }">
-            <detail-button
-              :data="record"
-              :columns="columns"
-            />
-            <a-popconfirm
-              content="确认要删除？"
-              @ok="QuestionDelete(record)"
+          <template #columns>
+            <template
+              v-for="{ dataIndex, slotName } in columns"
+              :key="dataIndex"
             >
-              <a-button
-                type="text"
-                status="danger"
+              <a-table-column
+                v-if="!['$operation', 'subject'].includes(dataIndex as string)"
+                :title="slotName"
+                :data-index="dataIndex"
+              />
+              <a-table-column
+                v-else-if="dataIndex === 'subject'"
+                :title="slotName"
               >
-                删除
-              </a-button>
-            </a-popconfirm>
+                <template #cell="{ record }">
+                  {{ record.subject.title }}
+                </template>
+              </a-table-column>
+              <a-table-column
+                v-else-if="dataIndex === '$operation'"
+                :title="slotName"
+              >
+                <template #cell="{ record }">
+                  <detail-button
+                    :data="{
+                      ...record,
+                      subject: record.subject.title,
+                    }"
+                    :columns="columns"
+                  />
+                  <a-popconfirm
+                    content="确认要删除？"
+                    @ok="QuestionDelete(record)"
+                  >
+                    <a-button
+                      type="text"
+                      status="danger"
+                    >
+                      删除
+                    </a-button>
+                  </a-popconfirm>
+                </template>
+              </a-table-column>
+            </template>
           </template>
         </a-table>
       </a-card>
@@ -105,15 +125,14 @@
 </template>
 
 <script setup lang="ts">
-  import { TableColumnData, TableData, Message } from '@arco-design/web-vue';
-  import { ref, reactive, watch } from 'vue';
-  import { Paging } from '@/api/types';
+  import { TableColumnData, Message } from '@arco-design/web-vue';
+  import { reactive } from 'vue';
   import DetailButton from '@/components/detail-button/index.vue';
-  import { listQuestion, deleteQuestion } from '@/api/question';
+  import { listQuestion, deleteQuestion, type QuestionListItem } from '@/api/question';
+  import { getSubjectListAPI } from '@/api/subject';
+  import useTable from '@/hooks/table/useTable';
   import addQuestionModalButton from './components/addQuestionModalButton.vue';
 
-  const loading = ref(false);
-  const totalAll = ref(0);
   const form = reactive<{
     subject: string;
     title: string;
@@ -125,84 +144,57 @@
   });
 
   const columns: TableColumnData[] = Object.entries({
-    id: '序号',
+    id: '标识',
     subject: '学科',
     title: '题目',
     expectedDifficulty: '难易程度',
     source: '来源',
     $operation: '操作',
-  }).map(([dataIndex, title]) => ({ dataIndex, title, slotName: dataIndex }));
+  }).map(([dataIndex, title]) => ({ dataIndex, slotName: title }));
 
-  const rawData: TableData[] = reactive([]);
-
-  const selectedData = ref<TableData[]>();
-
-  const pagination = reactive<Paging<{ key: string; examId: number }>>({
-    page: 1,
-    pageSize: 10,
-    key: '',
-    examId: 0,
+  const otherSearchParams = { key: '', examId: 0 };
+  const { tableData, pagination, loading, loadList, handlePageChange, handleSizeChange, page, key, examId } = useTable<
+    QuestionListItem,
+    typeof otherSearchParams
+  >({
+    requestApi: listQuestion,
+    otherSearchParams,
   });
 
-  // 获取试题列表数据
-  function LoadList() {
-    loading.value = true;
-    listQuestion(pagination)
-      .then((res) => {
-        console.log(res);
-        const { list, total } = res.data;
-        totalAll.value = total;
-        selectedData.value = list;
-      })
-      .finally(() => {
-        loading.value = false;
-      });
-  }
-  watch(
-    () => pagination,
-    (newVal, oldVal) => {
-      if (!newVal.key || newVal.page !== oldVal.page || newVal.pageSize !== oldVal.pageSize) {
-        LoadList();
-      }
-    },
-    { deep: true }
-  );
-
   // 查询
-  function query() {
-    loading.value = true;
-    pagination.examId = 0;
-    pagination.key = form.title;
-    listQuestion(pagination)
-      .then((res) => {
-        const { list, total } = res.data;
-        totalAll.value = total;
-        selectedData.value = list;
-      })
-      .finally(() => {
-        loading.value = false;
-      });
+  async function query() {
+    page.value = 1;
+    await loadList();
+    Message.success('数据查询成功');
   }
   // 重置
-  function reset() {
-    pagination.key = '';
+  async function reset() {
+    key.value = '';
     form.title = '';
     form.subject = '';
     form.grade = 1;
-    LoadList();
-    Message.success('已重置');
+    await loadList();
+    Message.success('数据已更新');
   }
   // 删除
-  function QuestionDelete(record) {
+  function QuestionDelete(record: QuestionListItem) {
     const { id } = record;
     deleteQuestion(id as number).then((res) => {
       const { message } = res;
       if (message === 'success') {
         Message.success('删除成功');
-        LoadList();
+        loadList();
       }
     });
   }
 
-  LoadList();
+  function initSelect() {}
+
+  // 初始化页面
+  function pageInit() {
+    loadList();
+    initSelect();
+  }
+
+  pageInit();
 </script>

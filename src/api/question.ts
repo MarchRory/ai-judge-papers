@@ -10,6 +10,7 @@ export interface Question {
   expectedDifficulty: number;
   source: string;
 }
+export type QuestionListItem = Omit<Question, 'subject'> & { id: number; subject: { id: number; icon: string; title: string } };
 
 export function createQuestion(q: Question) {
   return request.post<Question>('/study/problem/create', q);
@@ -27,7 +28,7 @@ export function listQuestion(
 ) {
   return request.post<{
     total: number;
-    list: Question[];
+    list: QuestionListItem[];
   }>('/study/problem/list', data);
 }
 
