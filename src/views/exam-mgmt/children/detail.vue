@@ -176,6 +176,11 @@
               >
                 {{ examStateMap[examStatus].btnText }}
               </a-button>
+              <div>
+                <mark>TODO:完成后删除</mark>
+                <button @click="jumpToJudge">TEST:jumpToJudge </button>
+                <button @click="jumpToDataAnalysis">TEST:jumpToDataAnalysis</button>
+              </div>
             </div>
           </section>
           <section>

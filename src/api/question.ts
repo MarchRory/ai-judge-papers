@@ -24,7 +24,7 @@ export function listQuestion(
   data: Paging<{
     key: string;
     subjectId: number | string;
-  }>,
+  }>
 ) {
   return request.post<{
     total: number;

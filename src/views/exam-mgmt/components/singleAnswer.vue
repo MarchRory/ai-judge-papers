@@ -128,11 +128,11 @@
     >
       <div class="flex items-center gap-4">
         <a-typography-text v-if="typeof props.modelValue.humanScore !== 'undefined'"
-          >已 <a-typography-text type="success">人工</a-typography-text> 判定为
+          >已 <a-typography-text type="warning">人工</a-typography-text> 判定为
           <strong>{{ props.modelValue.humanScore }}</strong> 分</a-typography-text
         >
         <a-typography-text v-else
-          >已确认 <a-typography-text type="primary">AI</a-typography-text> 判定为
+          >已确认 <a-typography-text type="success">AI</a-typography-text> 判定为
           <strong>{{ props.modelValue.aiScore }}</strong> 分</a-typography-text
         >
         <a-link @click="reset">取消</a-link>
