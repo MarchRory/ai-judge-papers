@@ -20,10 +20,11 @@ interface TableBaseMethodsType<R extends object, T extends object> {
 // 接收：表格数据的范型T, 请求方法以及参数
 // 抛出以下:
 // 1、loading
-// 2、pagination
-// 3、分页器交互方法
-// 4、表格数据
-// 5、表格数据请求方法
+// 2、pagination - 分页器配置项
+// 3、分页器交互方法 - <handlePageChange>、<handleSizeChange>
+// 4、表格数据 - <tableData>
+// 5、表格数据请求方法 - <loadList>
+// 6、表格查询参数 <ref>
 export default function useTable<R extends object, T extends object>(config: TableBaseMethodsType<R, T>) {
   const { otherSearchParams = {}, requestApi } = config;
 
@@ -48,7 +49,7 @@ export default function useTable<R extends object, T extends object>(config: Tab
       pageSize: pageParams.pageSize,
       showTotal: true,
       showMore: true,
-      showJumper: true,
+      showJumper: false,
       showPageSize: true,
       pageSizeOptions: [10, 20, 30, 50],
       size: 'medium',
@@ -63,6 +64,7 @@ export default function useTable<R extends object, T extends object>(config: Tab
       const res = await requestApi(params as Paging<T>);
       if (res.code === 200) {
         const { list, total } = res.data;
+        // @ts-ignore
         state.tableData = list;
         state.totalAll = total;
       } else {
@@ -71,7 +73,7 @@ export default function useTable<R extends object, T extends object>(config: Tab
     } catch (e) {
       state.tableData = [];
       state.totalAll = 0;
-      Message.error('出现异常, 请求发生失败');
+      Message.error('出现异常, 请求失败');
     } finally {
       state.loading = false;
     }

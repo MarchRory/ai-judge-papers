@@ -1,6 +1,4 @@
 import request from '@/utils/request';
-import getFileFormData from '@/utils/file';
-import { FileItem } from '@arco-design/web-vue';
 import { ListResponse, Paging } from './types';
 
 const schema = '/study/exam';
@@ -9,8 +7,10 @@ const enum ExamApi {
   update = `${schema}/update`,
   delete = `${schema}/delete`,
   list = `${schema}/list`,
+  detail = `${schema}/detail`,
   addProblem = `${schema}/addProblem`,
   uploadTemplate = `${schema}/upload`, // 上传考试excel模板
+  sheetList = `${schema}/answerSheet/list`, // 获取上传到某考试中的学生的答题卡列表
 }
 
 /**
@@ -29,7 +29,7 @@ export interface ExamFormData {
 }
 
 export interface ExamFileParams {
-  file: FileItem;
+  file: File;
   sheet?: string;
   examId: number;
 }
@@ -71,9 +71,17 @@ export function getExamListApi(data: Paging & { key: string }) {
 }
 
 export function uploadExamTemplateApi({ file, sheet = '', examId }: ExamFileParams) {
-  return request.upload(ExamApi.uploadTemplate, file, { sheet, examId }, {});
+  return request.upload(ExamApi.uploadTemplate, file, { sheet, examId });
 }
 
 export function addProblemApi(data: addProblemParams) {
   return request.post(ExamApi.addProblem, data);
+}
+
+export function getAnswerSheetListApi(data: Paging<{ examId: number; key?: string }>) {
+  return request.post(ExamApi.sheetList, data);
+}
+
+export function getExamDetailApi(data: { id: number }) {
+  return request.post<ExamListItem>(ExamApi.detail, data);
 }

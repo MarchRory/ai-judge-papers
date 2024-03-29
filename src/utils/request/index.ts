@@ -5,6 +5,7 @@ import { getToken } from '@/utils/auth';
 import LRUCache from '@/dataStruct/LRUCache';
 import getFileFormData from '../file';
 import { Optimization } from './Optimizations';
+import { createFormData } from '@/api/utils';
 
 export interface HttpResponse<T = unknown> {
   success: boolean;
@@ -98,7 +99,7 @@ class HttpRequest {
     );
   }
 
-  request<T = any>(config: AxiosRequestConfig, opts?: Optimization): Promise<HttpResponse<T>> {
+  private request<T = any>(config: AxiosRequestConfig, opts?: Optimization): Promise<HttpResponse<T>> {
     /**
      * TODO: execute other methods according to config
      */
@@ -135,19 +136,20 @@ class HttpRequest {
 
   upload<T = string>(
     url: string,
-    fileItem: FileItem,
+    fileItem: File,
     otherParams: Record<string, number | string>,
-    config: Omit<AxiosRequestConfig, 'url' | 'data' | 'method'>
+    config: Omit<AxiosRequestConfig, 'url' | 'data' | 'method'> = {}
   ) {
-    const data = getFileFormData(fileItem, otherParams);
+    const data = createFormData(otherParams, true);
+    data.append('file', fileItem);
     const requestConfig: AxiosRequestConfig = {
       ...config,
       headers: {
-        ...config.headers,
+        ...(config.headers || {}),
         'Content-Type': 'multipart/form-data',
       },
     };
-    return this.request<T>({ url, data, ...requestConfig });
+    return this.post<T>(url, data, requestConfig);
   }
 }
 

@@ -5,7 +5,7 @@ const schema = '/study/judge/';
 
 const enum JudgeApi {
   submit = `${schema}/submiy`,
-  beginJudge = `${schema}/dojudge`, // 启动AI阅卷
+  beginJudge = `${schema}/doJudge`, // 启动AI阅卷
   problemList = `${schema}/list`,
   stuScoreList = `${schema}/scoreList`,
   updateProblemRes = `${schema}/update`, // 更新判题结果=, 对指定题目进行复审

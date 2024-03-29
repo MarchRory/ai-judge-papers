@@ -65,7 +65,7 @@
 
       <!-- 题目区域 -->
 
-      <a-scrollbar class="flex-1 h-full overflow-auto px-2">
+      <a-scrollbar class="h-full overflow-auto px-6">
         <!-- TODO: 若实际上题目真的非常多再考虑虚拟列表 -->
         <div>
           <h2 class="px-4 pt-4 pb-12 bg-slate-100 rounded-2xl border-solid b-blue-100 b-1">一、选择题</h2>
@@ -87,3 +87,9 @@
     </div>
   </a-layout>
 </template>
+
+<style scoped>
+  :deep(.arco-scrollbar) {
+    flex: 1;
+  }
+</style>
