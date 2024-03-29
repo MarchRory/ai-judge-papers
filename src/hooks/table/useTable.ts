@@ -49,7 +49,7 @@ export default function useTable<R extends object, T extends object>(config: Tab
       pageSize: pageParams.pageSize,
       showTotal: true,
       showMore: true,
-      showJumper: true,
+      showJumper: false,
       showPageSize: true,
       pageSizeOptions: [10, 20, 30, 50],
       size: 'medium',
@@ -73,7 +73,7 @@ export default function useTable<R extends object, T extends object>(config: Tab
     } catch (e) {
       state.tableData = [];
       state.totalAll = 0;
-      Message.error('出现异常, 请求发生失败');
+      Message.error('出现异常, 请求失败');
     } finally {
       state.loading = false;
     }

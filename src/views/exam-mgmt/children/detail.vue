@@ -1,13 +1,25 @@
 <script setup lang="ts">
-  import { ExamListItem, uploadExamTemplateApi } from '@/api/exam';
+  import { ref } from 'vue';
+  import { ExamListItem, uploadExamTemplateApi, getExamDetailApi } from '@/api/exam';
   import { useRoute, useRouter } from 'vue-router';
   import { FileItem, Message } from '@arco-design/web-vue';
+  import { beginAiJudge } from '@/api/judge';
   import { examStateMap } from '../config';
 
   const route = useRoute();
   const router = useRouter();
-  const query = route.query as unknown as ExamListItem;
 
+  const query = route.query as unknown as ExamListItem;
+  const examStatus = ref(+query.state);
+  const examDetail = ref({} as ExamListItem);
+
+  const getExamDetail = () => {
+    getExamDetailApi({ id: +query.id }).then((res) => {
+      const { data } = res;
+      examDetail.value = data;
+      // examStatus.value = data.state;
+    });
+  };
   // @ts-ignore
   const uploadPaperTemplate = (_, fileItem: FileItem) => {
     const { file } = fileItem;
@@ -16,17 +28,52 @@
       uploadExamTemplateApi({
         file,
         sheet: '',
-        examId: query.id,
+        examId: examDetail.value.id,
       }).then(() => {
         Message.success('答卷上传成功');
       });
     /* eslint-enable */
   };
-
+  const beginAIJudge = () => {
+    beginAiJudge(+query.id).then((res) => {
+      const { success } = res;
+      if (success) {
+        Message.success('AI判卷已启动, 请耐心等待');
+        getExamDetail();
+      } else {
+        const { message } = res;
+        Message.warning(message);
+      }
+    });
+  };
   const jumpToJudge = () => {
     // @ts-ignore
     router.push({ path: '/exam-mgmt/judgePlatform', query });
   };
+  const jumpToDataAnalysis = () => {
+    // @ts-ignore
+    router.push({ path: '/exam-mgmt/chartPage', query });
+  };
+  const stateFnTrigger = () => {
+    switch (+examStatus.value) {
+      case 1:
+        beginAIJudge();
+        break;
+      case 3:
+        jumpToJudge();
+        break;
+      case 4:
+        jumpToDataAnalysis();
+        break;
+      default:
+        break;
+    }
+  };
+
+  const initPage = () => {
+    getExamDetail();
+  };
+  initPage();
 </script>
 
 <template>
@@ -57,15 +104,16 @@
                 <li
                   text="3em"
                   font="bold"
-                  >{{ query.name }}</li
-                ><br />
-                <li text="1.5em"
-                  >{{ new Date(+query.time).toISOString().slice(0, 10) }} | {{ (query.timeLimit - query.time) / (1000 * 60) }}分钟 |
+                  >{{ examDetail.name }}
+                </li>
+                <br />
+                <li text="1.5em">
+                  {{ new Date(+query.time).toISOString().slice(0, 10) }} | {{ (query.timeLimit - query.time) / (1000 * 60) }}分钟 |
                   {{ query.subject }}
                 </li>
               </ul>
             </div>
-            <div> <span />{{ examStateMap[query.state].text }} </div>
+            <div> <span />{{ examStateMap[examStatus].text }} </div>
           </div>
         </a-card>
       </a-layout-header>
@@ -76,9 +124,9 @@
               <strong class="text-2xl"> 考卷信息 </strong>
             </header>
             <div flex="~ items-center justify-around">
-              <div w="3/7"
-                ><a-upload
-                  v-if="query.state !== 4"
+              <div w="3/7">
+                <a-upload
+                  v-if="examDetail.state !== 4"
                   action="/"
                   tip="请上传试题卷Excel"
                   :limit="1"
@@ -86,10 +134,11 @@
                   draggable
                   :auto-upload="false"
                   @change="uploadPaperTemplate"
-              /></div>
-              <div w="3/7"
-                ><a-upload
-                  v-if="query.state !== 4"
+                />
+              </div>
+              <div w="3/7">
+                <a-upload
+                  v-if="examDetail.state !== 4"
                   :limit="1"
                   :auto-upload="false"
                   tip="请上传学生答卷压缩包"
@@ -97,7 +146,8 @@
                   draggable
                   action="/"
                   @change="uploadPaperTemplate"
-              /></div>
+                />
+              </div>
             </div>
           </section>
           <section>
@@ -108,7 +158,7 @@
             <div w="1/1">
               <a-steps
                 type="arrow"
-                :current="query.state"
+                :current="+examStatus"
               >
                 <a-step
                   v-for="(item, index) in examStateMap"
@@ -117,14 +167,28 @@
                 >
               </a-steps>
 
-              <!-- v-if="query.state === 3" -->
               <a-button
-                mt="5"
+                class="status-trigger mt-5"
                 type="outline"
                 long
-                @click="jumpToJudge"
-                >去阅卷</a-button
+                :disabled="examStatus === 2"
+                @click="stateFnTrigger"
               >
+                {{ examStateMap[examStatus].btnText }}
+              </a-button>
+            </div>
+          </section>
+          <section>
+            <header class="pt-4 pb-8 mt-10">
+              <strong class="text-2xl"> 数据分析 </strong>
+            </header>
+            <div flex="~ items-center justify-around">
+              <a-empty>
+                <template #image>
+                  <icon-bar-chart />
+                </template>
+                <div v-if="examDetail.state !== 4">试卷评阅结束, 完成提交后, 可查看数据分析</div>
+              </a-empty>
             </div>
           </section>
         </a-card>
@@ -135,3 +199,11 @@
     </a-layout>
   </div>
 </template>
+
+<style scoped lang="less">
+  :deep(.arco-btn-size-medium) {
+    padding: 25px 0;
+    font-size: 1.5em;
+    font-weight: 800;
+  }
+</style>

@@ -1,9 +1,8 @@
 <script setup lang="ts">
-  import { reactive, ref, computed } from 'vue';
+  import { ref, watch } from 'vue';
   import { createExamApi, updateExamApi } from '@/api/exam';
   import type { ExamFormData } from '@/api/exam';
-  import { SubjectItem, getSubjectListAPI } from '@/api/subject';
-  import { cloneDeep } from 'lodash';
+  import { getSubjectListAPI } from '@/api/subject';
   import { FormInstance, Message, SelectOptionData } from '@arco-design/web-vue';
 
   interface Props {
@@ -67,7 +66,7 @@
           }
         }, 500);
       }
-    }
+    },
   );
 
   // select数据

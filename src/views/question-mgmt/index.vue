@@ -25,10 +25,11 @@
                   label="学科"
                   label-col-flex="32px"
                 >
-                  <a-input
-                    v-model="form.subject"
-                    placeholder="请选择学科"
-                  ></a-input>
+                  <a-select
+                    v-model="subjectId"
+                    :options="subjectOptions"
+                    :field-names="{ label: 'name', value: 'id' }"
+                  />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -152,29 +153,29 @@
     $operation: '操作',
   }).map(([dataIndex, title]) => ({ dataIndex, slotName: title }));
 
-  const otherSearchParams = { key: '', examId: 0 };
-  const { tableData, pagination, loading, loadList, handlePageChange, handleSizeChange, page, key, examId } = useTable<
+  const otherSearchParams = { key: '', subjectId: '' };
+  const { tableData, pagination, loading, loadList, handlePageChange, handleSizeChange, page, key, subjectId } = useTable<
     QuestionListItem,
     typeof otherSearchParams
   >({
     requestApi: listQuestion,
     otherSearchParams,
   });
+  const subjectOptions = ref<{ name: string; id: number | string }[]>([{ name: '全部', id: '' }]);
 
   // 查询
   async function query() {
     page.value = 1;
     await loadList();
-    Message.success('数据查询成功');
   }
   // 重置
   async function reset() {
     key.value = '';
+    subjectId.value = '';
     form.title = '';
     form.subject = '';
     form.grade = 1;
     await loadList();
-    Message.success('数据已更新');
   }
   // 删除
   function QuestionDelete(record: QuestionListItem) {
@@ -188,7 +189,21 @@
     });
   }
 
-  function initSelect() {}
+  function initSelect() {
+    getSubjectListAPI({ page: 1, pageSize: 100, key: '' }, { cache: true })
+      .then((res) => {
+        const { list } = res.data;
+        list.forEach((item) => {
+          subjectOptions.value.push({
+            id: item.id as number,
+            name: item.name,
+          });
+        });
+      })
+      .catch(() => {
+        Message.error('学科信息获取失败, 请刷新页面重试');
+      });
+  }
 
   // 初始化页面
   function pageInit() {

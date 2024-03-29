@@ -1,31 +1,28 @@
 interface stateConfig {
   text: string;
   iconColor: string;
+  btnText: string;
 }
-type typeConfig = stateConfig;
 
 export const examStateMap: Record<number, stateConfig> = {
   1: {
-    text: '未开始',
+    text: '准备中',
     iconColor: '',
+    btnText: '启动阅卷',
   },
   2: {
-    text: '进行中',
+    text: 'AI判卷中',
     iconColor: '',
+    btnText: '等待AI阅卷结束',
   },
   3: {
-    text: '阅卷中',
+    text: 'AI判卷结束',
     iconColor: '',
+    btnText: '去复审',
   },
   4: {
-    text: '已结束',
+    text: '已提交阅卷结果',
     iconColor: '',
-  },
-};
-
-export const examTypeMap: Record<number, typeConfig> = {
-  1: {
-    text: '',
-    iconColor: '',
+    btnText: '考试回顾',
   },
 };
