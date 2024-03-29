@@ -48,6 +48,17 @@ const EXAM_MGMT: AppRouteRecordRaw = {
         roles: ['root', 'exam'],
       },
     },
+    {
+      path: 'chartPage',
+      name: 'chartPage',
+      component: () => import('@/views/exam-mgmt/children/chartPage.vue'),
+      meta: {
+        locale: '考试分析',
+        requiresAuth: true,
+        activeMenu: 'exam-mgmt',
+        roles: ['root', 'exam'],
+      },
+    },
   ],
 };
 

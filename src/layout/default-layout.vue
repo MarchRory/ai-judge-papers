@@ -43,10 +43,10 @@
           :style="paddingStyle"
         >
           <TabBar v-if="appStore.tabBar" />
-          <a-layout-content p="18px">
+          <a-layout-content p="5px">
             <PageLayout />
           </a-layout-content>
-          <Footer v-if="footer" />
+          <Footer v-if="false" />
         </a-layout>
       </a-layout>
     </a-layout>
@@ -96,7 +96,7 @@
     () => userStore.auth,
     (roleValue) => {
       if (roleValue && !permission.accessRouter(route)) router.push({ name: 'notFound' });
-    }
+    },
   );
   const drawerVisible = ref(false);
   const drawerCancel = () => {

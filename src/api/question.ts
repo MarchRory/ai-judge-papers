@@ -23,8 +23,8 @@ export function deleteQuestion(id: number) {
 export function listQuestion(
   data: Paging<{
     key: string;
-    examId: number;
-  }>
+    subjectId: number | string;
+  }>,
 ) {
   return request.post<{
     total: number;

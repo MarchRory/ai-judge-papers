@@ -7,6 +7,7 @@ const enum ExamApi {
   update = `${schema}/update`,
   delete = `${schema}/delete`,
   list = `${schema}/list`,
+  detail = `${schema}/detail`,
   addProblem = `${schema}/addProblem`,
   uploadTemplate = `${schema}/upload`, // 上传考试excel模板
   sheetList = `${schema}/answerSheet/list`, // 获取上传到某考试中的学生的答题卡列表
@@ -79,4 +80,8 @@ export function addProblemApi(data: addProblemParams) {
 
 export function getAnswerSheetListApi(data: Paging<{ examId: number; key?: string }>) {
   return request.post(ExamApi.sheetList, data);
+}
+
+export function getExamDetailApi(data: { id: number }) {
+  return request.post<ExamListItem>(ExamApi.detail, data);
 }

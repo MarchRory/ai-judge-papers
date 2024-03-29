@@ -123,7 +123,7 @@
           }
         }, 500);
       }
-    }
+    },
   );
 
   function pageInit() {
@@ -163,8 +163,12 @@
               <a-button
                 m="l-2"
                 @click="reset"
-                >重置</a-button
               >
+                <template #icon>
+                  <icon-refresh />
+                </template>
+                <template #default> 重置 </template>
+              </a-button>
             </div>
             <div w="1/4">
               <a-button

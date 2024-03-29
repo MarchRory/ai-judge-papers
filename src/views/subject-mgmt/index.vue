@@ -78,7 +78,7 @@
           }
         }, 500);
       }
-    }
+    },
   );
 
   function jumpDetail(query: SubjectItem) {
@@ -113,7 +113,10 @@
                 @search="loadList"
               />
             </div>
-            <div w="1/4">
+            <div
+              v-if="false"
+              w="1/4"
+            >
               <a-button
                 type="primary"
                 @click="openForm('create')"
@@ -177,6 +180,7 @@
                     >详情</a-button
                   >
                   <a-popconfirm
+                    v-if="false"
                     content="确定要删除该学科吗？"
                     type="error"
                     @ok="deleteSubject(record)"

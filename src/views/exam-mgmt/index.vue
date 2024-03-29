@@ -1,45 +1,29 @@
 <script setup lang="ts">
-  import { reactive, ref, watch, defineAsyncComponent } from 'vue';
+  import { ref, defineAsyncComponent } from 'vue';
   import { Message } from '@arco-design/web-vue';
   import { useRouter } from 'vue-router';
-  import { Paging } from '@/api/types';
-  import { createExamApi, updateExamApi, deleteExamApi, getExamListApi } from '@/api/exam';
+  import useTable from '@/hooks/table/useTable';
+  import { deleteExamApi, getExamListApi } from '@/api/exam';
   import type { ExamFormData, ExamListItem } from '@/api/exam';
-  import { examStateMap, examTypeMap } from './config';
+  import { examStateMap } from './config';
 
   const FormModal = defineAsyncComponent(() => import('./components/formModal.vue'));
-
+  const now = new Date().getTime();
   const router = useRouter();
-  const pagination = reactive<Paging<{ key: string }>>({
-    page: 1,
-    pageSize: 10,
-    key: '',
+  const otherSearchParams = { key: '' };
+  const { key, loading, page, tableData, pagination, loadList, handleSizeChange, handlePageChange } = useTable<
+    ExamListItem,
+    typeof otherSearchParams
+  >({
+    requestApi: getExamListApi,
+    otherSearchParams,
   });
 
-  const tableData = ref<ExamListItem[]>([]);
-  const totalAll = ref(0);
-  const loading = ref(false);
-  function loadList() {
-    loading.value = true;
-    getExamListApi(pagination)
-      .then((res) => {
-        const { total, list } = res.data;
-        totalAll.value = total;
-        tableData.value = list;
-      })
-      .finally(() => {
-        loading.value = false;
-      });
+  function reset() {
+    key.value = '';
+    page.value = 1;
+    loadList();
   }
-  watch(
-    () => pagination,
-    (newVal, oldVal) => {
-      if (!newVal.key || newVal.page !== oldVal.page || newVal.pageSize !== oldVal.pageSize) {
-        loadList();
-      }
-    },
-    { deep: true }
-  );
 
   const isFormOpen = ref(false);
   const formType = ref<'create' | 'edit'>('create');
@@ -101,14 +85,26 @@
             p="x-4"
             flex="~ justify-between items-center"
           >
-            <div w="1/4">
+            <div
+              w="1/4"
+              flex="~"
+            >
               <a-input-search
-                v-model="pagination.key"
+                v-model="key"
                 allow-clear
                 placeholder="输入关键字查找相关考试"
                 search-button
                 @search="loadList"
               />
+              <a-button
+                m="l-2"
+                @click="reset"
+              >
+                <template #icon>
+                  <icon-refresh />
+                </template>
+                <template #default> 重置 </template>
+              </a-button>
             </div>
             <div w="1/4">
               <a-button
@@ -133,15 +129,10 @@
             stripe
             :loading="loading"
             page-position="br"
-            :pagination="{
-              total: totalAll,
-              pageSize: pagination.pageSize,
-              showJumper: true,
-              showPageSize: true,
-            }"
+            :pagination="pagination"
             sticky-header
-            @page-size-change="(newSize) => (pagination.pageSize = newSize)"
-            @page-change="(newPage) => (pagination.page = newPage)"
+            @page-size-change="handleSizeChange"
+            @page-change="handlePageChange"
           >
             <template #columns>
               <a-table-column
@@ -212,6 +203,7 @@
                     >详情</a-button
                   >
                   <a-button
+                    v-if="now < record.time"
                     m="r-2"
                     type="outline"
                     status="warning"
@@ -224,6 +216,7 @@
                     @ok="deleteSubject(record)"
                   >
                     <a-button
+                      v-if="now < record.time"
                       type="primary"
                       status="danger"
                     >
