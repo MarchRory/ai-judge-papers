@@ -89,8 +89,14 @@
         </header>
         <a-table
           :columns="columns"
-          :data="selectedData"
+          :data="tableData"
+          stripe
           :loading="loading"
+          page-position="br"
+          :pagination="pagination"
+          sticky-header
+          @page-size-change="handleSizeChange"
+          @page-change="handlePageChange"
         >
           <!-- <template #state="{ record: { state } }">
             <a-tag
@@ -136,16 +142,14 @@
 </template>
 
 <script setup lang="ts">
-  import { TableColumnData, TableData, Message } from '@arco-design/web-vue';
-  import { ref, reactive, watch } from 'vue';
+  import { TableColumnData, Message } from '@arco-design/web-vue';
+  import { reactive } from 'vue';
   import addClassModalButton from '@/views/class-mgmt/components/addClassModalButton.vue';
   import importBtn from '@/views/class-mgmt/components/importBtn.vue';
   import DetailButton from '@/components/detail-button/index.vue';
-  import { listClass, deleteClass } from '@/api/class';
-  import { Paging } from '@/api/types';
+  import useTable from '@/hooks/table/useTable';
+  import { listClass, deleteClass, Class } from '@/api/class';
 
-  const loading = ref(false);
-  const totalAll = ref(0);
   const form = reactive<{
     state: string;
     graduation: string;
@@ -156,6 +160,15 @@
     graduation: '',
     grade: '2021',
     name: '',
+  });
+
+  const otherSearchParams = { key: '', grade: '' };
+  const { key, grade, loading, tableData, loadList, handlePageChange, handleSizeChange, pagination } = useTable<
+    Class,
+    typeof otherSearchParams
+  >({
+    requestApi: listClass,
+    otherSearchParams,
   });
 
   const columns: TableColumnData[] = Object.entries({
@@ -169,75 +182,35 @@
     $operation: '操作', // 伪列
   }).map(([dataIndex, title]) => ({ dataIndex, title, slotName: dataIndex }));
 
-  const rawData: TableData[] = reactive([]);
-
-  const selectedData = ref<TableData[]>();
-
-  const pagination = reactive<Paging<{ key: string; grade: string }>>({
-    page: 1,
-    pageSize: 10,
-    key: '',
-    grade: '',
-  });
-
   // 获取班级列表数据
-  function LoadList() {
-    loading.value = true;
-    listClass(pagination)
-      .then((res) => {
-        // console.log(res);
-        const { list, total } = res.data;
-        totalAll.value = total;
-        selectedData.value = list;
-      })
-      .finally(() => {
-        loading.value = false;
-      });
-  }
-  watch(
-    () => pagination,
-    (newVal, oldVal) => {
-      if (!newVal.key || newVal.page !== oldVal.page || newVal.pageSize !== oldVal.pageSize) {
-        LoadList();
-      }
-    },
-    { deep: true }
-  );
   // 查询
-  function query() {
+  async function query() {
     loading.value = true;
-    pagination.grade = form.grade;
-    pagination.key = form.name;
-    listClass(pagination)
-      .then((res) => {
-        const { list, total } = res.data;
-        totalAll.value = total;
-        selectedData.value = list;
-      })
-      .finally(() => {
-        loading.value = false;
-      });
+    grade.value = form.grade;
+    key.value = form.name;
+    await loadList();
+    Message.success('数据查询成功');
   }
   // 重置
-  function reset() {
-    pagination.grade = '';
-    pagination.key = '';
+  async function reset() {
+    grade.value = '';
+    key.value = '';
     form.grade = '';
     form.name = '';
-    LoadList();
-    Message.success('已重置');
+    await loadList();
+    Message.success('数据已更新');
   }
   // 删除
-  function classDelete(record) {
+  async function classDelete(record: Class) {
     const { id } = record;
     deleteClass(id as number).then((res) => {
       const { message } = res;
       if (message === 'success') {
         Message.success('删除成功');
-        LoadList();
+        loadList();
       }
     });
   }
 
-  LoadList();
+  loadList();
 </script>

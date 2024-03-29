@@ -46,11 +46,10 @@
 
   const descriptionsData = props.columns
     .filter(({ dataIndex }) => !dataIndex?.startsWith('$')) // opt out virtual row
-    .map(({ title, dataIndex }) => ({
-      label: title,
+    .map(({ title, dataIndex, slotName }) => ({
+      label: title || slotName,
       value: String(props.data[dataIndex!]),
     }));
-
   // modal
   const modalVisible = ref(false);
 </script>

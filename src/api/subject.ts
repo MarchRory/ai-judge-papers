@@ -1,4 +1,5 @@
 import request from '@/utils/request/index';
+import { Optimization } from '@/utils/request/Optimizations';
 import { ListResponse, Paging } from './types';
 
 const schema = 'study/subject';
@@ -28,8 +29,8 @@ export function updateSubjectAPI(data: SubjectItem) {
   return request.post(SubjectApi.update, data);
 }
 
-export function getSubjectListAPI(data: Paging<{ key: string }>) {
-  return request.post<ListResponse<SubjectItem>>(SubjectApi.page, data, {});
+export function getSubjectListAPI(data: Paging<{ key: string }>, opts?: Optimization) {
+  return request.post<ListResponse<SubjectItem>>(SubjectApi.page, data, {}, opts);
 }
 
 export function deleteSubjectAPI(id: number) {

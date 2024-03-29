@@ -1,21 +1,21 @@
 <script setup lang="ts">
-  import { Paging } from '@/api/types';
   import { UserItem, createUserAPI, deleteUserAPI, getUserListAPI, updateUserAPI } from '@/api/user';
   import { Message } from '@arco-design/web-vue';
   import { cloneDeep, reject } from 'lodash';
   import { useUserStore } from '@/store';
-  import { ref, reactive, watch } from 'vue';
+  import { ref, watch } from 'vue';
   import { BaseRole } from '@/types/permissions';
   import { getRoleListAPI, getUserRoleAPI, roleBindUserAPI } from '@/api/permissions';
+  import useTable from '@/hooks/table/useTable';
 
-  const pagination = reactive<Paging<{ key: string }>>({
-    page: 1,
-    pageSize: 10,
-    key: '',
+  const otherSearchParams = { key: '' };
+  const { key, page, loading, tableData, loadList, handlePageChange, handleSizeChange, pagination } = useTable<
+    UserItem,
+    typeof otherSearchParams
+  >({
+    requestApi: getUserListAPI,
+    otherSearchParams,
   });
-  const tableData = ref<UserItem[]>([]);
-  const loading = ref(false);
-  const totalAll = ref(0);
   const formType = ref<'create' | 'edit'>('create');
   const isFormOpen = ref(false);
   const formRef = ref();
@@ -33,12 +33,10 @@
   const { permissions } = useUserStore();
   const roleList = ref<Omit<BaseRole, 'auth'>[]>([]);
 
-  function loadList() {
-    getUserListAPI(pagination).then((res) => {
-      const { list, total } = res.data;
-      tableData.value = list;
-      totalAll.value = total;
-    });
+  function reset() {
+    key.value = '';
+    page.value = 1;
+    loadList();
   }
   function deleteUser(data: UserItem) {
     const { id } = data;
@@ -111,16 +109,6 @@
     formType.value = type;
     isFormOpen.value = true;
   }
-
-  watch(
-    () => pagination,
-    (newVal, oldVal) => {
-      if (!newVal.key || newVal.page !== oldVal.page || newVal.pageSize !== oldVal.pageSize) {
-        loadList();
-      }
-    },
-    { deep: true }
-  );
   watch(
     () => isFormOpen.value,
     (newVal) => {
@@ -135,7 +123,7 @@
           }
         }, 500);
       }
-    }
+    },
   );
 
   function pageInit() {
@@ -161,14 +149,26 @@
             p="x-4"
             flex="~ justify-between items-center"
           >
-            <div w="1/4">
+            <div
+              w="1/4"
+              flex="~"
+            >
               <a-input-search
-                v-model="pagination.key"
+                v-model="key"
                 allow-clear
                 placeholder="输入关键字查找用户"
                 search-button
                 @search="loadList"
               />
+              <a-button
+                m="l-2"
+                @click="reset"
+              >
+                <template #icon>
+                  <icon-refresh />
+                </template>
+                <template #default> 重置 </template>
+              </a-button>
             </div>
             <div w="1/4">
               <a-button
@@ -193,15 +193,10 @@
             stripe
             :loading="loading"
             page-position="br"
-            :pagination="{
-              total: totalAll,
-              pageSize: pagination.pageSize,
-              showJumper: true,
-              showPageSize: true,
-            }"
+            :pagination="pagination"
             sticky-header
-            @page-size-change="(newSize) => (pagination.pageSize = newSize)"
-            @page-change="(newPage) => (pagination.page = newPage)"
+            @page-size-change="handleSizeChange"
+            @page-change="handlePageChange"
           >
             <template #columns>
               <a-table-column
