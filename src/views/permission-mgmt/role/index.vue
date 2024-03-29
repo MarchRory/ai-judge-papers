@@ -102,7 +102,7 @@
           }
         }, 500);
       }
-    },
+    }
   );
   const detailAuthVisible = ref(false);
   const deatailAuthModalInfo = reactive<{ roleName: string; auth: PermissionTreeNode[] }>({
@@ -127,7 +127,7 @@
           deatailAuthModalInfo.roleName = '';
         }, 1000);
       }
-    },
+    }
   );
 
   loadList();

@@ -35,7 +35,7 @@
         数学: 456,
         英语: 789,
       }),
-    },
+    }
   );
 
   const { loading } = useLoading();

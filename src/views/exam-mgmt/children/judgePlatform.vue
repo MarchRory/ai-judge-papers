@@ -13,6 +13,7 @@
 
   const route = useRoute();
   const query = route.query as unknown as ExamListItem;
+  console.log(query);
   const user = useUserStore();
 
   // TODO:
@@ -46,7 +47,7 @@
       </template>
     </a-page-header>
 
-    <div class="flex pt-4 pb-2 px-2 bg-white rounded-lg relative max-h-72vh">
+    <div class="flex pt-4 pb-2 px-2 bg-white rounded-lg relative max-h-78vh">
       <!-- 导航区域 -->
       <aside>
         <collapse-panel class="h-full">
