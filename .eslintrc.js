@@ -36,6 +36,12 @@ module.exports = {
     },
   },
   rules: {
+    'max-len': [
+      'error',
+      {
+        code: 140,
+      },
+    ],
     'prettier/prettier': 1,
     // Vue: Recommended rules to be closed or modify
     'vue/require-default-prop': 0,

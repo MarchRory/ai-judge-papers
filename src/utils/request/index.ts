@@ -59,7 +59,7 @@ class HttpRequest {
       (error) => {
         // do something
         return Promise.reject(error);
-      }
+      },
     );
     // add response interceptors
     this.service.interceptors.response.use(
@@ -95,7 +95,7 @@ class HttpRequest {
           duration: 5 * 1000,
         });
         return Promise.reject(error);
-      }
+      },
     );
   }
 
@@ -138,8 +138,9 @@ class HttpRequest {
     url: string,
     fileItem: File,
     otherParams: Record<string, number | string>,
-    config: Omit<AxiosRequestConfig, 'url' | 'data' | 'method'> = {}
+    config: Omit<AxiosRequestConfig, 'url' | 'data' | 'method'> = {},
   ) {
+    // @ts-ignore
     const data = createFormData(otherParams, true);
     data.append('file', fileItem);
     const requestConfig: AxiosRequestConfig = {
