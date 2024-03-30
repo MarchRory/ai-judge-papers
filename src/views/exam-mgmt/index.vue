@@ -3,11 +3,13 @@
   import { Message } from '@arco-design/web-vue';
   import { useRouter } from 'vue-router';
   import useTable from '@/hooks/table/useTable';
-  import { deleteExamApi, getExamListApi } from '@/api/exam';
+  import { deleteExamApi, getExamListApi, Group } from '@/api/exam';
   import type { ExamFormData, ExamListItem } from '@/api/exam';
   import { examStateMap } from './config';
 
-  const FormModal = defineAsyncComponent(() => import('./components/formModal.vue'));
+  /* 考试table crud */
+  const ExamFormModal = defineAsyncComponent(() => import('./components/formModal.vue'));
+  const ExamGroup = defineAsyncComponent(() => import('./components/ExamGroup.vue'));
   const now = new Date().getTime();
   const router = useRouter();
   const otherSearchParams = { key: '' };
@@ -24,7 +26,6 @@
     page.value = 1;
     loadList();
   }
-
   const isFormOpen = ref(false);
   const formType = ref<'create' | 'edit'>('create');
   const form = ref<ExamFormData>({
@@ -37,8 +38,6 @@
     type: undefined,
   });
   async function openForm(type: 'create' | 'edit', data?: ExamFormData) {
-    formType.value = type;
-    isFormOpen.value = true;
     if (type === 'edit') {
       form.value = data as ExamFormData;
     }
@@ -56,18 +55,29 @@
       }
     });
   }
-
-  function jumpDetail(query) {
+  function jumpDetail(query: ExamListItem) {
     router.push({
       path: '/exam-mgmt/examDetail',
       query,
     });
   }
-
   const handleSubmitSuccess = () => {
     isFormOpen.value = false;
     loadList();
   };
+  /* 考试table crud */
+
+  /* 考试组 逻辑 */
+  const isGroupTableVisible = ref(false);
+  const groupList = ref<Group[]>([]);
+
+  const openGroup = () => {
+    isGroupTableVisible.value = true;
+  };
+  const closeGroup = () => {
+    isGroupTableVisible.value = false;
+  };
+  /* 考试组 逻辑 */
 
   loadList();
 </script>
@@ -107,16 +117,33 @@
               </a-button>
             </div>
             <div w="1/4">
-              <a-button
-                type="primary"
-                @click="openForm('create')"
-              >
-                <template #icon>
-                  <icon-plus-circle />
-                </template>
-                <!-- Use the default slot to avoid extra spaces -->
-                <template #default>创建考试</template>
-              </a-button>
+              <a-tooltip content="创建考试前, 请先创建对应考试组, 以便正常使用数据分析功能">
+                <a-button
+                  type="primary"
+                  @click="openForm('create')"
+                >
+                  <template #icon>
+                    <icon-plus-circle />
+                  </template>
+                  <!-- Use the default slot to avoid extra spaces -->
+                  <template #default>创建考试</template>
+                </a-button>
+              </a-tooltip>
+
+              <a-tooltip content="新建考试所属阶段, 如第三周测试、第一学月月考......">
+                <a-button
+                  type="outline"
+                  status="warning"
+                  class="ml-3"
+                  @click="openGroup"
+                >
+                  <template #icon>
+                    <icon-plus-circle />
+                  </template>
+                  <!-- Use the default slot to avoid extra spaces -->
+                  <template #default>考试组管理</template>
+                </a-button>
+              </a-tooltip>
             </div>
           </section>
         </a-card>
@@ -135,6 +162,10 @@
             @page-change="handlePageChange"
           >
             <template #columns>
+              <a-table-column
+                title="考试组"
+                data-index="groupName"
+              ></a-table-column>
               <a-table-column
                 title="考试"
                 data-index="name"
@@ -156,7 +187,7 @@
               </a-table-column>
               <a-table-column
                 title="状态"
-                data-index="time"
+                data-index="state"
                 :width="100"
               >
                 <template #cell="{ record }">
@@ -233,13 +264,28 @@
         </a-card>
       </a-layout-content>
     </a-layout>
-    <FormModal
+    <ExamFormModal
       :create="formType"
       :visible="isFormOpen"
       :form-data="form"
       @on-cancel="isFormOpen = false"
       @on-succes="handleSubmitSuccess"
     />
+    <a-drawer
+      placement="right"
+      :esc-to-close="false"
+      :mask-closable="false"
+      :visible="isGroupTableVisible"
+      unmount-on-close
+      width="40%"
+      ok-text="退出"
+      hide-cancel
+      @cancel="closeGroup"
+      @ok="closeGroup"
+    >
+      <template #title> 考试组管理 </template>
+      <ExamGroup />
+    </a-drawer>
   </div>
 </template>
 

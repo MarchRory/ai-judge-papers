@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { ref, watch } from 'vue';
   import { SubjectItem, createSubjectAPI, deleteSubjectAPI, getSubjectListAPI, updateSubjectAPI } from '@/api/subject';
-  import { Message } from '@arco-design/web-vue';
+  import { Message, type FormInstance } from '@arco-design/web-vue';
   import { useRouter } from 'vue-router';
   import useTable from '@/hooks/table/useTable';
 
@@ -17,7 +17,7 @@
   const router = useRouter();
 
   const isFormOpen = ref(false);
-  const formRef = ref();
+  const formRef = ref<FormInstance>();
   const okLoading = ref(false);
   const formType = ref<'create' | 'edit'>('create');
   const form = ref<SubjectItem>({
@@ -78,7 +78,7 @@
           }
         }, 500);
       }
-    }
+    },
   );
 
   function jumpDetail(query: SubjectItem) {

@@ -2,6 +2,8 @@ import request from '@/utils/request';
 import { ListResponse, Paging } from './types';
 
 const schema = '/study/exam';
+
+// 考试本体crud接口
 const enum ExamApi {
   create = `${schema}/create`,
   update = `${schema}/update`,
@@ -11,6 +13,15 @@ const enum ExamApi {
   addProblem = `${schema}/addProblem`,
   uploadTemplate = `${schema}/upload`, // 上传考试excel模板
   sheetList = `${schema}/answerSheet/list`, // 获取上传到某考试中的学生的答题卡列表
+}
+
+// 考试组crud接口
+const groupSchema = `${schema}/group`;
+const enum ExamGroupApi {
+  creat = `${groupSchema}/create`,
+  update = `${groupSchema}/update`,
+  list = `${groupSchema}/list`,
+  delete = `${groupSchema}/delete`,
 }
 
 /**
@@ -45,6 +56,8 @@ export interface addProblemParams {
 export interface ExamListItem {
   id: number;
   name: string;
+  groupId: number;
+  groupName: string;
   description: string;
   state: number;
   type: number;
@@ -84,4 +97,30 @@ export function getAnswerSheetListApi(data: Paging<{ examId: number; key?: strin
 
 export function getExamDetailApi(data: { id: number }) {
   return request.post<ExamListItem>(ExamApi.detail, data);
+}
+
+export interface Group {
+  id: number;
+  description: string;
+  name: string;
+  state: number | null;
+  time: number | null;
+  timeLimit: number | null;
+  [property: string]: any;
+}
+
+export function createGroupApi(data: Omit<Group, 'id'>) {
+  return request.post(ExamGroupApi.creat, data);
+}
+
+export function updateGroupApi(data: Group) {
+  return request.post(ExamGroupApi.update, data);
+}
+// order: 1-升序, 其他数字-降序
+export function getGroupList(data: Paging<{ key: string; order: number }>) {
+  return request.post<ListResponse<Group>>(ExamGroupApi.list, data);
+}
+
+export function deleteGroupApi(id: number) {
+  return request.post(ExamGroupApi.delete, { id });
 }
