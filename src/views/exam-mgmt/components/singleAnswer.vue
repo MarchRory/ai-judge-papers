@@ -3,7 +3,7 @@
    * 单个试题
    */
 
-  import { ref, computed } from 'vue';
+  import { ref, computed, onUpdated } from 'vue';
 
   interface ModelValue {
     /**
@@ -30,7 +30,20 @@
 
   const props = defineProps<{
     modelValue: ModelValue;
+    /** 滚动当前元素到视窗顶部 */
+    scrollIntoView?: boolean;
   }>();
+
+  const eRef = ref<HTMLElement>();
+  const fnScrollIntoView = () => {
+    eRef.value?.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
+  };
+  defineExpose({ scrollIntoView: fnScrollIntoView });
+  onUpdated(() => {
+    if (props.scrollIntoView) {
+      fnScrollIntoView();
+    }
+  });
 
   const emit = defineEmits<{ 'update:modelValue': [modelValue: ModelValue] }>();
 
@@ -70,7 +83,10 @@
 </script>
 
 <template>
-  <section class="relative">
+  <section
+    ref="eRef"
+    class="relative"
+  >
     <div
       :class="`flex justify-between gap-4 mb-4 transition ${done && 'opacity-25'}`"
       :inert="done"
@@ -81,13 +97,26 @@
           <div class="bg-gray-100 text-sm text-center aspect-1/1 h-1.3rem line-height-1.3rem align-middle rounded-lg select-none">
             {{ props.modelValue.number }}
           </div>
-          <strong>Maybe title?</strong>
+          <h3 class="my-1">Maybe title?</h3>
         </div>
 
-        <a-typography-text>
+        <a-typography-paragraph>
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Perferendis possimus optio modi, sit facilis aliquid sapiente aperiam
           nulla, laboriosam illo iste veniam voluptatem accusantium iure nisi ex, repudiandae consequatur? Magni?
-        </a-typography-text>
+        </a-typography-paragraph>
+
+        <a-typography>
+          <a-typography-paragraph blockquote>
+            <strong>参考答案</strong>
+            <br />
+            <a-typography-paragraph :ellipsis="{ rows: 3, expandable: true }">
+              {{ '参考答案'.repeat(99) }}
+              <template #expand-node="{ expanded }">
+                {{ expanded ? '折叠' : '展开' }}
+              </template>
+            </a-typography-paragraph>
+          </a-typography-paragraph>
+        </a-typography>
       </div>
 
       <!-- right: the operation panel -->

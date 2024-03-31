@@ -11,6 +11,20 @@ const enum JudgeApi {
   updateProblemRes = `${schema}/update`, // 更新判题结果=, 对指定题目进行复审
 }
 
+export interface Answer {
+  problemId: number;
+  answer: string;
+  /** 答案类型(ai/人脑) */
+  type: number;
+}
+
+export interface KnowledgePoints {
+  title: string;
+  description: string;
+  /** subject */
+  type: number;
+}
+
 /**
  * 提交阅卷结果, 生成考试成绩
  * @param id 考试id
@@ -33,7 +47,7 @@ export const beginAiJudge = (id: number) => {
  * 获取判题列表
  * @returns
  */
-export const getPaperDeatil = (data: Pagination & { examId: number; userId: number }) => {
+export const getPaperDetail = (data: Pagination & { examId: number; userId: number }) => {
   return request.post(JudgeApi.problemList, data);
 };
 

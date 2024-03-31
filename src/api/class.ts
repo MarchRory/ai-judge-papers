@@ -24,7 +24,7 @@ export function listClass(
   data: Paging<{
     key: string;
     grade: string;
-  }>
+  }>,
 ) {
   return request.post<{
     total: number;

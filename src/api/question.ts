@@ -9,6 +9,8 @@ export interface Question {
   state: number;
   expectedDifficulty: number;
   source: string;
+  /** 题目类型(0,简答,1选择,2填空,3判断) */
+  type: 0 | 1 | 2 | 3;
 }
 export type QuestionListItem = Omit<Question, 'subject'> & { id: number; subject: { id: number; icon: string; title: string } };
 
@@ -24,7 +26,7 @@ export function listQuestion(
   data: Paging<{
     key: string;
     subjectId: number | string;
-  }>
+  }>,
 ) {
   return request.post<{
     total: number;

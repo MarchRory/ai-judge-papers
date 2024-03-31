@@ -3,7 +3,7 @@
    * TODO：草稿，因此不同题型，例如选择或填空，暂时硬编码
    *
    */
-  import { reactive } from 'vue';
+  import { reactive, ref, nextTick } from 'vue';
   import { useRoute } from 'vue-router';
   import { ExamListItem } from '@/api/exam';
   import { useUserStore } from '@/store';
@@ -28,7 +28,18 @@
     { number: 1, aiScore: 2.5, humanScore: undefined, reviewPassed: false, totalScore: 10 },
     { number: 1, aiScore: 2.5, humanScore: undefined, reviewPassed: false, totalScore: 10 },
     { number: 1, aiScore: 2.5, humanScore: undefined, reviewPassed: false, totalScore: 10 },
+    { number: 1, aiScore: 2.5, humanScore: undefined, reviewPassed: false, totalScore: 10 },
+    { number: 1, aiScore: 2.5, humanScore: undefined, reviewPassed: false, totalScore: 10 },
   ]);
+  const shouldScrollIntoViewInfo = ref({ type: -1, index: -1 });
+  const onScrollIntoView = (e: { type: number; index: number }) => {
+    // TODO: type 字段未判断
+    shouldScrollIntoViewInfo.value = e;
+    // reset
+    return nextTick(() => {
+      shouldScrollIntoViewInfo.value = { type: -1, index: -1 };
+    });
+  };
 </script>
 
 <template>
@@ -51,15 +62,25 @@
       <!-- 导航区域 -->
       <aside>
         <collapse-panel class="h-full">
-          <a-anchor>
+          <a-anchor line-less>
             <a-anchor-link>
-              一、选择题
+              简答题
               <template #sublist>
-                <a-anchor-link>1</a-anchor-link>
-                <a-anchor-link>2</a-anchor-link>
+                <a-anchor-link
+                  v-for="(_, index) in testData"
+                  :key="index"
+                  class="inline-block"
+                  @click="onScrollIntoView({ type: -1, index })"
+                >
+                  {{ index + 1 }}
+                </a-anchor-link>
               </template>
             </a-anchor-link>
-            <a-anchor-link>二、阅读理解</a-anchor-link>
+            <a-anchor-link>选择题</a-anchor-link>
+
+            <a-anchor-link>填空题</a-anchor-link>
+
+            <a-anchor-link>判断题</a-anchor-link>
           </a-anchor>
         </collapse-panel>
       </aside>
@@ -69,19 +90,12 @@
       <a-scrollbar class="h-full overflow-auto px-6">
         <!-- TODO: 若实际上题目真的非常多再考虑虚拟列表 -->
         <div>
-          <h2 class="px-4 pt-4 pb-12 bg-slate-100 rounded-2xl border-solid b-blue-100 b-1">一、选择题</h2>
+          <h2 class="px-4 pt-4 pb-12 bg-slate-100 rounded-2xl border-solid b-blue-100 b-1">简答题</h2>
           <single-answer
             v-for="(_, index) in testData"
             :key="index"
             v-model="testData[index]"
-          />
-        </div>
-        <div>
-          <h2 class="px-4 pt-4 pb-12 bg-slate-100 rounded-2xl border-solid b-blue-100 b-1">二、阅读理解</h2>
-          <single-answer
-            v-for="(_, index) in testData"
-            :key="index"
-            v-model="testData[index]"
+            :scroll-into-view="shouldScrollIntoViewInfo.index === index"
           />
         </div>
       </a-scrollbar>
