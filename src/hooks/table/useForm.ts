@@ -3,7 +3,7 @@ import { FormInstance } from '@arco-design/web-vue/es/form';
 import { cloneDeep } from 'lodash';
 import Message from '@arco-design/web-vue/es/message';
 
-type formType = 'create' | 'edit';
+export type FormType = 'create' | 'edit';
 type commonObj = Record<string, any>;
 interface formState<R = commonObj> {
   form: R;
@@ -15,12 +15,13 @@ interface FormBaseMethod<R extends object = commonObj> {
   formUpdateApi?: (data: R) => Promise<HttpResponse>;
   onSuccess?: (...args: any[]) => any;
   onFail?: (...args: any[]) => any;
+  onBeforeClose?: (...args: any[]) => any;
   visible?: Ref<boolean>;
 }
 
 // 设计上感觉有点问题， 没法在页面内很好地让form和page组件解耦， 后面看看改一下
-export function useForm<R extends object>(formRef: FormInstance | undefined, config: FormBaseMethod<R>) {
-  const { visible, formCreateApi, formUpdateApi, onSuccess, onFail } = config;
+export function useForm<R extends object>(formRef: Ref<FormInstance | undefined>, config: FormBaseMethod<R>) {
+  const { visible, formCreateApi, formUpdateApi, onSuccess, onFail, onBeforeClose } = config;
 
   const formState = reactive<formState<R>>({
     form: {} as R,
@@ -32,13 +33,23 @@ export function useForm<R extends object>(formRef: FormInstance | undefined, con
   const openForm = (type: formType, data?: R) => {
     if (type === 'edit') {
       // @ts-ignore
-      tableState.form = cloneDeep(data) as R;
+      formState.form = cloneDeep(data) as R;
     }
     formState.formType = type;
     isFormOpen.value = true;
   };
   // 关闭表单, 初始化type
   const closeForm = () => {
+    setTimeout(() => {
+      onBeforeClose && onBeforeClose(); // eslint-disable-line
+      if (formRef.value) {
+        formRef.value.resetFields();
+        if (Object.prototype.hasOwnProperty.call(formState.form, 'id')) {
+          // @ts-ignore
+          delete formState.form.id;
+        }
+      }
+    });
     isFormOpen.value = false;
     formState.formType = 'create';
   };
@@ -69,23 +80,6 @@ export function useForm<R extends object>(formRef: FormInstance | undefined, con
       throw new Error('表单提交请求方法缺失');
     }
   };
-
-  watch(
-    () => isFormOpen.value,
-    (newVal) => {
-      if (!newVal) {
-        setTimeout(() => {
-          if (formRef) {
-            formRef.resetFields();
-            if (Object.prototype.hasOwnProperty.call(formState.form, 'id')) {
-              // @ts-ignore
-              delete tableState.form.id;
-            }
-          }
-        }, 500);
-      }
-    },
-  );
 
   return {
     isFormOpen,

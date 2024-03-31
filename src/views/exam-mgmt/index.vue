@@ -3,7 +3,7 @@
   import { Message } from '@arco-design/web-vue';
   import { useRouter } from 'vue-router';
   import useTable from '@/hooks/table/useTable';
-  import { deleteExamApi, getExamListApi, Group } from '@/api/exam';
+  import { deleteExamApi, getExamListApi, getGroupList, Group } from '@/api/exam';
   import type { ExamFormData, ExamListItem } from '@/api/exam';
   import { examStateMap } from './config';
 
@@ -12,8 +12,8 @@
   const ExamGroup = defineAsyncComponent(() => import('./components/ExamGroup.vue'));
   const now = new Date().getTime();
   const router = useRouter();
-  const otherSearchParams = { key: '' };
-  const { key, loading, page, tableData, pagination, loadList, handleSizeChange, handlePageChange } = useTable<
+  const otherSearchParams = { key: '', groupId: 0 };
+  const { key, loading, page, groupId, tableData, pagination, loadList, handleSizeChange, handlePageChange } = useTable<
     ExamListItem,
     typeof otherSearchParams
   >({
@@ -24,11 +24,13 @@
   function reset() {
     key.value = '';
     page.value = 1;
+    groupId.value = 0;
     loadList();
   }
   const isFormOpen = ref(false);
   const formType = ref<'create' | 'edit'>('create');
   const form = ref<ExamFormData>({
+    groupId: null,
     description: '',
     name: '',
     state: undefined,
@@ -69,17 +71,43 @@
 
   /* 考试组 逻辑 */
   const isGroupTableVisible = ref(false);
-  const groupList = ref<Group[]>([]);
-
+  // 考试组初始化
+  const groupOpts = ref<{ label: string; value: number }[]>([]);
+  const initGroupSelectData = () => {
+    getGroupList({ page: 1, pageSize: 100, key: '', order: 1 })
+      .then((res) => {
+        const { list } = res.data;
+        groupOpts.value = list.map((item) => {
+          return {
+            label: item.name,
+            value: item.id,
+          };
+        });
+        groupOpts.value.unshift({
+          label: '全部近期可用考试组',
+          value: 0,
+        });
+      })
+      .catch((e) => {
+        Message.error('考试组数据获取失败, 请稍后重试');
+      });
+  };
   const openGroup = () => {
+    if (!groupOpts.value.length) {
+      initGroupSelectData();
+    }
     isGroupTableVisible.value = true;
   };
   const closeGroup = () => {
     isGroupTableVisible.value = false;
   };
   /* 考试组 逻辑 */
+  const initPage = () => {
+    initGroupSelectData();
+    loadList();
+  };
 
-  loadList();
+  initPage();
 </script>
 
 <template>
@@ -96,13 +124,13 @@
             flex="~ justify-between items-center"
           >
             <div
-              w="1/4"
+              w="max"
               flex="~"
             >
               <a-input-search
                 v-model="key"
                 allow-clear
-                placeholder="输入关键字查找相关考试"
+                placeholder="输入关键字查找考试"
                 search-button
                 @search="loadList"
               />
@@ -115,6 +143,17 @@
                 </template>
                 <template #default> 重置 </template>
               </a-button>
+              <a-select
+                v-model:model-value="groupId"
+                m="l-10"
+                :options="groupOpts"
+                allow-search
+                placeholder="输入关键词搜索"
+              >
+                <template #label="{ data }">
+                  <span>{{ data.label }}</span>
+                </template>
+              </a-select>
             </div>
             <div w="1/4">
               <a-tooltip content="创建考试前, 请先创建对应考试组, 以便正常使用数据分析功能">
@@ -164,6 +203,7 @@
             <template #columns>
               <a-table-column
                 title="考试组"
+                :width="200"
                 data-index="groupName"
               ></a-table-column>
               <a-table-column
@@ -176,7 +216,10 @@
                 :width="100"
               >
               </a-table-column>
-              <a-table-column title="分类">
+              <a-table-column
+                title="分类"
+                :width="100"
+              >
                 <template #cell="{ record }">
                   <a-tag
                     bordered
@@ -196,18 +239,20 @@
               </a-table-column>
               <a-table-column
                 title="开考时间"
+                :width="200"
                 data-index="time"
               >
                 <template #cell="{ record }">
-                  {{ new Date(record.time).toLocaleString() }}
+                  {{ new Date(record.time).toLocaleString().replace(/\//g, '-') }}
                 </template>
               </a-table-column>
               <a-table-column
                 title="交卷时间"
+                :width="200"
                 data-index="time"
               >
                 <template #cell="{ record }">
-                  {{ new Date(record.timeLimit).toLocaleString() }}
+                  {{ new Date(record.timeLimit).toLocaleString().replace(/\//g, '-') }}
                 </template>
               </a-table-column>
               <a-table-column
@@ -268,6 +313,7 @@
       :create="formType"
       :visible="isFormOpen"
       :form-data="form"
+      :group-opts="groupOpts"
       @on-cancel="isFormOpen = false"
       @on-succes="handleSubmitSuccess"
     />
@@ -277,7 +323,7 @@
       :mask-closable="false"
       :visible="isGroupTableVisible"
       unmount-on-close
-      width="40%"
+      width="60%"
       ok-text="退出"
       hide-cancel
       @cancel="closeGroup"
