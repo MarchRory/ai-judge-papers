@@ -2,15 +2,14 @@
   /**
    *@description 考试组crud
    */
-  import { ref } from 'vue';
+  import { ref, defineAsyncComponent } from 'vue';
   import useTable from '@/hooks/table/useTable';
-  import { useForm } from '@/hooks/table/useForm';
-  import { getGroupList, createGroupApi, updateGroupApi, type Group, deleteGroupApi } from '@/api/exam';
-  import { type FormInstance } from '@arco-design/web-vue';
+  import { getGroupList, type Group, deleteGroupApi } from '@/api/exam';
+  import { type FormType } from '@/hooks/table/useForm';
   import { examStateMap } from '../config';
 
+  const GroupForm = defineAsyncComponent(() => import('./groupForm.vue'));
   const now = new Date().getTime();
-  const formRef = ref<FormInstance>();
   const otherSearchParams = { key: '', order: 1 };
   const { key, order, tableData, page, loading, pagination, loadList, handlePageChange, handleSizeChange, handleDelete } = useTable<
     Group,
@@ -20,14 +19,28 @@
     deleteApi: deleteGroupApi,
     otherSearchParams,
   });
-  const { isFormOpen, formType, form, submitLoading, handleSubmit, openForm, closeForm } = useForm<Group>(formRef.value, {
-    formCreateApi: createGroupApi,
-    formUpdateApi: updateGroupApi,
-    onSuccess: () => {
-      page.value = 1;
-      loadList();
-    },
+  const formCfg = ref({
+    visible: false,
+    formType: 'create' as FormType,
+    formData: {} as Group,
   });
+  const openForm = (type: FormType, data?: Group) => {
+    if (type === 'edit' && data) {
+      formCfg.value.formData = data;
+    } else {
+      formCfg.value.formData = {} as Group;
+    }
+    formCfg.value.formType = type;
+    formCfg.value.visible = true;
+  };
+  const handleFormClose = () => {
+    formCfg.value = {
+      visible: false,
+      formType: 'create' as FormType,
+      formData: {} as Group,
+    };
+  };
+
   const setupComp = () => {
     loadList();
   };
@@ -75,7 +88,7 @@
       <a-layout-content>
         <a-card h="full">
           <a-table
-            h="full"
+            h="2xl"
             :data="tableData"
             stripe
             :loading="loading"
@@ -101,7 +114,7 @@
                 data-index="time"
               >
                 <template #cell="{ record }">
-                  {{ new Date(record.time).toLocaleString() }}
+                  {{ new Date(record.time).toLocaleString().slice(0, 9).replace(/\//g, '-') }}
                 </template>
               </a-table-column>
               <a-table-column
@@ -109,17 +122,20 @@
                 data-index="timeLimit"
               >
                 <template #cell="{ record }">
-                  {{ new Date(record.timeLimit).toLocaleString() }}
+                  {{ new Date(record.timeLimit).toLocaleString().slice(0, 9).replace(/\//g, '-') }}
                 </template>
               </a-table-column>
               <a-table-column
                 title="其他信息"
                 data-index="description"
               ></a-table-column>
-              <a-table-column title="操作">
+              <a-table-column
+                title="操作"
+                :width="200"
+              >
                 <template #cell="{ record }">
                   <a-button
-                    v-if="now < record.time"
+                    v-if="now < record.timeLimit"
                     m="r-2"
                     type="outline"
                     status="warning"
@@ -149,6 +165,10 @@
         </a-card>
       </a-layout-content>
     </a-layout>
-    <a-model> </a-model>
+    <GroupForm
+      :form-cfg="formCfg"
+      :load-table="loadList"
+      @on-close="handleFormClose"
+    />
   </div>
 </template>

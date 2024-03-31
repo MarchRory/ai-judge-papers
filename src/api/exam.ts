@@ -30,6 +30,7 @@ const enum ExamGroupApi {
 export interface ExamFormData {
   description: string;
   id?: number;
+  groupId: number | null;
   name: string;
   state: number | undefined;
   subject: number | undefined;
@@ -104,8 +105,8 @@ export interface Group {
   description: string;
   name: string;
   state: number | null;
-  time: number | null;
-  timeLimit: number | null;
+  time: number | string;
+  timeLimit: number | string;
   [property: string]: any;
 }
 
