@@ -1,14 +1,16 @@
 <script setup lang="ts">
   import { ref, watch } from 'vue';
-  import { createExamApi, updateExamApi } from '@/api/exam';
+  import { createExamApi, getGroupList, updateExamApi } from '@/api/exam';
   import type { ExamFormData } from '@/api/exam';
   import { getSubjectListAPI } from '@/api/subject';
   import { FormInstance, Message, SelectOptionData } from '@arco-design/web-vue';
+  import dayjs from 'dayjs';
 
   interface Props {
     visible: boolean;
     formData: ExamFormData;
     create: 'create' | 'edit';
+    groupOpts: { label: string; value: number }[];
   }
   // 组件通信定义
   const props = withDefaults(defineProps<Props>(), {
@@ -17,6 +19,7 @@
       return {
         description: '',
         name: '',
+        groupId: null,
         state: undefined,
         subject: undefined,
         time: undefined,
@@ -36,6 +39,7 @@
   const initForm: ExamFormData = {
     description: '',
     name: '',
+    groupId: null,
     state: undefined,
     subject: undefined,
     time: undefined,
@@ -51,7 +55,8 @@
       if (newVal) {
         if (props.create === 'edit') {
           const timeLength = ((props.formData.timeLimit - (props.formData.time as number)) / 60000).toFixed();
-          formInfo.value = { ...props.formData, examTimeLength: +timeLength };
+          const groupName = props.groupOpts.find((item) => item.value === formInfo.value.groupId)?.label;
+          formInfo.value = { ...props.formData, examTimeLength: +timeLength, groupName };
         } else {
           formInfo.value.examTimeLength = 60;
         }
@@ -66,12 +71,12 @@
           }
         }, 500);
       }
-    }
+    },
   );
 
   // select数据
   const subjectList = ref<SelectOptionData[]>([]);
-  const requestSelectData = () => {
+  const initSubjectSelectData = () => {
     getSubjectListAPI({ page: 1, pageSize: 100, key: '' }).then((res) => {
       const { list } = res.data;
       subjectList.value = list.map((item) => {
@@ -81,6 +86,9 @@
   };
 
   // 时间选择
+  const disabledTimeRange = (current: Date) => {
+    return dayjs(current).isBefore(dayjs(), 'day');
+  };
 
   // 数据提交
   const submitLoading = ref(false);
@@ -89,6 +97,8 @@
     const submitFn = props.create === 'create' ? createExamApi : updateExamApi;
     const timeLimit = (formInfo.value.time as number) + (formInfo.value.examTimeLength as number) * 60 * 1000;
     formInfo.value.timeLimit = timeLimit;
+    formInfo.value.subject = formInfo.value.subjectId;
+    delete formInfo.value.subjectId;
     delete formInfo.value.examTimeLength;
     submitFn({ ...formInfo.value, state: 1 })
       .then((res) => {
@@ -109,7 +119,7 @@
 
   // 组件初始化、获取数据
   const setupComp = () => {
-    requestSelectData();
+    initSubjectSelectData();
   };
 
   setupComp();
@@ -129,6 +139,23 @@
       :model="formInfo"
       @submit-success="submit"
     >
+      <a-form-item
+        field="groupId"
+        label="考试组"
+        :rules="[{ required: true, message: '请配置考试组' }]"
+      >
+        <!--@vue-ignore-->
+        <a-select
+          v-model:model-value="formInfo.groupId"
+          :options="groupOpts"
+          allow-search
+          placeholder="输入关键词搜索"
+        >
+          <template #label="{ data }">
+            <span>{{ data.label }}</span>
+          </template>
+        </a-select>
+      </a-form-item>
       <a-form-item
         field="name"
         label="考试名"
@@ -162,12 +189,14 @@
         label="开考时间"
         :rules="[{ required: true, message: '请设置开考时间' }]"
       >
+        <!--@vue-ignore-->
         <a-date-picker
           v-model:model-value="formInfo.time"
           show-time
           :show-now-btn="false"
           size="large"
           :day-start-of-week="1"
+          :disabled-date="disabledTimeRange"
           value-format="timestamp"
           placeholder="请选择开考时间"
           format="YYYY-MM-DD HH:mm"
