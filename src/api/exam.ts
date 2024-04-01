@@ -26,6 +26,15 @@ const enum ExamGroupApi {
   delete = `${groupSchema}/delete`,
 }
 
+// 考试组crud接口
+const groupSchema = `${schema}/group`;
+const enum ExamGroupApi {
+  creat = `${groupSchema}/create`,
+  update = `${groupSchema}/update`,
+  list = `${groupSchema}/list`,
+  delete = `${groupSchema}/delete`,
+}
+
 /**
  * ExamUpdateReq
  */
