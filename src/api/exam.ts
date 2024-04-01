@@ -1,5 +1,6 @@
 import request from '@/utils/request';
 import { ListResponse, Paging } from './types';
+import { Question } from './question';
 
 const schema = '/study/exam';
 
@@ -13,6 +14,7 @@ const enum ExamApi {
   addProblem = `${schema}/addProblem`,
   uploadTemplate = `${schema}/upload`, // 上传考试excel模板
   sheetList = `${schema}/answerSheet/list`, // 获取上传到某考试中的学生的答题卡列表
+  problemList = `${schema}/problemList`,
 }
 
 // 考试组crud接口
@@ -124,4 +126,8 @@ export function getGroupList(data: Paging<{ key: string; order: number }>) {
 
 export function deleteGroupApi(id: number) {
   return request.post(ExamGroupApi.delete, { id });
+}
+
+export function getProblemList(examId: number) {
+  return request.post<ListResponse<Question>>(ExamApi.problemList, { examId });
 }

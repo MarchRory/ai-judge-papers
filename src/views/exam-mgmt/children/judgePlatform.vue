@@ -3,47 +3,61 @@
    * TODO：草稿，因此不同题型，例如选择或填空，暂时硬编码
    *
    */
-  import { reactive, ref, nextTick } from 'vue';
+  import { ref, onMounted } from 'vue';
   import { useRoute } from 'vue-router';
-  import { ExamListItem } from '@/api/exam';
-  import { useUserStore } from '@/store';
-  import * as api from '@/api/judge';
-  import CollapsePanel from '../components/collapsePanel.vue';
-  import SingleAnswer from '../components/singleAnswer.vue';
+  import { useFullscreen } from '@vueuse/core';
+  import { ExamListItem, getProblemList } from '@/api/exam';
+  import { PaperDetail, getPaperDetail } from '@/api/judge';
+  import { Question } from '@/api/question';
+  import SinglePaper from '../components/singlePaper.vue';
 
   const route = useRoute();
   const query = route.query as unknown as ExamListItem;
-  console.log(query);
-  const user = useUserStore();
+  const userId = 2; // TODO：需要传入学生 id
+  const examId = 17; // Number(query.id);
 
-  // TODO:
-  // api.getPaperDetail({
-  //   examId: Number(query.id),
-  //   userId: /* user.id */ 2,
-  //   current: 0,
-  //   pageSize: 100,
-  // });
+  const el = ref<HTMLElement | null>(null);
+  const { isFullscreen, toggle } = useFullscreen(el);
 
-  const testData = reactive([
-    { number: 1, aiScore: 2.5, humanScore: undefined, reviewPassed: false, totalScore: 10 },
-    { number: 1, aiScore: 2.5, humanScore: undefined, reviewPassed: false, totalScore: 10 },
-    { number: 1, aiScore: 2.5, humanScore: undefined, reviewPassed: false, totalScore: 10 },
-    { number: 1, aiScore: 2.5, humanScore: undefined, reviewPassed: false, totalScore: 10 },
-    { number: 1, aiScore: 2.5, humanScore: undefined, reviewPassed: false, totalScore: 10 },
-  ]);
-  const shouldScrollIntoViewInfo = ref({ type: -1, index: -1 });
-  const onScrollIntoView = (e: { type: number; index: number }) => {
-    // TODO: type 字段未判断
-    shouldScrollIntoViewInfo.value = e;
-    // reset
-    return nextTick(() => {
-      shouldScrollIntoViewInfo.value = { type: -1, index: -1 };
-    });
-  };
+  /** 需求请求多个接口，请求时展示loading */
+  const loadingDataStatus = ref('loading');
+  type ComposedData = PaperDetail & Question;
+  const compositePaper = ref<ComposedData[]>();
+
+  onMounted(async () => {
+    try {
+      const problems = (await getProblemList(Number(query.id))).data.list;
+      const thisUserPaperDetail = (
+        await getPaperDetail({
+          examId,
+          userId,
+          current: 0,
+          pageSize: 999,
+        })
+      ).data.list;
+      const wipComposedData: ComposedData[] = [];
+      thisUserPaperDetail.forEach((detail) => {
+        //! 重要：注意：如果 problem === undefined 那必然是数据库有一些问题
+        // 此处暂未做处理
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const problem = problems.find((p) => p.problemId === detail.problemId)!;
+        // console.log({ detail, problem });
+        wipComposedData.push({ ...problem, ...detail });
+      });
+      compositePaper.value = wipComposedData;
+      // done
+      loadingDataStatus.value = 'success';
+    } catch {
+      loadingDataStatus.value = 'error';
+    }
+  });
 </script>
 
 <template>
-  <a-layout class="h-full">
+  <a-layout
+    ref="el"
+    class="h-full"
+  >
     <a-page-header @back="$router.back()">
       <template #title> {{ query.name }}&nbsp;{{ query.subject }} </template>
       <template #subtitle>
@@ -52,53 +66,34 @@
 
       <template #extra>
         <a-space>
+          <a-button
+            type="primary"
+            @click="toggle"
+            >{{ isFullscreen ? '退出全屏' : '全屏阅卷' }}</a-button
+          >
           <a-button type="primary">提交</a-button>
           <a-button type="outline">全部</a-button>
         </a-space>
       </template>
     </a-page-header>
 
-    <div class="flex pt-4 pb-2 px-2 bg-white rounded-lg relative max-h-78vh">
-      <!-- 导航区域 -->
-      <aside>
-        <collapse-panel class="h-full">
-          <a-anchor line-less>
-            <a-anchor-link>
-              简答题
-              <template #sublist>
-                <a-anchor-link
-                  v-for="(_, index) in testData"
-                  :key="index"
-                  class="inline-block"
-                  @click="onScrollIntoView({ type: -1, index })"
-                >
-                  {{ index + 1 }}
-                </a-anchor-link>
-              </template>
-            </a-anchor-link>
-            <a-anchor-link>选择题</a-anchor-link>
-
-            <a-anchor-link>填空题</a-anchor-link>
-
-            <a-anchor-link>判断题</a-anchor-link>
-          </a-anchor>
-        </collapse-panel>
-      </aside>
-
-      <!-- 题目区域 -->
-
-      <a-scrollbar class="h-full overflow-auto px-6">
-        <!-- TODO: 若实际上题目真的非常多再考虑虚拟列表 -->
-        <div>
-          <h2 class="px-4 pt-4 pb-12 bg-slate-100 rounded-2xl border-solid b-blue-100 b-1">简答题</h2>
-          <single-answer
-            v-for="(_, index) in testData"
-            :key="index"
-            v-model="testData[index]"
-            :scroll-into-view="shouldScrollIntoViewInfo.index === index"
-          />
-        </div>
-      </a-scrollbar>
+    <div :class="`flex pt-4 pb-2 px-2 bg-white rounded-lg relative ${isFullscreen ? 'h-full' : 'max-h-78vh'}`">
+      <div
+        v-if="loadingDataStatus === 'loading'"
+        class="w-full py-20"
+      >
+        <a-spin
+          tip="试卷正在加载中..."
+          class="w-full"
+        />
+      </div>
+      <template v-if="loadingDataStatus === 'success'">
+        <SinglePaper
+          :exam-id="examId"
+          :user-id="userId"
+          :composite-paper="compositePaper!"
+        />
+      </template>
     </div>
   </a-layout>
 </template>
@@ -106,5 +101,9 @@
 <style scoped>
   :deep(.arco-scrollbar) {
     flex: 1;
+  }
+  /* 确保全屏模式下背景颜色正确 */
+  * {
+    background: Canvas;
   }
 </style>

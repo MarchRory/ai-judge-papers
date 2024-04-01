@@ -1,10 +1,11 @@
 import { Pagination } from '@/types/global';
 import request from '@/utils/request/index';
+import { ListResponse } from './types';
 
 const schema = '/study/judge/';
 
 const enum JudgeApi {
-  submit = `${schema}/submiy`,
+  submit = `${schema}/submit`,
   beginJudge = `${schema}/doJudge`, // 启动AI阅卷
   problemList = `${schema}/list`,
   stuScoreList = `${schema}/scoreList`,
@@ -43,12 +44,22 @@ export const beginAiJudge = (id: number) => {
   return request.post(JudgeApi.beginJudge, { id });
 };
 
+export interface PaperDetail {
+  id: number;
+  problemId: number;
+  result: string;
+  score: number;
+  totalScore: number;
+  url: string;
+  studentAnswer: string;
+}
+
 /**
  * 获取判题列表
  * @returns
  */
 export const getPaperDetail = (data: Pagination & { examId: number; userId: number }) => {
-  return request.post(JudgeApi.problemList, data);
+  return request.post<ListResponse<PaperDetail>>(JudgeApi.problemList, data);
 };
 
 /**
@@ -64,6 +75,6 @@ export const getScoreList = () => {
  * @param data id: 题目id, result: 阅卷评论, score: 更正分数
  * @returns
  */
-export const PassJudge = (data: { id: number; result: string; score: number }) => {
+export const passJudge = (data: { id: number; result: string; score: number }) => {
   return request.post(JudgeApi.updateProblemRes, data);
 };
