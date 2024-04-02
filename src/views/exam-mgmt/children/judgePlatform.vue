@@ -54,7 +54,9 @@
 </script>
 
 <template>
+  <!-- id 确保全屏模式挂载点正确 -->
   <a-layout
+    id="id-for-judge-container"
     ref="el"
     class="h-full"
   >
@@ -104,5 +106,9 @@
   /* 确保全屏模式下背景颜色正确 */
   * {
     background: Canvas;
+  }
+
+  #id-for-judge-container {
+    padding: 1rem 0;
   }
 </style>

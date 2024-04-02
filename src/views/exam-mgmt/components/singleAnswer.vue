@@ -53,6 +53,8 @@
     if (!res.success) throw new Error('失败');
     emitModify();
   };
+
+  const popupContainer = document.getElementById('id-for-judge-container');
 </script>
 
 <template>
@@ -63,6 +65,7 @@
     <div class="flex justify-between gap-4 mb-4">
       <!-- left: the question area -->
       <div class="flex-1 grid">
+        <!-- 题目 -->
         <div class="flex gap-2 items-start mb-2">
           <div class="bg-gray-100 text-sm text-center aspect-1/1 h-1.3rem line-height-1.3rem align-middle rounded-lg select-none mt-1">
             {{ question.order }}
@@ -70,6 +73,7 @@
           <h3 class="my-1">{{ question.title }}</h3>
         </div>
 
+        <!-- 内容 -->
         <div class="px-1">
           <a-image
             v-if="question.url"
@@ -105,6 +109,7 @@
             </a-typography-paragraph>
           </a-typography-paragraph>
           <a-popconfirm
+            :popup-container="popupContainer!"
             position="lt"
             @before-ok="handleModifyResult"
           >
@@ -123,7 +128,7 @@
                 v-model="modifiedResult"
                 :placeholder="`修改第${question.order}题的评语`"
                 allow-clear
-                :auto-size="{ minRows: 5 }"
+                :auto-size="{ minRows: 5, maxRows: 20 }"
                 class="min-w-40vw"
               />
             </template>
