@@ -42,7 +42,7 @@
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const problem = problems.find((p) => p.problemId === detail.problemId)!;
         // console.log({ detail, problem });
-        wipComposedData.push({ ...problem, ...detail });
+        wipComposedData.push(Object.assign(problem, detail));
       });
       compositePaper.value = wipComposedData;
       // done
@@ -71,8 +71,7 @@
             @click="toggle"
             >{{ isFullscreen ? '退出全屏' : '全屏阅卷' }}</a-button
           >
-          <a-button type="primary">提交</a-button>
-          <a-button type="outline">全部</a-button>
+          <a-button type="outline">提交阅卷结果</a-button>
         </a-space>
       </template>
     </a-page-header>

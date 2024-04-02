@@ -4,25 +4,10 @@
    */
 
   import { ref, onUpdated } from 'vue';
-  import { PaperDetail } from '@/api/judge';
+  import { Message } from '@arco-design/web-vue';
+  import { PaperDetail, updateJudge } from '@/api/judge';
   import { Question } from '@/api/question';
-
-  const test = {
-    problemId: 257,
-    title: '无',
-    content: '英语测试题面1',
-    state: 0,
-    expectedDifficulty: 1,
-    source: 'upload',
-    type: 0,
-    score: 2,
-    order: 1,
-    id: 57,
-    result: '',
-    totalScore: 3,
-    url: '',
-    studentAnswer: 'A',
-  };
+  import ActionButton from './actionButton.vue';
 
   const props = defineProps<{
     compositeQuestion: PaperDetail & Question;
@@ -30,11 +15,14 @@
     scrollIntoView?: boolean;
   }>();
   const question = props.compositeQuestion;
-  console.log({ ...question });
 
-  const eRef = ref<HTMLElement>();
+  const emit = defineEmits<{
+    modify: [{ id: number; score: number; result: string }];
+  }>();
+
+  const el = ref<HTMLElement>();
   const fnScrollIntoView = () => {
-    eRef.value?.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
+    el.value?.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
   };
   defineExpose({ scrollIntoView: fnScrollIntoView });
   onUpdated(() => {
@@ -43,26 +31,36 @@
     }
   });
 
-  /**
-   * 目前是弹窗形式，也许可以做成 Popover？
-   */
-  const visible = ref(false);
-
-  // v-model 值
-  const humanScoreModel = ref(0);
-
-  const handleManualCorrection = () => {};
+  const modifiedResult = ref(question.result);
+  const modifiedScore = ref(question.score);
+  const emitModify = () =>
+    emit('modify', {
+      id: question.id,
+      score: modifiedScore.value,
+      result: modifiedResult.value,
+    });
+  const handleModifyResult = async () => {
+    const res = await updateJudge({ id: question.id, result: modifiedResult.value });
+    if (res.success) {
+      Message.success('修改成功');
+      emitModify();
+    } else {
+      Message.error('修改失败');
+    }
+  };
+  const handleModifyScore = async () => {
+    const res = await updateJudge({ id: question.id, score: modifiedScore.value });
+    if (!res.success) throw new Error('失败');
+    emitModify();
+  };
 </script>
 
 <template>
   <section
-    ref="eRef"
+    ref="el"
     class="relative"
   >
-    <div
-      :class="`flex justify-between gap-4 mb-4 transition ${false && 'opacity-25'}`"
-      :inert="false"
-    >
+    <div class="flex justify-between gap-4 mb-4">
       <!-- left: the question area -->
       <div class="flex-1 grid">
         <div class="flex gap-2 items-start mb-2">
@@ -88,74 +86,87 @@
           </a-typography-paragraph>
         </div>
 
-        <!-- TODO:参考答案后端未给 -->
-        <!-- <a-typography>
-          <a-typography-paragraph blockquote>
-            <strong>参考答案</strong>
-            <br />
-            <a-typography-paragraph :ellipsis="{ rows: 3, expandable: true }">
-              {{ '参考答案'.repeat(99) }}
+        <a-typography class="relative group">
+          <a-typography-paragraph
+            blockquote
+            class="transition group-hover:bg-stone-50 cursor-pointer"
+          >
+            <div class="my-1">
+              <strong>评语</strong>
+            </div>
+            <a-typography-paragraph
+              :type="question.result ? '' : 'warning'"
+              :ellipsis="{ rows: 3, expandable: true }"
+            >
+              <template #default> {{ question.result || '<无>' }}</template>
               <template #expand-node="{ expanded }">
                 {{ expanded ? '折叠' : '展开' }}
               </template>
             </a-typography-paragraph>
           </a-typography-paragraph>
-        </a-typography> -->
+          <a-popconfirm
+            position="lt"
+            @before-ok="handleModifyResult"
+          >
+            <template #icon>
+              <div class="flex flex-col translate-y-10">
+                <small
+                  v-for="(char, i) in `修改评语`"
+                  :key="i"
+                  >{{ char }}</small
+                >
+              </div>
+            </template>
+
+            <template #content>
+              <a-textarea
+                v-model="modifiedResult"
+                :placeholder="`修改第${question.order}题的评语`"
+                allow-clear
+                :auto-size="{ minRows: 5 }"
+                class="min-w-40vw"
+              />
+            </template>
+            <a-button
+              type="text"
+              class="absolute inset-[4px_0_auto_auto] transition opacity-0 group-hover:opacity-100"
+              @click="handleModifyScore"
+              >修改评语
+            </a-button>
+          </a-popconfirm>
+        </a-typography>
       </div>
 
       <!-- right: the operation panel -->
       <div>
-        <div class="flex items-center gap-2">
-          <div class="font-thin text-xl text-gray">{{ 'AI' }}</div>
-          <div class="py-4 flex justify-around items-center text-2xl">
+        <div class="flex flex-col items-center justify-center gap-2">
+          <div class="font-thin text-xl text-gray">当前得分</div>
+          <div class="flex justify-around items-center text-2xl">
             <span>{{ question.score }}</span>
             <span class="text-4xl font-thin">/</span>
             <span>{{ question.totalScore }}</span>
           </div>
         </div>
-        <div class="grid">
-          <a-button status="success">复审通过</a-button>
-          <a-button
+        <div class="grid mt-4">
+          <a-input-number
+            v-model="modifiedScore"
+            class="max-w-108px"
+            placeholder="请输入..."
+            mode="button"
+            :min="0"
+            :max="question.totalScore"
+          />
+          <action-button
             status="warning"
-            @click="() => (visible = true)"
-            >人工批改</a-button
+            :disabled="modifiedScore === question.score"
+            @action="handleModifyScore"
           >
+            修改得分
+          </action-button>
         </div>
       </div>
     </div>
     <a-divider></a-divider>
-
-    <a-card
-      v-if="false"
-      class="absolute top-50% left-50% translate-[-50%]"
-    >
-    </a-card>
-
-    <a-modal
-      :visible="visible"
-      ok-text="确认"
-      cancel-text="取消"
-      unmount-on-close
-      @ok="handleManualCorrection"
-      @cancel="() => (visible = false)"
-    >
-      <template #title>人工批改</template>
-      <a-form :model="{}">
-        <a-form-item label="AI 判定分数">
-          <a-typography-text>{{ question.score }} / {{ question.totalScore }}</a-typography-text>
-        </a-form-item>
-        <a-form-item label="人工判定分数">
-          <a-input-number
-            v-model="humanScoreModel"
-            placeholder="请输入..."
-            mode="button"
-            size="large"
-            :min="0"
-            :max="question.totalScore"
-          />
-        </a-form-item>
-      </a-form>
-    </a-modal>
   </section>
 </template>
 
