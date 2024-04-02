@@ -1,7 +1,12 @@
 <script setup lang="ts">
   /**
-   * TODO：草稿，因此不同题型，例如选择或填空，暂时硬编码
+   * 阅卷界面
+   * 必须query参数：
+   * examId
+   * userId
    *
+   * BUG：
+   * 评语的 pop-confirm 定位有问题，属于 arco 的实现问题
    */
   import { ref, onMounted } from 'vue';
   import { useRoute } from 'vue-router';
@@ -13,8 +18,8 @@
 
   const route = useRoute();
   const query = route.query as unknown as ExamListItem;
-  const userId = 2; // TODO：需要传入学生 id
-  const examId = 17; // Number(query.id);
+  const userId = 2; // TODO：修改为query传入学生 id
+  const examId = 17; // TODO：修改为 Number(query.id);
 
   const el = ref<HTMLElement | null>(null);
   const { isFullscreen, toggle } = useFullscreen(el);
@@ -32,7 +37,7 @@
           examId,
           userId,
           current: 0,
-          pageSize: 999,
+          pageSize: 9999, // get all questions, do not paging it
         })
       ).data.list;
       const wipComposedData: ComposedData[] = [];
@@ -68,6 +73,7 @@
 
       <template #extra>
         <a-space>
+          <div class="px-8 text-right"> 考试ID={{ examId }} 学生ID={{ userId }}</div>
           <a-button
             type="primary"
             @click="toggle"
@@ -78,7 +84,7 @@
       </template>
     </a-page-header>
 
-    <div :class="`flex pt-4 pb-2 px-2 bg-white rounded-lg relative ${isFullscreen ? 'h-full' : 'max-h-78vh'}`">
+    <div>
       <div
         v-if="loadingDataStatus === 'loading'"
         class="w-full py-20"
@@ -90,6 +96,7 @@
       </div>
       <template v-if="loadingDataStatus === 'success'">
         <SinglePaper
+          :fullscreen="isFullscreen"
           :exam-id="examId"
           :user-id="userId"
           :composite-paper="compositePaper!"

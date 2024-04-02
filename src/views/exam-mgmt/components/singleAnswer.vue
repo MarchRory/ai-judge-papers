@@ -62,7 +62,7 @@
     ref="el"
     class="relative"
   >
-    <div class="flex justify-between gap-4 mb-4">
+    <div class="flex justify-between items-start gap-4 mb-4">
       <!-- left: the question area -->
       <div class="flex-1 grid">
         <!-- 题目 -->
@@ -143,7 +143,7 @@
       </div>
 
       <!-- right: the operation panel -->
-      <div>
+      <div class="sticky top-1">
         <div class="flex flex-col items-center justify-center gap-2">
           <div class="font-thin text-xl text-gray">当前得分</div>
           <div class="flex justify-around items-center text-2xl">
