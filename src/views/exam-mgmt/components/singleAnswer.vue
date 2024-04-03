@@ -5,8 +5,10 @@
 
   import { ref, onUpdated } from 'vue';
   import { Message } from '@arco-design/web-vue';
+
   import { PaperDetail, updateJudge } from '@/api/judge';
   import { Question } from '@/api/question';
+  import DisplayLatex from '@/components/latex/index.vue';
   import ActionButton from './actionButton.vue';
 
   const props = defineProps<{
@@ -60,17 +62,19 @@
 <template>
   <section
     ref="el"
-    class="relative"
+    class="relative [&_*]:max-w-full"
   >
     <div class="flex justify-between items-start gap-4 mb-4">
       <!-- left: the question area -->
       <div class="flex-1 grid">
         <!-- 题目 -->
         <div class="flex gap-2 items-start mb-2">
-          <div class="bg-gray-100 text-sm text-center aspect-1/1 h-1.3rem line-height-1.3rem align-middle rounded-lg select-none mt-1">
+          <span class="bg-gray-100 text-sm text-center aspect-1/1 h-1.3rem line-height-1.3rem align-middle rounded-lg select-none mt-1">
             {{ question.order }}
-          </div>
-          <h3 class="my-1">{{ question.title }}</h3>
+          </span>
+          <h3 class="my-1">
+            <display-latex :latex="question.title" />
+          </h3>
         </div>
 
         <!-- 内容 -->
@@ -80,9 +84,9 @@
             :src="question.url"
           />
 
-          <a-typography-paragraph v-if="question.studentAnswer">
-            {{ question.studentAnswer }}
-          </a-typography-paragraph>
+          <p v-if="question.studentAnswer">
+            <display-latex :latex="question.studentAnswer" />
+          </p>
           <a-typography-paragraph
             v-else
             type="warning"
@@ -98,14 +102,9 @@
             <div class="my-1">
               <strong>评语</strong>
             </div>
-            <a-typography-paragraph
-              :type="question.result ? '' : 'warning'"
-              :ellipsis="{ rows: 3, expandable: true }"
-            >
-              <template #default> {{ question.result || '<无>' }}</template>
-              <template #expand-node="{ expanded }">
-                {{ expanded ? '折叠' : '展开' }}
-              </template>
+            <a-typography-paragraph :type="question.result ? '' : 'warning'">
+              <template v-if="question.result"> <display-latex :latex="question.result" /> </template>
+              <template v-else> {{ '<无>' }}</template>
             </a-typography-paragraph>
           </a-typography-paragraph>
           <a-popconfirm
@@ -147,7 +146,7 @@
         <div class="flex flex-col items-center justify-center gap-2">
           <div class="font-thin text-xl text-gray">当前得分</div>
           <div class="flex justify-around items-center text-2xl">
-            <span>{{ question.score }}</span>
+            <span>{{ question.score.toFixed(1) }}</span>
             <span class="text-4xl font-thin">/</span>
             <span>{{ question.totalScore }}</span>
           </div>

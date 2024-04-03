@@ -18,8 +18,8 @@
 
   const route = useRoute();
   const query = route.query as unknown as ExamListItem;
-  const userId = 2; // TODO：修改为query传入学生 id
-  const examId = 17; // TODO：修改为 Number(query.id);
+  const userId = 50; // TODO：修改为query传入学生 id
+  const examId = 19; // TODO：修改为 Number(query.id);
 
   const el = ref<HTMLElement | null>(null);
   const { isFullscreen, toggle } = useFullscreen(el);
@@ -63,7 +63,6 @@
   <a-layout
     id="id-for-judge-container"
     ref="el"
-    class="h-full"
   >
     <a-page-header @back="$router.back()">
       <template #title> {{ query.name }}&nbsp;{{ query.subject }} </template>
@@ -84,10 +83,10 @@
       </template>
     </a-page-header>
 
-    <div>
+    <div :class="`flex px-2 bg-white rounded-lg relative ${isFullscreen ? 'h-92vh' : 'max-h-72vh'}`">
       <div
         v-if="loadingDataStatus === 'loading'"
-        class="w-full py-20"
+        class="w-full h-50vh"
       >
         <a-spin
           tip="试卷正在加载中..."
@@ -96,7 +95,6 @@
       </div>
       <template v-if="loadingDataStatus === 'success'">
         <SinglePaper
-          :fullscreen="isFullscreen"
           :exam-id="examId"
           :user-id="userId"
           :composite-paper="compositePaper!"
@@ -116,6 +114,8 @@
   }
 
   #id-for-judge-container {
-    padding: 1rem 0;
+    height: 100%;
+    display: grid;
+    grid-template-rows: 1fr auto;
   }
 </style>
