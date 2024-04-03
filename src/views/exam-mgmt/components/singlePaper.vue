@@ -1,11 +1,9 @@
-h2
 <script setup lang="ts">
   import { ref, nextTick } from 'vue';
   import { PaperDetail } from '@/api/judge';
   import { Question } from '@/api/question';
   import SingleAnswer from './singleAnswer.vue';
   import collapsePanel from './collapsePanel.vue';
-  import { addProblemApi } from '../../../api/exam';
 
   const props = defineProps<{
     userId: number;
@@ -48,7 +46,10 @@ h2
           v-for="([name, problems], type) in types"
           :key="name"
         >
-          <a-anchor-link v-if="problems.length > 0">
+          <a-anchor-link
+            v-if="problems.length > 0"
+            @click="onScrollIntoView({ type, index: 1 })"
+          >
             {{ name }}
             <template #sublist>
               <a-anchor-link
