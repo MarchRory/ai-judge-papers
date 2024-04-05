@@ -66,14 +66,16 @@ class HttpRequest {
       (response: AxiosResponse<HttpResponse>): AxiosResponse['data'] => {
         const res = response.data;
         // http error response guard
-        if (!res.success) {
+        const { success, code, message } = res;
+
+        if (!success) {
           Message.error({
-            content: res.message || 'Error',
+            content: message || errorCodeMap[code] || '服务器异常',
             duration: 5 * 1000,
           });
           // TODO: 这里可能还需要根据后端修改
           // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-          if ([403].includes(res.code) && response.config.url !== '/api/user/info') {
+          if ([403].includes(code) && response.config.url !== '/api/user/info') {
             Modal.error({
               title: '确认注销',
               content: '您已经注销，您可以取消并停留在此页面，或者重新登录',
@@ -85,7 +87,7 @@ class HttpRequest {
               },
             });
           }
-          return Promise.reject(new Error(res.message || 'Error'));
+          return Promise.reject(new Error(message || errorCodeMap[code] || '服务器异常'));
         }
         return res as HttpResponse;
       },
@@ -107,7 +109,6 @@ class HttpRequest {
       if (opts?.cache) {
         const cache = this.cacheMap.get(config.url as string);
         if (cache) {
-          console.log(cache);
           resolve(cache as HttpResponse<T>);
         }
       }

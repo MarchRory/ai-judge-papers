@@ -9,6 +9,9 @@
   import { examStateMap } from '../config';
 
   const GroupForm = defineAsyncComponent(() => import('./groupForm.vue'));
+  const emits = defineEmits<{
+    (e: 'onChange'): void;
+  }>();
   const now = new Date().getTime();
   const otherSearchParams = { key: '', order: 1 };
   const { key, order, tableData, page, loading, pagination, loadList, handlePageChange, handleSizeChange, handleDelete } = useTable<
@@ -145,7 +148,12 @@
                   <a-popconfirm
                     :content="`确定删除该考试组${record.name}吗？`"
                     type="error"
-                    @ok="handleDelete(record)"
+                    @ok="
+                      () => {
+                        handleDelete(record);
+                        emits('onChange');
+                      }
+                    "
                   >
                     <a-button
                       v-if="now < record.time"

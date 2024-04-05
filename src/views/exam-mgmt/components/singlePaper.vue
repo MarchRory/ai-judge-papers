@@ -1,3 +1,4 @@
+h2
 <script setup lang="ts">
   import { ref, nextTick } from 'vue';
   import { PaperDetail } from '@/api/judge';
@@ -28,13 +29,6 @@
       shouldScrollIntoViewInfo.value = { type: -1, index: -1 };
     });
   };
-
-  const handleModifyQuestion = (e: { id: number; score: number; result: string }) => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const problem = props.compositePaper.find(({ id }) => id === e.id)!;
-    problem.score = e.score;
-    problem.result = e.result;
-  };
 </script>
 
 <template>
@@ -46,10 +40,7 @@
           v-for="([name, problems], type) in types"
           :key="name"
         >
-          <a-anchor-link
-            v-if="problems.length > 0"
-            @click="onScrollIntoView({ type, index: 1 })"
-          >
+          <a-anchor-link v-if="problems.length > 0">
             {{ name }}
             <template #sublist>
               <a-anchor-link
@@ -76,35 +67,12 @@
       :key="name"
     >
       <div v-if="questions.length > 0">
-        <div class="px-4 pb-6 mb-8 bg-slate-100 rounded-2xl border-solid b-blue-100 b-1">
-          <h1 class="font-normal">{{ name }}</h1>
-          <a-typography class="flex gap-4">
-            <a-tag
-              bordered
-              size="small"
-              color="arcoblue"
-              >题目数：{{ questions.length }}</a-tag
-            >
-            <a-tag
-              bordered
-              size="small"
-              color="arcoblue"
-              >得分：{{ questions.reduce((acc, cur) => acc + cur.score, 0) }}</a-tag
-            >
-            <a-tag
-              bordered
-              size="small"
-              color="arcoblue"
-              >总分：{{ questions.reduce((acc, cur) => acc + cur.totalScore, 0) }}</a-tag
-            >
-          </a-typography>
-        </div>
+        <h2 class="px-4 pt-4 pb-12 bg-slate-100 rounded-2xl border-solid b-blue-100 b-1">{{ name }}</h2>
         <single-answer
           v-for="question in questions"
           :key="question.problemId"
           :composite-question="question"
           :scroll-into-view="shouldScrollIntoViewInfo.index === question.order && shouldScrollIntoViewInfo.type === type"
-          @modify="handleModifyQuestion"
         />
       </div>
     </template>

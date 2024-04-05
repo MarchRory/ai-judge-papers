@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, defineAsyncComponent } from 'vue';
+  import { ref, defineAsyncComponent, watch } from 'vue';
   import { Message } from '@arco-design/web-vue';
   import { useRouter } from 'vue-router';
   import useTable from '@/hooks/table/useTable';
@@ -101,6 +101,14 @@
   const closeGroup = () => {
     isGroupTableVisible.value = false;
   };
+  watch(
+    () => isGroupTableVisible.value,
+    (newVal) => {
+      if (!newVal) {
+        initGroupSelectData();
+      }
+    },
+  );
   /* 考试组 逻辑 */
   const initPage = () => {
     initGroupSelectData();

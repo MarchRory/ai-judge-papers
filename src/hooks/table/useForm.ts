@@ -7,7 +7,7 @@ export type FormType = 'create' | 'edit';
 type commonObj = Record<string, any>;
 interface formState<R = commonObj> {
   form: R;
-  formType: formType;
+  formType: FormType;
   submitLoading: boolean;
 }
 interface FormBaseMethod<R extends object = commonObj> {
@@ -30,7 +30,7 @@ export function useForm<R extends object>(formRef: Ref<FormInstance | undefined>
   });
   const isFormOpen = visible || ref(false);
   // 打开表单和数据初始化
-  const openForm = (type: formType, data?: R) => {
+  const openForm = (type: FormType, data?: R) => {
     if (type === 'edit') {
       // @ts-ignore
       formState.form = cloneDeep(data) as R;
