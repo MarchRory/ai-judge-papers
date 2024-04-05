@@ -2,14 +2,15 @@ import { Pagination } from '@/types/global';
 import request from '@/utils/request/index';
 import { ListResponse } from './types';
 
-const schema = '/study/judge/';
+const schema = '/study/judge';
 
 const enum JudgeApi {
   submit = `${schema}/submit`,
   beginJudge = `${schema}/doJudge`, // 启动AI阅卷
-  problemList = `${schema}/list`,
+  problemList = `${schema}/list`, // 对于userId和problemId得到正在判题的id列表
   stuScoreList = `${schema}/scoreList`,
   updateProblemRes = `${schema}/update`, // 更新判题结果=, 对指定题目进行复审
+  getReview = `${schema}/review`, // 根据状态查询在某考试中的学生
 }
 
 export interface Answer {
@@ -45,6 +46,7 @@ export const beginAiJudge = (id: number) => {
 };
 
 export interface PaperDetail {
+  /** 当前判题id */
   id: number;
   problemId: number;
   result: string;
@@ -75,6 +77,26 @@ export const getScoreList = () => {
  * @param data id: 题目id, result: 阅卷评论, score: 更正分数
  * @returns
  */
-export const passJudge = (data: { id: number; result: string; score: number }) => {
+export const updateJudge = (data: { id: number; result?: string; score: number } | { id: number; result: string; score?: number }) => {
   return request.post(JudgeApi.updateProblemRes, data);
+};
+
+/**
+ * 根据状态查询在某考试中的学生
+ */
+export const getReview = (data: {
+  page?: number;
+  pageSize?: number;
+  examId: number;
+  /**
+   * 状态
+   * 1 AI审核进行中
+   * 2 AI初审结束
+   * 3 复审中
+   * 4 阅卷结束
+   * @docs https://swpu.feishu.cn/docx/OMK2df7zOokZgRx0HDScniKPnMb
+   */
+  state: 1 | 2 | 3 | 4;
+}) => {
+  return request.post<ListResponse<PaperDetail>>(JudgeApi.getReview, data);
 };

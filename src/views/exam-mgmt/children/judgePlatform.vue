@@ -1,7 +1,12 @@
 <script setup lang="ts">
   /**
-   * TODO：草稿，因此不同题型，例如选择或填空，暂时硬编码
+   * 阅卷界面
+   * 必须query参数：
+   * examId
+   * userId
    *
+   * BUG：
+   * 评语的 pop-confirm 定位有问题，属于 arco 的实现问题
    */
   import { ref, onMounted } from 'vue';
   import { useRoute } from 'vue-router';
@@ -13,8 +18,8 @@
 
   const route = useRoute();
   const query = route.query as unknown as ExamListItem;
-  const userId = 2; // TODO：需要传入学生 id
-  const examId = 17; // Number(query.id);
+  const userId = 50; // TODO：修改为query传入学生 id
+  const examId = 19; // TODO：修改为 Number(query.id);
 
   const el = ref<HTMLElement | null>(null);
   const { isFullscreen, toggle } = useFullscreen(el);
@@ -32,7 +37,7 @@
           examId,
           userId,
           current: 0,
-          pageSize: 999,
+          pageSize: 9999, // get all questions, do not paging it
         })
       ).data.list;
       const wipComposedData: ComposedData[] = [];
@@ -42,7 +47,7 @@
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const problem = problems.find((p) => p.problemId === detail.problemId)!;
         // console.log({ detail, problem });
-        wipComposedData.push({ ...problem, ...detail });
+        wipComposedData.push(Object.assign(problem, detail));
       });
       compositePaper.value = wipComposedData;
       // done
@@ -54,9 +59,10 @@
 </script>
 
 <template>
+  <!-- id 确保全屏模式挂载点正确 -->
   <a-layout
+    id="id-for-judge-container"
     ref="el"
-    class="h-full"
   >
     <a-page-header @back="$router.back()">
       <template #title> {{ query.name }}&nbsp;{{ query.subject }} </template>
@@ -66,21 +72,21 @@
 
       <template #extra>
         <a-space>
+          <div class="px-8 text-right"> 考试ID={{ examId }} 学生ID={{ userId }}</div>
           <a-button
             type="primary"
             @click="toggle"
             >{{ isFullscreen ? '退出全屏' : '全屏阅卷' }}</a-button
           >
-          <a-button type="primary">提交</a-button>
-          <a-button type="outline">全部</a-button>
+          <a-button type="outline">提交阅卷结果</a-button>
         </a-space>
       </template>
     </a-page-header>
 
-    <div :class="`flex pt-4 pb-2 px-2 bg-white rounded-lg relative ${isFullscreen ? 'h-full' : 'max-h-78vh'}`">
+    <div :class="`flex px-2 bg-white rounded-lg relative ${isFullscreen ? 'h-92vh' : 'max-h-72vh'}`">
       <div
         v-if="loadingDataStatus === 'loading'"
-        class="w-full py-20"
+        class="w-full h-50vh"
       >
         <a-spin
           tip="试卷正在加载中..."
@@ -105,5 +111,11 @@
   /* 确保全屏模式下背景颜色正确 */
   * {
     background: Canvas;
+  }
+
+  #id-for-judge-container {
+    height: 100%;
+    display: grid;
+    grid-template-rows: 1fr auto;
   }
 </style>
