@@ -30,7 +30,7 @@ const useTreeStore = defineStore('tree', {
     },
     allParentIds() {
       const parentPermissions: NestArr<PermissionItem>[] = this.flattenPermissionsTree.filter(
-        (p: NestArr<PermissionItem>) => p.children && p.children.length,
+        (p: NestArr<PermissionItem>) => p.children && p.children.length
       );
       const res: number[] = [];
       parentPermissions.forEach((p) => {

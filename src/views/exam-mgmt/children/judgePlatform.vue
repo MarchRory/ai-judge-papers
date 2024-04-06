@@ -28,10 +28,11 @@
   const loadingDataStatus = ref('loading');
   type ComposedData = PaperDetail & Question;
   const compositePaper = ref<ComposedData[]>();
+  const errorMessage = ref<string>();
 
   onMounted(async () => {
     try {
-      const problems = (await getProblemList(Number(query.id))).data.list;
+      const problems = (await getProblemList(examId)).data.list;
       const thisUserPaperDetail = (
         await getPaperDetail({
           examId,
@@ -40,22 +41,30 @@
           pageSize: 9999, // get all questions, do not paging it
         })
       ).data.list;
+
       const wipComposedData: ComposedData[] = [];
       thisUserPaperDetail.forEach((detail) => {
         //! 重要：注意：如果 problem === undefined 那必然是数据库有一些问题
         // 此处暂未做处理
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const problem = problems.find((p) => p.problemId === detail.problemId)!;
-        // console.log({ detail, problem });
+
+        // console.log({ detail, problem, problems });
         wipComposedData.push(Object.assign(problem, detail));
       });
       compositePaper.value = wipComposedData;
       // done
       loadingDataStatus.value = 'success';
-    } catch {
+    } catch (e) {
+      console.error(e);
+      errorMessage.value = String(e);
       loadingDataStatus.value = 'error';
     }
   });
+
+  const handleModify = (composited: ComposedData[]) => {
+    compositePaper.value = composited;
+  };
 </script>
 
 <template>
@@ -93,13 +102,22 @@
           class="w-full"
         />
       </div>
-      <template v-if="loadingDataStatus === 'success'">
+      <template v-else-if="loadingDataStatus === 'success'">
         <SinglePaper
           :exam-id="examId"
           :user-id="userId"
           :composite-paper="compositePaper!"
+          @modify="handleModify"
         />
       </template>
+      <div
+        v-else-if="loadingDataStatus === 'error'"
+        class="w-full h-80vh px-8"
+      >
+        <a-typography-text type="warning">
+          {{ errorMessage }}
+        </a-typography-text>
+      </div>
     </div>
   </a-layout>
 </template>

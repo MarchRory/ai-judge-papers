@@ -1,5 +1,6 @@
 import axios from 'axios';
 import type { TableData } from '@arco-design/web-vue/es/table/interface';
+import mockjs, { mock } from 'mockjs';
 
 export interface ContentDataRecord {
   x: string;

@@ -47,7 +47,7 @@
         </a-avatar>
         <a-statistic
           title="教师人数"
-          :value="368"
+          :value="168"
           :value-from="0"
           animation
           show-group-separator

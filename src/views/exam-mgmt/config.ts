@@ -7,6 +7,13 @@ interface stateConfig {
 }
 
 export const examStateMap: Record<number, stateConfig> = {
+  0: {
+    value: 0,
+    text: '',
+    groupState: '准备中',
+    iconColor: '',
+    btnText: '启动阅卷',
+  },
   1: {
     value: 1,
     text: '准备中',

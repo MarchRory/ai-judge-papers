@@ -23,13 +23,14 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref } from 'vue';
-  import { graphic } from 'echarts';
-  import useLoading from '@/hooks/loading';
-  import { queryContentData, ContentDataRecord } from '@/api/dashboard';
+  import { ContentDataRecord } from '@/api/dashboard';
   import useChartOption from '@/hooks/chart-option';
+  import useLoading from '@/hooks/loading';
   import { ToolTipFormatterParams } from '@/types/echarts';
   import { AnyObject } from '@/types/global';
+  import { graphic } from 'echarts';
+  import { Random } from 'mockjs';
+  import { ref } from 'vue';
 
   function graphicFactory(side: AnyObject) {
     return {
@@ -119,8 +120,8 @@
           const [firstElement] = params as ToolTipFormatterParams[];
           return `<div>
             <p class="tooltip-title">${firstElement.axisValueLabel}</p>
-            <div class="content-panel"><span>总内容量</span><span class="tooltip-value">${(
-              Number(firstElement.value) * 10000
+            <div class="content-panel"><span>评阅数量</span><span class="tooltip-value">${(
+              Number(firstElement.value) * 1
             ).toLocaleString()}</span></div>
           </div>`;
         },
@@ -180,7 +181,29 @@
   const fetchData = async () => {
     setLoading(true);
     try {
-      const { data: chartData } = await queryContentData();
+      // const { data: chartData } = await queryContentData();
+      const lastYear = [
+        '2023-04',
+        '2023-05',
+        '2023-06',
+        '2023-07',
+        '2023-08',
+        '2023-09',
+        '2023-10',
+        '2023-11',
+        '2023-12',
+        '2024-01',
+        '2024-02',
+        '2024-03',
+        '2024-04',
+      ];
+      const base = 1238;
+      const chartData = lastYear.map((it) => {
+        return {
+          x: it,
+          y: base + Random.integer(-100, 1000),
+        };
+      });
       chartData.forEach((el: ContentDataRecord, idx: number) => {
         xAxis.value.push(el.x);
         chartsData.value.push(el.y);
