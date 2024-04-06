@@ -13,16 +13,16 @@ const PERMISSION_MGMT: AppRouteRecordRaw = {
     order: 1,
   },
   children: [
-    {
-      path: 'tree',
-      name: 'tree',
-      component: () => import('@/views/permission-mgmt/tree/index.vue'),
-      meta: {
-        locale: '权限树',
-        requiresAuth: true,
-        roles: ['root', 'permission'],
-      },
-    },
+    // {
+    //   path: 'tree',
+    //   name: 'tree',
+    //   component: () => import('@/views/permission-mgmt/tree/index.vue'),
+    //   meta: {
+    //     locale: '权限树',
+    //     requiresAuth: true,
+    //     roles: ['root', 'permission'],
+    //   },
+    // },
     {
       path: 'role',
       name: 'role',

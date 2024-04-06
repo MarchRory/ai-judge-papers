@@ -39,7 +39,7 @@ export async function listStudent(
     name?: Student['name'];
     state?: Student['state'];
   } = { state: -1 },
-  page = 1
+  page = 1,
 ) {
   const res = await request.post('/organization/student/list', withPaging(data, page));
 

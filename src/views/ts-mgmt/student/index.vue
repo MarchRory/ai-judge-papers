@@ -59,8 +59,8 @@
   const displayData = computed(() =>
     selectedData.value.map(
       // 转换为可读形式
-      ({ sex, state, ...props }) => ({ ...props, sex: ['男', '女'][sex], state: Boolean(state) })
-    )
+      ({ sex, state, ...props }) => ({ ...props, sex: ['男', '女'][sex], state: Boolean(state) }),
+    ),
   );
 
   // actions

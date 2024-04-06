@@ -12,14 +12,14 @@ export const examStateMap: Record<number, stateConfig> = {
     text: '准备中',
     groupState: '准备中',
     iconColor: '',
-    btnText: '启动阅卷',
+    btnText: '启动AI阅卷',
   },
   2: {
     value: 2,
     text: 'AI判卷中',
     groupState: '阅卷中',
     iconColor: '',
-    btnText: '等待AI阅卷结束',
+    btnText: '请等待AI阅卷结束',
   },
   3: {
     value: 3,
@@ -33,7 +33,7 @@ export const examStateMap: Record<number, stateConfig> = {
     text: '已提交阅卷结果',
     groupState: '已结束',
     iconColor: '',
-    btnText: '考试回顾',
+    btnText: '数据分析',
   },
 };
 

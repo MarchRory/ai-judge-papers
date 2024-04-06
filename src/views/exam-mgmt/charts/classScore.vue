@@ -10,9 +10,9 @@
   const { id } = examInfo as ExamListItem;
   const chartOpt = ref({});
   const getOpt = (data: ClassScore[]) => {
-    const avgList = getSpecificValueArr(data, 'average');
-    const midList = getSpecificValueArr(data, 'mid');
-    const maxList = getSpecificValueArr(data, 'max');
+    const avgList = getSpecificValueArr(data, 'average', (num) => +num.toFixed(2));
+    const midList = getSpecificValueArr(data, 'mid', (num) => +num.toFixed(2));
+    const maxList = getSpecificValueArr(data, 'max', (num) => +num.toFixed(2));
     const classNames = getSpecificValueArr(data, 'className');
     const option = {
       title: {

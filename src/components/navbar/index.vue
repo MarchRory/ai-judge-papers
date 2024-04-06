@@ -23,7 +23,7 @@
       <Menu v-if="topMenu" />
     </div>
     <ul class="right-side">
-      <li>
+      <!-- <li>
         <a-tooltip content="搜索">
           <a-button
             class="nav-btn"
@@ -35,7 +35,7 @@
             </template>
           </a-button>
         </a-tooltip>
-      </li>
+      </li> -->
       <li>
         <a-tooltip :content="theme === 'light' ? '点击切换为暗黑模式' : '点击切换为亮色模式'">
           <a-button
@@ -51,7 +51,7 @@
           </a-button>
         </a-tooltip>
       </li>
-      <li>
+      <!-- <li>
         <a-tooltip :content="'消息通知'">
           <div class="message-box-trigger">
             <a-badge
@@ -83,7 +83,7 @@
             <message-box />
           </template>
         </a-popover>
-      </li>
+      </li> -->
       <li>
         <a-tooltip :content="isFullscreen ? '点击退出全屏模式' : '点击切换全屏模式'">
           <a-button
@@ -99,7 +99,7 @@
           </a-button>
         </a-tooltip>
       </li>
-      <li>
+      <!-- <li>
         <a-tooltip content="页面配置">
           <a-button
             class="nav-btn"
@@ -112,7 +112,7 @@
             </template>
           </a-button>
         </a-tooltip>
-      </li>
+      </li> -->
       <li>
         <a-dropdown trigger="click">
           <a-avatar
@@ -125,7 +125,7 @@
             />
           </a-avatar>
           <template #content>
-            <a-doption>
+            <!-- <a-doption>
               <a-space @click="$router.push({ name: 'Info' })">
                 <icon-user />
                 <span> 用户中心 </span>
@@ -136,7 +136,7 @@
                 <icon-settings />
                 <span> 用户设置 </span>
               </a-space>
-            </a-doption>
+            </a-doption> -->
             <a-doption>
               <a-space @click="handleLogout">
                 <icon-export />

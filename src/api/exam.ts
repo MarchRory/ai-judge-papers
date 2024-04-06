@@ -13,6 +13,7 @@ const enum ExamApi {
   detail = `${schema}/detail`,
   addProblem = `${schema}/addProblem`,
   uploadTemplate = `${schema}/upload`, // 上传考试excel模板
+  uploadAnswerSheet = `${schema}/answerSheet/upload`, // 上传答题卡zip
   sheetList = `${schema}/answerSheet/list`, // 获取上传到某考试中的学生的答题卡列表
   problemList = `${schema}/problemList`,
 }
@@ -68,6 +69,7 @@ export interface ExamListItem {
   subjectId: number;
   time: number;
   timeLimit: number;
+  total?: number;
 }
 
 export function createExamApi(data: Omit<ExamFormData, 'id'>) {
@@ -88,6 +90,10 @@ export function getExamListApi(data: Paging & { key: string }) {
 
 export function uploadExamTemplateApi({ file, sheet = '', examId }: ExamFileParams) {
   return request.upload(ExamApi.uploadTemplate, file, { sheet, examId });
+}
+
+export function uploadAnswerSheetApi({ file, examId }: ExamFileParams) {
+  return request.upload(ExamApi.uploadTemplate, file, { examId });
 }
 
 export function addProblemApi(data: addProblemParams) {

@@ -42,15 +42,15 @@ const router = createRouter({
             requiresAuth: false,
           },
         },
-        {
-          path: 'personal-center',
-          name: 'personal-center',
-          component: () => import('@/views/personal-center/index.vue'), // TODO: replace me
-          meta: {
-            locale: '个人中心',
-            requiresAuth: false,
-          },
-        },
+        // {
+        //   path: 'personal-center',
+        //   name: 'personal-center',
+        //   component: () => import('@/views/personal-center/index.vue'), // TODO: replace me
+        //   meta: {
+        //     locale: '个人中心',
+        //     requiresAuth: false,
+        //   },
+        // },
       ],
     },
     // @ts-ignore TODO: 下面这行处于调试目的，待权限系统完成可删
