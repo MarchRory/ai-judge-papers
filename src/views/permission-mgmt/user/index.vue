@@ -123,7 +123,7 @@
           }
         }, 500);
       }
-    }
+    },
   );
 
   function pageInit() {

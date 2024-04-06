@@ -127,7 +127,7 @@
 
 <script setup lang="ts">
   import { TableColumnData, Message } from '@arco-design/web-vue';
-  import { reactive } from 'vue';
+  import { reactive, ref } from 'vue';
   import DetailButton from '@/components/detail-button/index.vue';
   import { listQuestion, deleteQuestion, type QuestionListItem } from '@/api/question';
   import { getSubjectListAPI } from '@/api/subject';
@@ -153,7 +153,7 @@
     $operation: '操作',
   }).map(([dataIndex, title]) => ({ dataIndex, slotName: title }));
 
-  const otherSearchParams = { key: '', subjectId: '' };
+  const otherSearchParams = { key: '' };
   const { tableData, pagination, loading, loadList, handlePageChange, handleSizeChange, page, key, subjectId } = useTable<
     QuestionListItem,
     typeof otherSearchParams
