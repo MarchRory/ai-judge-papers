@@ -50,6 +50,7 @@ function useAutoHighlight(chartDom, options, delay = 3000) {
     }, delay);
   };
 
+  // @ts-ignore
   if (!timer) {
     timer = setInterval(() => {
       curIndex = (curIndex + 1) % dataLen;

@@ -153,7 +153,7 @@
     $operation: '操作',
   }).map(([dataIndex, title]) => ({ dataIndex, slotName: title }));
 
-  const otherSearchParams = { key: '' };
+  const otherSearchParams = { key: '', subjectId: '' };
   const { tableData, pagination, loading, loadList, handlePageChange, handleSizeChange, page, key, subjectId } = useTable<
     QuestionListItem,
     typeof otherSearchParams

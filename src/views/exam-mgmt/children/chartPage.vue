@@ -1,15 +1,17 @@
 <script setup lang="ts">
-  import { ref, provide } from 'vue';
+  import { ref, provide, defineAsyncComponent } from 'vue';
   import { useRoute } from 'vue-router';
   import { useFullscreen } from '@vueuse/core';
   import { type ExamListItem } from '@/api/exam';
-  import { stuExamRankList, StuExamRank, stuProgressListApi, importantQustionsApi, focusStuApi, FocusStu } from '@/api/data';
+  import { stuExamRankList, StuExamRank, stuProgressListApi, importantQustionsApi, focusStuApi, FocusStu, ProgressStu } from '@/api/data';
   import { Message } from '@arco-design/web-vue';
-  import AutoScrollTable from '@/components/customTable/autoScrollTable.vue';
-  import PassPieChart from '../charts/passPie.vue';
-  import ScoreDistriChart from '../charts/scoredistri.vue';
-  import DegreeChart from '../charts/degree.vue';
-  import ClassScoreChart from '../charts/classScore.vue';
+
+  // chart components
+  const AutoScrollTable = defineAsyncComponent(() => import('@/components/customTable/autoScrollTable.vue'));
+  const PassPieChart = defineAsyncComponent(() => import('../charts/passPie.vue'));
+  const ScoreDistriChart = defineAsyncComponent(() => import('../charts/scoredistri.vue'));
+  const DegreeChart = defineAsyncComponent(() => import('../charts/degree.vue'));
+  const ClassScoreChart = defineAsyncComponent(() => import('../charts/classScore.vue'));
 
   // 传值
   const route = useRoute();
@@ -18,23 +20,24 @@
   const chartContainer = ref<HTMLElement | null>(null);
   const { isFullscreen, enter, exit, toggle: fullScreenToggle } = useFullscreen(chartContainer);
 
-  fullScreenToggle();
-
   /* 数据请求和处理 */
   // 学生成绩细则
   const stuScoreDetail = ref<StuExamRank[]>([]);
   const loadStuScoreList = () => {
-    stuExamRankList({ page: 1, pageSize: 1000, id: +query.id }).then((res) => {
-      const { list, total } = res.data;
-      if (!total) {
-        Message.warning('数据异常, 学生成绩缺失');
-      }
-      stuScoreDetail.value = list;
-    });
+    stuExamRankList({ page: 1, pageSize: 1000, id: +query.id })
+      .then((res) => {
+        const { list, total } = res.data;
+        if (!total) {
+          Message.warning('数据异常, 学生成绩缺失');
+        }
+        stuScoreDetail.value = list;
+      })
+      .finally(() => {});
   };
 
   const initPage = () => {
     loadStuScoreList();
+    // fullScreenToggle();
   };
 
   const tableListPageParams = { page: 1, pageSize: 3000 };
@@ -187,6 +190,11 @@
                 { name: '进步系数', dataIndex: 'coefficient' },
               ]"
               :request-params="{ id: +query.id, subjectId: +query.subjectId, ...tableListPageParams }"
+              :formart="
+                (item: ProgressStu) => {
+                  item.coefficient = +item.coefficient.toFixed(2);
+                }
+              "
             />
           </div>
           <div class="chartBox h-5/16">

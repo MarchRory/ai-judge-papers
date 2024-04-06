@@ -48,7 +48,7 @@
     :loading="loading"
     :size="20"
     dot
-    tip="正在获取数据"
+    tip="数据加载中"
   >
     <div class="wh-full flex flex-col items-center justify-start">
       <div class="text-white text-lg font-bold">{{ title }}</div>
@@ -88,7 +88,7 @@
         </div>
       </vue3-seamless-scroll>
       <div
-        v-else-if="!loading && dataSource && !dataSource.length"
+        v-else
         class="wh-full flex items-center justify-center text-white font-bold text-2xl"
       >
         暂无数据

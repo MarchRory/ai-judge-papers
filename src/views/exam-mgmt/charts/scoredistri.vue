@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, watch, inject, onBeforeUnmount } from 'vue';
+  import { ref, inject } from 'vue';
   import { gradeListApi } from '@/api/data';
   import BaseChart from '@/components/chart/index.vue';
   import { ExamListItem } from '@/api/exam';
