@@ -69,9 +69,9 @@
       <div class="flex-1 grid">
         <!-- 题目 -->
         <div class="flex gap-2 items-start mb-2">
-          <span class="bg-gray-100 text-sm text-center aspect-1/1 h-1.3rem line-height-1.3rem align-middle rounded-lg select-none mt-1">
+          <small class="bg-gray-200 text-center aspect-1/1 h-1.3rem line-height-1.3rem align-middle rounded-lg select-none mt-1">
             {{ question.order }}
-          </span>
+          </small>
           <h3 class="my-1">
             <display-latex :latex="question.title" />
           </h3>
