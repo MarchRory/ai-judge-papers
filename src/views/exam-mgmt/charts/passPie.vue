@@ -7,6 +7,7 @@
     stuScoreList: StuExamRank[];
   }>();
   const chartOpt = ref({});
+  // @ts-ignore
   const getOpt = (dataList) => {
     const colorList = ['#30C9C9', '#306FFF'];
     const option = {
@@ -21,6 +22,7 @@
         top: '0%',
       },
       legend: {
+        // @ts-ignore
         data: dataList.map((item) => item.name),
         bottom: 0,
         itemWidth: 30,
@@ -43,6 +45,7 @@
           center: ['50%', '50%'],
           label: {
             fontWeight: 'bold',
+            // @ts-ignore
             formatter(params) {
               // eslint-disable-line
               return `${params.name}\n\n` + `${params.percent}%`; // eslint-disable-line
@@ -56,6 +59,7 @@
             normal: {
               borderColor: '#fff',
               borderWidth: 2,
+              // @ts-ignore
               color: (params) => {
                 return colorList[params.dataIndex];
               },

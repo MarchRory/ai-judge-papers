@@ -108,9 +108,9 @@
     () => props.stuScoreList,
     (newVal) => {
       const notPassValue = newVal.filter((item) => item.score < 90).length;
-      console.log(newVal);
       const degree = (notPassValue / newVal.length).toFixed(2);
-      chartOpt.value = getOpt(+degree);
+      const val = Number.isNaN(+degree) ? 0.0 : +degree;
+      chartOpt.value = getOpt(val);
     },
     { deep: true },
   );

@@ -1,10 +1,11 @@
 <script setup lang="ts">
-  import { ref, provide, defineAsyncComponent } from 'vue';
+  import { ref, provide } from 'vue';
   import { useRoute } from 'vue-router';
   import { useFullscreen } from '@vueuse/core';
   import { type ExamListItem } from '@/api/exam';
-  import { stuExamRankList, StuExamRank } from '@/api/data';
+  import { stuExamRankList, StuExamRank, stuProgressListApi, importantQustionsApi, focusStuApi, FocusStu } from '@/api/data';
   import { Message } from '@arco-design/web-vue';
+  import AutoScrollTable from '@/components/customTable/autoScrollTable.vue';
   import PassPieChart from '../charts/passPie.vue';
   import ScoreDistriChart from '../charts/scoredistri.vue';
   import DegreeChart from '../charts/degree.vue';
@@ -35,6 +36,8 @@
   const initPage = () => {
     loadStuScoreList();
   };
+
+  const tableListPageParams = { page: 1, pageSize: 3000 };
   initPage();
   provide('examInfo', query);
 </script>
@@ -46,7 +49,7 @@
   >
     <a-layout h="full">
       <a-layout-header
-        flex="~ items-center justify-around"
+        flex="~ items-center justify-around relative"
         w="full"
         h="10%"
         text-white
@@ -71,11 +74,14 @@
           </div>
         </div>
         <div
-          w="4/10"
+          class="trapezoid"
+          w="1/2"
+          h="4/5"
+          flex="~ items-center justify-center"
           text="3xl center"
           font="bold"
         >
-          考试数据分析平台
+          考试数据分析大屏
         </div>
         <div
           flex="~ col items-center justify-center"
@@ -95,6 +101,20 @@
             {{ new Date(+query.time).toISOString().slice(0, 10) }}
           </div>
         </div>
+        <div class="-translate-x-15 cursor-pointer">
+          <icon-fullscreen
+            v-if="!isFullscreen"
+            :size="30"
+            :stroke-width="7"
+            @click="enter"
+          />
+          <icon-fullscreen-exit
+            v-else
+            :size="30"
+            :stroke-width="7"
+            @click="exit"
+          />
+        </div>
       </a-layout-header>
       <a-layout-content
         w="full"
@@ -112,7 +132,20 @@
           <div class="chartBox h-5/16">
             <ScoreDistriChart />
           </div>
-          <div class="chartBox h-5/16"></div>
+          <div class="chartBox h-5/16">
+            <AutoScrollTable
+              title="重难点题目"
+              :columns="[
+                { name: '题序号', dataIndex: 'order' },
+                { name: '类型', dataIndex: 'type' },
+                { name: '分值', dataIndex: 'score' },
+                { name: '知识点', dataIndex: 'key' },
+                { name: '得分率', dataIndex: 'rate' },
+              ]"
+              :load-api="importantQustionsApi"
+              :request-params="{ id: +query.subjectId, ...tableListPageParams }"
+            />
+          </div>
         </section>
         <section
           w="16/40"
@@ -129,9 +162,52 @@
           w="11/40"
           flex="~ col items-center justify-around"
         >
-          <div class="chartBox h-5/16"></div>
-          <div class="chartBox h-5/16"></div>
-          <div class="chartBox h-5/16"></div>
+          <div class="chartBox h-5/16">
+            <AutoScrollTable
+              title="学生分数排名"
+              :load-api="stuExamRankList"
+              :columns="[
+                { name: '名次', dataIndex: 'order' },
+                { name: '姓名', dataIndex: 'name' },
+                { name: '班级', dataIndex: 'className' },
+                { name: '分数', dataIndex: 'score' },
+              ]"
+              :request-params="{ id: +query.subjectId, ...tableListPageParams }"
+            />
+          </div>
+          <div class="chartBox h-5/16">
+            <AutoScrollTable
+              title="学生进步排行"
+              :load-api="stuProgressListApi"
+              :columns="[
+                { name: '姓名', dataIndex: 'name' },
+                { name: '班级', dataIndex: 'className' },
+                { name: '上一轮名次', dataIndex: 'last' },
+                { name: '本轮名次', dataIndex: 'current' },
+                { name: '进步系数', dataIndex: 'coefficient' },
+              ]"
+              :request-params="{ id: +query.id, subjectId: +query.subjectId, ...tableListPageParams }"
+            />
+          </div>
+          <div class="chartBox h-5/16">
+            <AutoScrollTable
+              title="重点关注学生"
+              :load-api="focusStuApi"
+              :columns="[
+                { name: '姓名', dataIndex: 'name' },
+                { name: '班级', dataIndex: 'className' },
+                { name: '上一轮名次', dataIndex: 'last' },
+                { name: '本轮名次', dataIndex: 'current' },
+                { name: '退步系数', dataIndex: 'coefficient' },
+              ]"
+              :request-params="{ id: +query.id, subjectId: +query.subjectId, ...tableListPageParams }"
+              :formart="
+                (item: FocusStu) => {
+                  item.coefficient = +item.coefficient.toFixed(2);
+                }
+              "
+            />
+          </div>
         </section>
       </a-layout-content>
     </a-layout>
@@ -146,6 +222,7 @@
   .chartBox {
     border: 2px solid #9ab2eb41;
     width: 100%;
+    overflow: hidden;
     background-color: rgba(67, 135, 238, 0.068);
   }
 </style>

@@ -78,7 +78,7 @@ export function classScoreApi(data: Paging<{ id: number }>) {
   return request.post<ListResponse<ClassScore>>(statisticsApi.classComp, data);
 }
 
-export function focusStuApi(data: Paging<{ id: number; subject: number }>) {
+export function focusStuApi(data: Paging<{ id: number; subjectId: number }>) {
   return request.post<ListResponse<FocusStu>>(statisticsApi.focusStu, data);
 }
 

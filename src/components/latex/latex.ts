@@ -1,6 +1,7 @@
 /* eslint-disable spaced-comment */
 //@ts-ignore
 import { parse, HtmlGenerator } from 'latex.js';
+//@ts-ignore
 import autoRender from 'katex/contrib/auto-render';
 
 export function renderLatex(latex: string) {

@@ -54,7 +54,8 @@
     form.value.timeLimit = value[1] as number;
   };
   const disabledTimeRange = (current: Date) => {
-    return dayjs(current).isBefore(dayjs(), 'day');
+    // 录入假数据, 临时取消限制
+    // return dayjs(current).isBefore(dayjs(), 'day');
   };
   const gruopStateOpts = Object.values(examStateMap).map((item) => {
     return {

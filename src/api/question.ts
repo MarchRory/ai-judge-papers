@@ -30,7 +30,7 @@ export function deleteQuestion(id: number) {
 export function listQuestion(
   data: Paging<{
     key: string;
-    subjectId: number | string;
+    subjectId?: number | string;
   }>,
 ) {
   return request.post<{
