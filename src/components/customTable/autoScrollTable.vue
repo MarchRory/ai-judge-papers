@@ -29,6 +29,7 @@
               });
             }
             dataSource.value = list ?? [];
+
             if (!total) {
               Message.warning(`${props.title} 暂无数据`);
             }
@@ -60,35 +61,39 @@
           >{{ item.name }}</span
         >
       </div>
-      <vue3-seamless-scroll
-        v-if="!loading && dataSource && dataSource.length"
-        :list="dataSource"
-        direction="up"
-        :hover="true"
-        :limit-scroll-num="10"
-        :step="0.3"
-        class="overflow-hidden w-1/1"
-      >
-        <div
-          v-for="item in dataSource"
-          :key="item.id"
-          class="w-1/1 flex items-center justify-center px-2 cursor-pointer"
-          hover="bg-[#d4e5ed4a]"
-        >
-          <span
-            v-for="(t, index) in columns"
-            :key="item.id + '' + index"
-            :style="{
-              width: `calc(100% / ${columns.length})`,
-            }"
-            class="text-white text-center mt-1"
-          >
-            {{ item[t.dataIndex] }}
-          </span>
-        </div>
-      </vue3-seamless-scroll>
       <div
-        v-else
+        v-if="!loading && dataSource && dataSource.length"
+        class="w-full py-2"
+      >
+        <vue3-seamless-scroll
+          :list="dataSource"
+          direction="up"
+          :hover="true"
+          :limit-scroll-num="10"
+          :step="0.3"
+          class="overflow-hidden w-1/1"
+        >
+          <div
+            v-for="item in dataSource"
+            :key="item.id"
+            class="w-1/1 flex items-center justify-center px-2 cursor-pointer"
+            hover="bg-[#d4e5ed4a]"
+          >
+            <span
+              v-for="(t, index) in columns"
+              :key="item.id + '' + index"
+              :style="{
+                width: `calc(100% / ${columns.length})`,
+              }"
+              class="text-white text-center mt-1"
+            >
+              {{ item[t.dataIndex] }}
+            </span>
+          </div>
+        </vue3-seamless-scroll>
+      </div>
+      <div
+        v-else-if="!loading"
         class="wh-full flex items-center justify-center text-white font-bold text-2xl"
       >
         暂无数据
