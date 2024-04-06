@@ -19,7 +19,7 @@
 
   /** 题目类型(0,简答,1选择,2填空,3判断) */
   const types = ['简答题', '选择题', '填空题', '判断题'].map(
-    (name, type) => [name, props.compositePaper.filter((p) => p.type === type)] as const
+    (name, type) => [name, props.compositePaper.filter((p) => p.type === type)] as const,
   );
   // [题目类型，题目][]
 

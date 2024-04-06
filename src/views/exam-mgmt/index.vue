@@ -107,7 +107,7 @@
       if (!newVal) {
         initGroupSelectData();
       }
-    }
+    },
   );
   /* 考试组 逻辑 */
   const initPage = () => {

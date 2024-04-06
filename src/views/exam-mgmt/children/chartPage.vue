@@ -37,7 +37,7 @@
 
   const initPage = () => {
     loadStuScoreList();
-    // fullScreenToggle();
+    fullScreenToggle();
   };
 
   const tableListPageParams = { page: 1, pageSize: 3000 };
@@ -54,7 +54,7 @@
       <a-layout-header
         flex="~ items-center justify-around relative"
         w="full"
-        h="10%"
+        h="1/10"
         text-white
         bg="#1b2a5775"
       >
@@ -127,6 +127,7 @@
       >
         <section
           w="11/40"
+          h="9/10"
           flex="~ col items-center justify-around"
         >
           <div class="chartBox h-5/16">
@@ -152,6 +153,7 @@
         </section>
         <section
           w="16/40"
+          h="9/10"
           flex="~ col items-center justify-around"
         >
           <div class="chartBox h-11/25">
@@ -163,6 +165,7 @@
         </section>
         <section
           w="11/40"
+          h="9/10"
           flex="~ col items-center justify-around"
         >
           <div class="chartBox h-5/16">
@@ -226,6 +229,7 @@
   .main {
     background-image: url('../../../assets/images/chartBg.png');
     background-size: cover;
+    height: 100vh;
   }
   .chartBox {
     border: 2px solid #9ab2eb41;

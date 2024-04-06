@@ -43,7 +43,7 @@
     () => appStore.navbar,
     () => {
       affixRef.value.updatePosition();
-    }
+    },
   );
   listenerRouteChange((route: RouteLocationNormalized) => {
     if (!route.meta.noAffix && !tagList.value.some((tag) => tag.fullPath === route.fullPath)) {
