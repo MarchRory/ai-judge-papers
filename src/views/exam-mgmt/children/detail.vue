@@ -113,7 +113,7 @@
                 </li>
               </ul>
             </div>
-            <div> <span />{{ examStateMap[examStatus].text }} </div>
+            <div> <span />{{ examStateMap[examStatus]?.text }} </div>
           </div>
         </a-card>
       </a-layout-header>

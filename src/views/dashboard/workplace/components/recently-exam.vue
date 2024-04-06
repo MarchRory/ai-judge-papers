@@ -22,24 +22,28 @@
           type="button"
           @change="typeChange as any"
         >
-          <a-radio value="text"> 语文 </a-radio>
-          <a-radio value="image"> 数学 </a-radio>
-          <a-radio value="video"> 英语 </a-radio>
+          <a-radio :value="1"> 语文 </a-radio>
+          <a-radio :value="2"> 数学 </a-radio>
+          <a-radio :value="3"> 英语 </a-radio>
         </a-radio-group>
         <a-table
-          :data="renderList"
+          :data="renderList!!"
           :pagination="false"
           :bordered="false"
           :scroll="{ x: '100%', y: '264px' }"
         >
           <template #columns>
             <a-table-column
-              title="排名"
-              data-index="key"
-            ></a-table-column>
+              title="时间"
+              data-index="time"
+            >
+              <template #cell="{ record }">
+                {{ dateFormat(record.time) }}
+              </template>
+            </a-table-column>
             <a-table-column
               title="考试名称"
-              data-index="title"
+              data-index="name"
             >
               <template #cell="{ record }">
                 <a-typography-paragraph
@@ -47,31 +51,26 @@
                     rows: 1,
                   }"
                 >
-                  {{ record.title }}
+                  {{ record.name }}
                 </a-typography-paragraph>
               </template>
             </a-table-column>
             <a-table-column
-              title="点击量"
-              data-index="clickNumber"
-            >
-            </a-table-column>
-            <a-table-column
-              title="日涨幅"
-              data-index="increases"
+              title="说明"
+              data-index="description"
               :sortable="{
                 sortDirections: ['ascend', 'descend'],
               }"
             >
-              <template #cell="{ record }">
-                <div class="increases-cell">
-                  <span>{{ record.increases }}%</span>
-                  <icon-caret-up
-                    v-if="record.increases !== 0"
-                    style="color: #f53f3f; font-size: 8px"
-                  />
-                </div>
-              </template>
+              <!--              <template #cell="{ record }">-->
+              <!--                <div class="increases-cell">-->
+              <!--                  <span>{{ record.increases }}%</span>-->
+              <!--                  <icon-caret-up-->
+              <!--                    v-if="record.increases !== 0"-->
+              <!--                    style="color: #f53f3f; font-size: 8px"-->
+              <!--                  />-->
+              <!--                </div>-->
+              <!--              </template>-->
             </a-table-column>
           </template>
         </a-table>
@@ -81,29 +80,33 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref } from 'vue';
+  import { getExamListApi } from '@/api/exam';
   import useLoading from '@/hooks/loading';
-  import { queryRecentlyExam } from '@/api/dashboard';
   import type { TableData } from '@arco-design/web-vue/es/table/interface';
+  import dayjs from 'dayjs';
+  import { ref } from 'vue';
 
-  const type = ref('text');
+  const type = ref(1);
   const { loading, setLoading } = useLoading();
   const renderList = ref<TableData[]>();
-  const fetchData = async (contentType: string) => {
+  const fetchData = async (contentType: number) => {
     try {
       setLoading(true);
-      const { data } = await queryRecentlyExam({ type: contentType });
-      renderList.value = data;
+      const { data } = await getExamListApi({ page: 1, pageSize: 5, subjectId: contentType });
+      renderList.value = data.list;
     } catch (err) {
       // you can report use errorHandler or other
     } finally {
       setLoading(false);
     }
   };
-  const typeChange = (contentType: string) => {
+  const typeChange = (contentType: number) => {
     fetchData(contentType);
   };
-  fetchData('text');
+  fetchData(1);
+  const dateFormat = (timestamp: number) => {
+    return dayjs.unix(timestamp).format('YYYY年MM月DD日');
+  };
 </script>
 
 <style scoped lang="less">

@@ -44,7 +44,7 @@ export async function listTeacher(
     name?: Teacher['name'];
     state?: Teacher['state'];
   } = { state: -1 },
-  page = 1,
+  page = 1
 ) {
   const res = await request.post('/organization/teacher/list', withPaging(data, page));
 

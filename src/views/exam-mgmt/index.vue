@@ -107,7 +107,7 @@
       if (!newVal) {
         initGroupSelectData();
       }
-    },
+    }
   );
   /* 考试组 逻辑 */
   const initPage = () => {
@@ -242,7 +242,7 @@
                 :width="100"
               >
                 <template #cell="{ record }">
-                  {{ examStateMap[record.state].text }}
+                  {{ examStateMap[record.state]?.text || '' }}
                 </template>
               </a-table-column>
               <a-table-column

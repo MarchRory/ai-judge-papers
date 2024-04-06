@@ -31,8 +31,8 @@
   const list = [
     {
       type: 'orangered',
-      label: '活动',
-      content: '内容最新优惠活动',
+      label: '通知',
+      content: '当前有一门考试阅卷完成。',
     },
     {
       type: 'cyan',
@@ -42,7 +42,7 @@
     {
       type: 'blue',
       label: '通知',
-      content: '当前产品试用期即将结束，如需续费请点击查看。',
+      content: 'ai评阅完成,请尽快复审。',
     },
     {
       type: 'blue',
