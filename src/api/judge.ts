@@ -98,5 +98,5 @@ export const getReview = (data: {
    */
   state: 1 | 2 | 3 | 4;
 }) => {
-  return request.post<ListResponse<PaperDetail>>(JudgeApi.getReview, data);
+  return request.post<ListResponse<number>>(JudgeApi.getReview, data);
 };
