@@ -39,6 +39,7 @@
         shape="circle"
         type="dashed"
         size="small"
+        class="scale-85 hover:scale-100"
         @click="collapse = !collapse"
       >
         <icon-right v-if="collapse" />

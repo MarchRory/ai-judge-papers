@@ -70,8 +70,8 @@
         sex: ['男', '女'][sex],
         state: Boolean(state),
         createdAt: new Date(createdAt).toLocaleString(),
-      })
-    )
+      }),
+    ),
   );
 
   // actions

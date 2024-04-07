@@ -2,7 +2,8 @@
   /**
    * 目前分数显示都取一位数精度  toFixed(1)
    */
-  import { ref, nextTick } from 'vue';
+  import { ref, provide } from 'vue';
+  import mitt from 'mitt';
   import { PaperDetail } from '@/api/judge';
   import { Question } from '@/api/question';
   import SingleAnswer from './singleAnswer.vue';
@@ -23,18 +24,25 @@
   );
   // [题目类型，题目][]
 
-  const shouldScrollIntoViewInfo = ref({ type: -1, index: -1 });
-  const onScrollIntoView = (e: { type: number; index: number }) => {
-    shouldScrollIntoViewInfo.value = e;
-    // reset
-    return nextTick(() => {
-      shouldScrollIntoViewInfo.value = { type: -1, index: -1 };
-    });
+  // 注入事件监听器，通知子组件自身需要调用 el.scrollIntoView
+  const scrollIntoViewEmitter = mitt();
+  provide('scrollIntoViewEmitter', scrollIntoViewEmitter);
+
+  const onShouldScrollIntoView = (e: { type: number; order: number }) => {
+    // 但注意由于需要确定第一个题目，此处使用 order 字段，而不是 problemId
+    scrollIntoViewEmitter.emit('scrollIntoView', e);
   };
 
   const emit = defineEmits<{
     modify: [compositePaper: typeof props.compositePaper];
+    isIntersecting: [{ id: number; type: number }];
   }>();
+
+  // 当前题目信息
+  const activeQuestionInfo = ref<{ id: number; type: number }>();
+  const handleIsIntersecting = (e: { id: number; type: number }) => {
+    activeQuestionInfo.value = e;
+  };
 
   const handleModifyQuestion = (e: { id: number; score: number; result: string }) => {
     const { compositePaper } = props;
@@ -75,15 +83,15 @@
         >
           <a-anchor-link
             v-if="problems.length > 0"
-            @click="onScrollIntoView({ type, index: 1 })"
+            @click="onShouldScrollIntoView({ type, order: 1 })"
           >
             {{ name }}
             <template #sublist>
               <a-anchor-link
-                v-for="({ order }, index) in problems"
-                :key="index"
+                v-for="{ order, problemId } in problems"
+                :key="problemId"
                 class="inline-block"
-                @click="onScrollIntoView({ type, index: order })"
+                @click.stop="onShouldScrollIntoView({ type, order })"
               >
                 {{ order }}
               </a-anchor-link>
@@ -99,7 +107,7 @@
   <a-scrollbar class="h-full overflow-auto px-6">
     <!-- TODO: 若实际上题目真的非常多再考虑虚拟列表 -->
     <template
-      v-for="([name, questions], type) in types"
+      v-for="[name, questions] in types"
       :key="name"
     >
       <div v-if="questions.length > 0">
@@ -131,8 +139,8 @@
           v-for="question in questions"
           :key="question.problemId"
           :composite-question="question"
-          :scroll-into-view="shouldScrollIntoViewInfo.index === question.order && shouldScrollIntoViewInfo.type === type"
           @modify="handleModifyQuestion"
+          @is-intersecting="handleIsIntersecting"
         />
       </div>
     </template>
