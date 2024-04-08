@@ -28,4 +28,4 @@ jobs:
         with:
           folder: dist
           domain: ai-judge-papers.surge.sh
-          token: cf0254a595b307300a6e434f58ecb658
+          token: c3cebc5862f75df6b3b494fb37c7899f
