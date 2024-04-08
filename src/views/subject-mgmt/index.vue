@@ -78,7 +78,7 @@
           }
         }, 500);
       }
-    }
+    },
   );
 
   function jumpDetail(query: SubjectItem) {

@@ -1,14 +1,14 @@
-import { reactive, toRefs, type Ref } from 'vue';
+import { reactive, toRefs } from 'vue';
 import { Paging, ListResponse } from '@/api/types';
 import { HttpResponse } from '@/utils/request';
-import { Message, PaginationProps, type FormInstance } from '@arco-design/web-vue';
+import { Message, PaginationProps } from '@arco-design/web-vue';
+import useLoading from '../loading';
 
 type commonObj = Record<string, any>;
 
 interface TableState<R = commonObj> {
   tableData: R[];
   totalAll: number;
-  loading: boolean;
 }
 
 interface TableBaseMethodsType<R extends object, T extends object> {
@@ -27,11 +27,11 @@ interface TableBaseMethodsType<R extends object, T extends object> {
 // 4、表格数据 - <tableData>
 // 5、表格数据请求方法 - <loadList>
 // 6、表格查询参数 <ref>
-export default function useTable<R extends object, T extends object>(config: TableBaseMethodsType<R, T>, formRef?: Ref<FormInstance>) {
+export default function useTable<R extends object, T extends object>(config: TableBaseMethodsType<R, T>) {
   const { otherSearchParams = {}, requestApi, deleteApi } = config;
+  const { loading, setLoading } = useLoading(false);
 
   const tableState = reactive<TableState<R>>({
-    loading: false,
     tableData: [],
     totalAll: 0,
   });
@@ -61,7 +61,7 @@ export default function useTable<R extends object, T extends object>(config: Tab
   // 数据更新方法
   const loadList = async () => {
     const params = toRaw(pageParams);
-    tableState.loading = true;
+    setLoading(true);
     try {
       const res = await requestApi(params as Paging<T>);
       const { success, data } = res;
@@ -75,7 +75,7 @@ export default function useTable<R extends object, T extends object>(config: Tab
       tableState.tableData = [];
       tableState.totalAll = 0;
     } finally {
-      tableState.loading = false;
+      setLoading(false);
     }
   };
 
@@ -115,7 +115,9 @@ export default function useTable<R extends object, T extends object>(config: Tab
   return {
     ...toRefs(tableState),
     ...toRefs(pageParams),
+    loading,
     pagination,
+    setLoading,
     handlePageChange,
     handleSizeChange,
     loadList,

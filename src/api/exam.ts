@@ -70,6 +70,23 @@ export interface ExamListItem {
   time: number;
   timeLimit: number;
   total?: number;
+  number?: number;
+}
+
+export interface AnswerSheetItem {
+  exam: number;
+  examId: number;
+  id?: number;
+  score: number;
+  state: number;
+  student: {
+    id: number;
+    name: string;
+    number: string;
+    [property: string]: any;
+  };
+  url: string;
+  [property: string]: any;
 }
 
 export function createExamApi(data: Omit<ExamFormData, 'id'>) {
@@ -93,7 +110,7 @@ export function uploadExamTemplateApi({ file, sheet = '', examId }: ExamFilePara
 }
 
 export function uploadAnswerSheetApi({ file, examId }: ExamFileParams) {
-  return request.upload(ExamApi.uploadTemplate, file, { examId });
+  return request.upload(ExamApi.uploadAnswerSheet, file, { examId });
 }
 
 export function addProblemApi(data: addProblemParams) {
@@ -101,7 +118,7 @@ export function addProblemApi(data: addProblemParams) {
 }
 
 export function getAnswerSheetListApi(data: Paging<{ examId: number; key?: string }>) {
-  return request.post(ExamApi.sheetList, data);
+  return request.post<ListResponse<AnswerSheetItem>>(ExamApi.sheetList, data);
 }
 
 export function getExamDetailApi(data: { id: number }) {
