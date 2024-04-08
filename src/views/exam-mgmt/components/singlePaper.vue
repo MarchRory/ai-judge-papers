@@ -59,7 +59,7 @@
   <!-- 导航区域 -->
   <aside>
     <collapse-panel class="h-full">
-      <div class="p-2 rounded mb-4 border-solid border-1 border-blue-100 bg-blue-50">
+      <div class="min-w-[10rem] p-2 rounded mb-4 border-solid border-1 border-blue-100 bg-blue-50">
         <div class="font-thin text-xl text-gray">总分</div>
         <span>
           {{
@@ -76,29 +76,44 @@
           }}</span
         >
       </div>
-      <a-anchor line-less>
-        <template
-          v-for="([name, problems], type) in types"
-          :key="name"
+
+      <template
+        v-for="([name, problems], type) in types"
+        :key="name"
+      >
+        <div
+          v-if="problems.length > 0"
+          @click="onShouldScrollIntoView({ type, order: 1 })"
         >
-          <a-anchor-link
-            v-if="problems.length > 0"
-            @click="onShouldScrollIntoView({ type, order: 1 })"
+          <button
+            class="w-full p-2 bg-zinc-50 hover:bg-zinc-100 transition-all rounded-lg cursor-pointer"
+            border="solid 1 zinc-1"
+            :style="{
+              color: activeQuestionInfo?.type === type ? '#f1f5f9' : '',
+              background: activeQuestionInfo?.type === type ? '#4080ff' : '',
+            }"
           >
             {{ name }}
-            <template #sublist>
-              <a-anchor-link
-                v-for="{ order, problemId } in problems"
-                :key="problemId"
-                class="inline-block"
-                @click.stop="onShouldScrollIntoView({ type, order })"
-              >
-                {{ order }}
-              </a-anchor-link>
-            </template>
-          </a-anchor-link>
-        </template>
-      </a-anchor>
+          </button>
+
+          <div class="grid grid-cols-[repeat(auto-fill,minmax(2rem,1fr))] gap-2 my-2">
+            <button
+              v-for="{ order, problemId } in problems"
+              :key="problemId"
+              class="inline-block grid place-items-center p-2 bg-zinc-50 hover:bg-zinc-100 transition-all rounded-lg cursor-pointer"
+              border="solid 1 zinc-1"
+              text="center thin zinc-5"
+              :style="{
+                color: activeQuestionInfo?.id === problemId ? '#f1f5f9' : '',
+                background: activeQuestionInfo?.id === problemId ? '#4080ff' : '',
+              }"
+              @click.stop="onShouldScrollIntoView({ type, order })"
+            >
+              {{ order }}
+            </button>
+          </div>
+        </div>
+      </template>
     </collapse-panel>
   </aside>
 

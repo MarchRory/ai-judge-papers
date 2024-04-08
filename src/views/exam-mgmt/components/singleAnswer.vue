@@ -41,7 +41,7 @@
 
   // 通知当前组件已进入视图
   useIntersectionObserver(el, ([{ isIntersecting }]) => {
-    if (isIntersecting) emit('isIntersecting', { id: question.id, type: question.type });
+    if (isIntersecting) emit('isIntersecting', { id: question.problemId, type: question.type });
   });
 
   // 修改数据
