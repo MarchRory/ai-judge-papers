@@ -3,7 +3,7 @@
    * 单个试题
    */
 
-  import { ref, inject, onMounted, onUnmounted } from 'vue';
+  import { ref, inject, onMounted, onUnmounted, watch } from 'vue';
   import { Emitter } from 'mitt';
   import { Message } from '@arco-design/web-vue';
   import { useIntersectionObserver } from '@vueuse/core';
@@ -11,6 +11,8 @@
   import { Question } from '@/api/question';
   import DisplayLatex from '@/components/latex/index.vue';
   import ActionButton from './actionButton.vue';
+  import ImgPreview from './imgPreview.vue';
+  import CollapseVertical from './collapseVertical.vue';
 
   const props = defineProps<{
     compositeQuestion: PaperDetail & Question;
@@ -45,8 +47,10 @@
   });
 
   // 修改数据
+  const toFixed = (n: number) => Number(n.toFixed(1));
   const modifiedResult = ref(question.result);
-  const modifiedScore = ref(question.score);
+  const modifiedScore = ref(toFixed(question.score));
+
   const emitModify = () =>
     emit('modify', {
       id: question.id,
@@ -91,19 +95,26 @@
 
         <!-- 内容 -->
         <div class="px-1">
-          <a-image
+          <img-preview
             v-if="question.url"
             :src="question.url"
+            class="max-h-50vh"
           />
 
-          <p v-if="question.studentAnswer">
-            <display-latex :latex="question.studentAnswer" />
-          </p>
-          <a-typography-paragraph
-            v-else
-            type="warning"
-            >{{ '<未作答>' }}
-          </a-typography-paragraph>
+          <div class="my-2">
+            <collapse-vertical v-if="question.url && question.studentAnswer">
+              <display-latex :latex="question.studentAnswer" />
+            </collapse-vertical>
+            <a-typography-paragraph
+              v-else-if="!question.studentAnswer"
+              type="warning"
+              >{{ '<未作答>' }}
+            </a-typography-paragraph>
+            <display-latex
+              v-else
+              :latex="question.studentAnswer"
+            />
+          </div>
         </div>
 
         <a-typography class="relative group">
@@ -115,8 +126,11 @@
               <strong>评语</strong>
             </div>
             <a-typography-paragraph :type="question.result ? '' : 'warning'">
-              <template v-if="question.result"> <display-latex :latex="question.result" /> </template>
-              <template v-else> {{ '<无>' }}</template>
+              <display-latex
+                v-if="question.result"
+                :latex="question.result"
+              />
+              <template v-else>{{ '<无>' }}</template>
             </a-typography-paragraph>
           </a-typography-paragraph>
           <a-popconfirm
@@ -156,7 +170,8 @@
       <!-- right: the operation panel -->
       <div class="sticky top-1">
         <div class="flex flex-col items-center justify-center gap-2">
-          <div class="font-thin text-xl text-gray">当前得分</div>
+          <div class="font-thin text-xl text-gray">本题得分</div>
+
           <div class="flex justify-around items-center text-2xl">
             <span>{{ question.score.toFixed(1) }}</span>
             <span class="text-4xl font-thin">/</span>

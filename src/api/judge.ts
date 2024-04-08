@@ -11,6 +11,7 @@ const enum JudgeApi {
   stuScoreList = `${schema}/scoreList`,
   updateProblemRes = `${schema}/update`, // 更新判题结果=, 对指定题目进行复审
   getReview = `${schema}/review`, // 根据状态查询在某考试中的学生
+  reviewFulfil = `${schema}/student`, // 学生答卷复审完成
 }
 
 export interface Answer {
@@ -99,4 +100,12 @@ export const getReview = (data: {
   state: 1 | 2 | 3 | 4;
 }) => {
   return request.post<ListResponse<number>>(JudgeApi.getReview, data);
+};
+
+/**
+ * 学生答卷复审完成
+ */
+export const reviewFulfil = async (data: { userId: number; examId: number }) => {
+  const res = await request.post(JudgeApi.reviewFulfil, data);
+  return res.success;
 };

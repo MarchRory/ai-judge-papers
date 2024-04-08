@@ -2,7 +2,7 @@ import { mergeConfig } from 'vite';
 import baseConfig from './vite.config.base';
 import configCompressPlugin from './plugin/compress';
 import configVisualizerPlugin from './plugin/visualizer';
-import configArcoResolverPlugin from './plugin/arcoResolver';
+import configArcoResolverPlugin from './plugin/arcoResolver'; // 这个插件会导致build失败，暂不使用
 import configImageminPlugin from './plugin/imagemin';
 
 export default mergeConfig(
@@ -11,7 +11,7 @@ export default mergeConfig(
     plugins: [
       configCompressPlugin('gzip'),
       configVisualizerPlugin(),
-      configArcoResolverPlugin(),
+      // configArcoResolverPlugin(),
       configImageminPlugin(),
     ],
     build: {
@@ -27,5 +27,5 @@ export default mergeConfig(
       chunkSizeWarningLimit: 2000,
     },
   },
-  baseConfig
+  baseConfig,
 );
