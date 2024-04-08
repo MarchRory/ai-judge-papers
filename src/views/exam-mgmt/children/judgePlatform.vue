@@ -9,13 +9,14 @@
    * 评语的 pop-confirm 定位有问题，属于 arco 的实现问题
    */
   import { ref, onMounted } from 'vue';
-  import { useRoute } from 'vue-router';
+  import { useRoute, useRouter } from 'vue-router';
   import { useFullscreen } from '@vueuse/core';
   import { ExamListItem, getProblemList } from '@/api/exam';
   import { PaperDetail, getPaperDetail } from '@/api/judge';
   import { Question } from '@/api/question';
   import SinglePaper from '../components/singlePaper.vue';
 
+  const router = useRouter();
   const route = useRoute();
   const query = route.query as unknown as ExamListItem;
   const userId = 50; // TODO：修改为query传入学生 id
@@ -56,6 +57,8 @@
       // done
       loadingDataStatus.value = 'success';
     } catch (e) {
+      // for debug
+      // eslint-disable-next-line no-console
       console.error(e);
       errorMessage.value = String(e);
       loadingDataStatus.value = 'error';
@@ -65,6 +68,16 @@
   const handleModify = (composited: ComposedData[]) => {
     compositePaper.value = composited;
   };
+
+  const back = () => {
+    router.push({
+      path: '/exam-mgmt/examDetail',
+      query: route.query, // 和入口页面相同 query
+    });
+    // setTimeout(() => {
+    //   location.reload();
+    // }, 1000);
+  };
 </script>
 
 <template>
@@ -73,7 +86,7 @@
     id="id-for-judge-container"
     ref="el"
   >
-    <a-page-header @back="$router.back()">
+    <a-page-header @back="back">
       <template #title> {{ query.name }}&nbsp;{{ query.subject }} </template>
       <template #subtitle>
         {{ new Date(Number(query.time)).toISOString().slice(0, 10) }}（{{ (query.timeLimit - query.time) / (1000 * 60) }}分钟）
@@ -81,6 +94,7 @@
 
       <template #extra>
         <a-space>
+          <!-- TODO 测试用 -->
           <div class="px-8 text-right"> 考试ID={{ examId }} 学生ID={{ userId }}</div>
           <a-button
             type="primary"

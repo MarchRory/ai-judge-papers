@@ -2,7 +2,8 @@
   /**
    * 目前分数显示都取一位数精度  toFixed(1)
    */
-  import { ref, nextTick } from 'vue';
+  import { ref, provide } from 'vue';
+  import mitt from 'mitt';
   import { PaperDetail } from '@/api/judge';
   import { Question } from '@/api/question';
   import SingleAnswer from './singleAnswer.vue';
@@ -23,18 +24,25 @@
   );
   // [题目类型，题目][]
 
-  const shouldScrollIntoViewInfo = ref({ type: -1, index: -1 });
-  const onScrollIntoView = (e: { type: number; index: number }) => {
-    shouldScrollIntoViewInfo.value = e;
-    // reset
-    return nextTick(() => {
-      shouldScrollIntoViewInfo.value = { type: -1, index: -1 };
-    });
+  // 注入事件监听器，通知子组件自身需要调用 el.scrollIntoView
+  const scrollIntoViewEmitter = mitt();
+  provide('scrollIntoViewEmitter', scrollIntoViewEmitter);
+
+  const onShouldScrollIntoView = (e: { type: number; order: number }) => {
+    // 但注意由于需要确定第一个题目，此处使用 order 字段，而不是 problemId
+    scrollIntoViewEmitter.emit('scrollIntoView', e);
   };
 
   const emit = defineEmits<{
     modify: [compositePaper: typeof props.compositePaper];
+    isIntersecting: [{ id: number; type: number }];
   }>();
+
+  // 当前题目信息
+  const activeQuestionInfo = ref<{ id: number; type: number }>();
+  const handleIsIntersecting = (e: { id: number; type: number }) => {
+    activeQuestionInfo.value = e;
+  };
 
   const handleModifyQuestion = (e: { id: number; score: number; result: string }) => {
     const { compositePaper } = props;
@@ -51,7 +59,7 @@
   <!-- 导航区域 -->
   <aside>
     <collapse-panel class="h-full">
-      <div class="p-2 rounded mb-4 border-solid border-1 border-blue-100 bg-blue-50">
+      <div class="min-w-[10rem] p-2 rounded mb-4 border-solid border-1 border-blue-100 bg-blue-50">
         <div class="font-thin text-xl text-gray">总分</div>
         <span>
           {{
@@ -68,29 +76,44 @@
           }}</span
         >
       </div>
-      <a-anchor line-less>
-        <template
-          v-for="([name, problems], type) in types"
-          :key="name"
+
+      <template
+        v-for="([name, problems], type) in types"
+        :key="name"
+      >
+        <div
+          v-if="problems.length > 0"
+          @click="onShouldScrollIntoView({ type, order: 1 })"
         >
-          <a-anchor-link
-            v-if="problems.length > 0"
-            @click="onScrollIntoView({ type, index: 1 })"
+          <button
+            class="w-full p-2 bg-zinc-50 hover:bg-zinc-100 transition-all rounded-lg cursor-pointer"
+            border="solid 1 zinc-1"
+            :style="{
+              color: activeQuestionInfo?.type === type ? '#f1f5f9' : '',
+              background: activeQuestionInfo?.type === type ? '#4080ff' : '',
+            }"
           >
             {{ name }}
-            <template #sublist>
-              <a-anchor-link
-                v-for="({ order }, index) in problems"
-                :key="index"
-                class="inline-block"
-                @click="onScrollIntoView({ type, index: order })"
-              >
-                {{ order }}
-              </a-anchor-link>
-            </template>
-          </a-anchor-link>
-        </template>
-      </a-anchor>
+          </button>
+
+          <div class="grid grid-cols-[repeat(auto-fill,minmax(2rem,1fr))] gap-2 my-2">
+            <button
+              v-for="{ order, problemId } in problems"
+              :key="problemId"
+              class="inline-block grid place-items-center p-2 bg-zinc-50 hover:bg-zinc-100 transition-all rounded-lg cursor-pointer"
+              border="solid 1 zinc-1"
+              text="center thin zinc-5"
+              :style="{
+                color: activeQuestionInfo?.id === problemId ? '#f1f5f9' : '',
+                background: activeQuestionInfo?.id === problemId ? '#4080ff' : '',
+              }"
+              @click.stop="onShouldScrollIntoView({ type, order })"
+            >
+              {{ order }}
+            </button>
+          </div>
+        </div>
+      </template>
     </collapse-panel>
   </aside>
 
@@ -99,7 +122,7 @@
   <a-scrollbar class="h-full overflow-auto px-6">
     <!-- TODO: 若实际上题目真的非常多再考虑虚拟列表 -->
     <template
-      v-for="([name, questions], type) in types"
+      v-for="[name, questions] in types"
       :key="name"
     >
       <div v-if="questions.length > 0">
@@ -131,8 +154,8 @@
           v-for="question in questions"
           :key="question.problemId"
           :composite-question="question"
-          :scroll-into-view="shouldScrollIntoViewInfo.index === question.order && shouldScrollIntoViewInfo.type === type"
           @modify="handleModifyQuestion"
+          @is-intersecting="handleIsIntersecting"
         />
       </div>
     </template>

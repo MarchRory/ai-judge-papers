@@ -3,9 +3,10 @@
    * 单个试题
    */
 
-  import { ref, onUpdated } from 'vue';
+  import { ref, inject, onMounted, onUnmounted } from 'vue';
+  import { Emitter } from 'mitt';
   import { Message } from '@arco-design/web-vue';
-
+  import { useIntersectionObserver } from '@vueuse/core';
   import { PaperDetail, updateJudge } from '@/api/judge';
   import { Question } from '@/api/question';
   import DisplayLatex from '@/components/latex/index.vue';
@@ -20,19 +21,30 @@
 
   const emit = defineEmits<{
     modify: [{ id: number; score: number; result: string }];
+    isIntersecting: [{ id: number; type: number }];
   }>();
 
+  // 以下代码处理 scrollIntoView
   const el = ref<HTMLElement>();
   const fnScrollIntoView = () => {
     el.value?.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
   };
-  defineExpose({ scrollIntoView: fnScrollIntoView });
-  onUpdated(() => {
-    if (props.scrollIntoView) {
+  defineExpose({ scrollIntoView: fnScrollIntoView }); // 暂时备用
+  const scrollIntoViewEmitter = inject('scrollIntoViewEmitter') as Emitter<{ scrollIntoView: { type: number; order: number } }>;
+  const handleSscrollIntoViewEvenet = ({ type, order }: { type: number; order: number }) => {
+    if (type === question.type && order === question.order) {
       fnScrollIntoView();
     }
+  };
+  onMounted(() => scrollIntoViewEmitter.on('scrollIntoView', handleSscrollIntoViewEvenet));
+  onUnmounted(() => scrollIntoViewEmitter.off('scrollIntoView', handleSscrollIntoViewEvenet));
+
+  // 通知当前组件已进入视图
+  useIntersectionObserver(el, ([{ isIntersecting }]) => {
+    if (isIntersecting) emit('isIntersecting', { id: question.problemId, type: question.type });
   });
 
+  // 修改数据
   const modifiedResult = ref(question.result);
   const modifiedScore = ref(question.score);
   const emitModify = () =>
