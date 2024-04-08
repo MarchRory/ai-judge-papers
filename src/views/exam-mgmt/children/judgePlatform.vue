@@ -10,11 +10,13 @@
    */
   import { ref, onMounted } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
+  import { Modal } from '@arco-design/web-vue';
   import { useFullscreen } from '@vueuse/core';
   import { ExamListItem, getProblemList } from '@/api/exam';
-  import { PaperDetail, getPaperDetail } from '@/api/judge';
+  import { PaperDetail, getPaperDetail, getReview, reviewFulfil } from '@/api/judge';
   import { Question } from '@/api/question';
   import SinglePaper from '../components/singlePaper.vue';
+  import ActionButton from '../components/actionButton.vue';
 
   const router = useRouter();
   const route = useRoute();
@@ -30,9 +32,13 @@
   type ComposedData = PaperDetail & Question;
   const compositePaper = ref<ComposedData[]>();
   const errorMessage = ref<string>();
+  const reviewIds = ref<number[]>();
 
   onMounted(async () => {
     try {
+      // 页面进入时，加载数据
+      reviewIds.value = (await getReview({ state: 2, examId, pageSize: 9999 })).data.list;
+
       const problems = (await getProblemList(examId)).data.list;
       const thisUserPaperDetail = (
         await getPaperDetail({
@@ -74,9 +80,26 @@
       path: '/exam-mgmt/examDetail',
       query: route.query, // 和入口页面相同 query
     });
-    // setTimeout(() => {
-    //   location.reload();
-    // }, 1000);
+  };
+
+  const submitModalVisible = ref(false);
+  const submitThis = async () => {
+    const ok = await reviewFulfil({ userId, examId });
+    if (ok) submitModalVisible.value = true;
+    reviewIds.value = (await getReview({ state: 2, examId, pageSize: 9999 })).data.list;
+  };
+  const handleSubmitModal = async () => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const ids = reviewIds.value!;
+    if (ids.length > 0) {
+      const nextUserId = ids[0];
+      router.push({
+        path: '/exam-mgmt/judgePlatform',
+        query: { ...route.query, userId: nextUserId },
+      });
+    } else {
+      back();
+    }
   };
 </script>
 
@@ -101,7 +124,21 @@
             @click="toggle"
             >{{ isFullscreen ? '退出全屏' : '全屏阅卷' }}</a-button
           >
-          <a-button type="outline">提交阅卷结果</a-button>
+          <action-button
+            type="outline"
+            @action="submitThis"
+            >提交阅卷结果</action-button
+          >
+          <a-modal
+            v-model:visible="submitModalVisible"
+            width="auto"
+            :on-before-ok="handleSubmitModal"
+            @cancel="submitModalVisible = false"
+          >
+            <template #title>提交成功</template>
+            <div v-if="reviewIds && reviewIds.length > 0">提交成功，是否转到下一张试卷？</div>
+            <div v-else>已评阅完成所有试卷，是否返回上一级页面？</div>
+          </a-modal>
         </a-space>
       </template>
     </a-page-header>
