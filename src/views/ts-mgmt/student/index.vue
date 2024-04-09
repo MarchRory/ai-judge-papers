@@ -251,7 +251,6 @@
               "
             />
           </template>
-          <!-- TODO -->
           <template #$operation="{ record }">
             <detail-button
               :data="record"
