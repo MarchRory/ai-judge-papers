@@ -34,7 +34,6 @@
   };
 
   const emit = defineEmits<{
-    modify: [compositePaper: typeof props.compositePaper];
     isIntersecting: [{ id: number; type: number }];
   }>();
 
@@ -42,16 +41,6 @@
   const activeQuestionInfo = ref<{ id: number; type: number }>();
   const handleIsIntersecting = (e: { id: number; type: number }) => {
     activeQuestionInfo.value = e;
-  };
-
-  const handleModifyQuestion = (e: { id: number; score: number; result: string }) => {
-    const { compositePaper } = props;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const problem = compositePaper.find(({ id }) => id === e.id)!;
-    problem.score = e.score;
-    problem.result = e.result;
-    // 通知父组件数据已更新（目前不必要，此逻辑可以删除）
-    emit('modify', compositePaper);
   };
 </script>
 
@@ -154,7 +143,6 @@
           v-for="question in questions"
           :key="question.problemId"
           :composite-question="question"
-          @modify="handleModifyQuestion"
           @is-intersecting="handleIsIntersecting"
         />
       </div>

@@ -1,16 +1,11 @@
 <script setup lang="ts">
   /**
-   * 阅卷界面
-   * 必须query参数：
-   * examId
-   * userId
-   *
-   * BUG：
-   * 评语的 pop-confirm 定位有问题，属于 arco 的实现问题
+   * 阅卷界面必须query参数：examId
+   * userId 现在自动获取
+   * BUG：评语的 pop-confirm 定位有问题，属于 arco 的实现问题
    */
   import { ref, onMounted } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import { Modal } from '@arco-design/web-vue';
   import { useFullscreen } from '@vueuse/core';
   import { ExamListItem, getProblemList } from '@/api/exam';
   import { PaperDetail, getPaperDetail, getReview, reviewFulfil } from '@/api/judge';
@@ -21,8 +16,8 @@
   const router = useRouter();
   const route = useRoute();
   const query = route.query as unknown as ExamListItem;
-  const userId = 47; // TODO：修改为query传入学生 id
-  const examId = 23; // TODO：修改为 Number(query.id);
+  const examId = Number(query.id); // 父页面提供
+  const userIdRef = ref<number>(); // 需要请求得到
 
   const el = ref<HTMLElement | null>(null);
   const { isFullscreen, toggle } = useFullscreen(el);
@@ -31,13 +26,22 @@
   const loadingDataStatus = ref('loading');
   type ComposedData = PaperDetail & Question;
   const compositePaper = ref<ComposedData[]>();
-  const errorMessage = ref<string>();
-  const reviewIds = ref<number[]>();
+  const error = ref<Error>();
+  const reviewIds = ref<number[]>(); // state=2
+  const reviewDoneIds = ref<number[]>(); // state=3
 
-  onMounted(async () => {
+  const loadNextUser = async () => {
+    loadingDataStatus.value = 'loading';
     try {
       // 页面进入时，加载数据
-      reviewIds.value = (await getReview({ state: 2, examId, pageSize: 9999 })).data.list;
+      const { list } = (await getReview({ state: 2, examId, pageSize: 9999 })).data;
+      reviewIds.value = list;
+      const [userId] = list; // 获取第一个考生
+      if (!userId) {
+        throw new Error('已全部阅卷完毕！');
+      }
+      userIdRef.value = userId;
+      reviewDoneIds.value = (await getReview({ state: 3, examId, pageSize: 9999 })).data.list;
 
       const problems = (await getProblemList(examId)).data.list;
       const thisUserPaperDetail = (
@@ -66,14 +70,12 @@
       // for debug
       // eslint-disable-next-line no-console
       console.error(e);
-      errorMessage.value = String(e);
+      error.value = e as Error;
       loadingDataStatus.value = 'error';
     }
-  });
-
-  const handleModify = (composited: ComposedData[]) => {
-    compositePaper.value = composited;
   };
+
+  onMounted(loadNextUser);
 
   const back = () => {
     router.push({
@@ -84,7 +86,7 @@
 
   const submitModalVisible = ref(false);
   const submitThis = async () => {
-    const ok = await reviewFulfil({ userId, examId });
+    const ok = await reviewFulfil({ userId: userIdRef.value!, examId });
     if (ok) submitModalVisible.value = true;
     reviewIds.value = (await getReview({ state: 2, examId, pageSize: 9999 })).data.list;
   };
@@ -92,11 +94,8 @@
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const ids = reviewIds.value!;
     if (ids.length > 0) {
-      const nextUserId = ids[0];
-      router.push({
-        path: '/exam-mgmt/judgePlatform',
-        query: { ...route.query, userId: nextUserId },
-      });
+      // 切换到下一个 userId
+      loadNextUser();
     } else {
       back();
     }
@@ -117,8 +116,13 @@
 
       <template #extra>
         <a-space>
-          <!-- TODO 测试用 -->
-          <div class="px-8 text-right"> 考试ID={{ examId }} 学生ID={{ userId }}</div>
+          <a-progress
+            v-if="reviewIds && reviewDoneIds"
+            class="w-full min-w-[16rem] mr-4"
+            :percent="reviewDoneIds.length / (reviewIds.length + reviewDoneIds.length)"
+          >
+            <template #text="scope"> 阅卷进度 {{ (scope.percent * 100).toFixed(1) }}% </template>
+          </a-progress>
           <a-button
             type="primary"
             @click="toggle"
@@ -146,28 +150,39 @@
     <div :class="`flex px-2 bg-white rounded-lg relative ${isFullscreen ? 'h-92vh' : 'max-h-72vh'}`">
       <div
         v-if="loadingDataStatus === 'loading'"
-        class="w-full h-50vh"
+        class="wh-full"
       >
         <a-spin
           tip="试卷正在加载中..."
-          class="w-full"
+          class="w-full my-[20vh]"
         />
       </div>
       <template v-else-if="loadingDataStatus === 'success'">
         <SinglePaper
           :exam-id="examId"
-          :user-id="userId"
+          :user-id="userIdRef!"
           :composite-paper="compositePaper!"
-          @modify="handleModify"
         />
       </template>
       <div
         v-else-if="loadingDataStatus === 'error'"
-        class="w-full h-80vh px-8"
+        class="w-full py-[10vh]"
       >
-        <a-typography-text type="warning">
-          {{ errorMessage }}
-        </a-typography-text>
+        <a-result
+          status="error"
+          :title="error?.name"
+        >
+          <template #subtitle>{{ error?.message }}</template>
+          <template #extra>
+            <a-space>
+              <a-button
+                type="primary"
+                @click="back"
+                >返回上一页</a-button
+              >
+            </a-space>
+          </template>
+        </a-result>
       </div>
     </div>
   </a-layout>
@@ -185,6 +200,6 @@
   #id-for-judge-container {
     height: 100%;
     display: grid;
-    grid-template-rows: 1fr auto;
+    grid-template-rows: auto 1fr;
   }
 </style>

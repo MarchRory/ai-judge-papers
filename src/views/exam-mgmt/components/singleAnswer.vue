@@ -3,7 +3,7 @@
    * 单个试题
    */
 
-  import { ref, inject, onMounted, onUnmounted, watch } from 'vue';
+  import { ref, inject, onMounted, onUnmounted } from 'vue';
   import { Emitter } from 'mitt';
   import { Message } from '@arco-design/web-vue';
   import { useIntersectionObserver } from '@vueuse/core';
@@ -22,7 +22,6 @@
   const question = props.compositeQuestion;
 
   const emit = defineEmits<{
-    modify: [{ id: number; score: number; result: string }];
     isIntersecting: [{ id: number; type: number }];
   }>();
 
@@ -51,17 +50,13 @@
   const modifiedResult = ref(question.result);
   const modifiedScore = ref(toFixed(question.score));
 
-  const emitModify = () =>
-    emit('modify', {
-      id: question.id,
-      score: modifiedScore.value,
-      result: modifiedResult.value,
-    });
+  // 为了方便，直接在子组件中修改父组件传入的对象数据
+  // 因此，注意此时父子组件是需要耦合的
   const handleModifyResult = async () => {
     const res = await updateJudge({ id: question.id, result: modifiedResult.value });
     if (res.success) {
       Message.success('修改成功');
-      emitModify();
+      question.result = modifiedResult.value;
     } else {
       Message.error('修改失败');
     }
@@ -69,7 +64,7 @@
   const handleModifyScore = async () => {
     const res = await updateJudge({ id: question.id, score: modifiedScore.value });
     if (!res.success) throw new Error('失败');
-    emitModify();
+    question.score = modifiedScore.value;
   };
 
   const popupContainer = document.getElementById('id-for-judge-container');
