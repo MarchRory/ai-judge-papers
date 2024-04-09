@@ -1,7 +1,6 @@
 <script setup lang="ts">
-  import useLoading from '@/hooks/loading';
   import { computed, ref, defineAsyncComponent } from 'vue';
-  import { ExamStateEnum } from '../config';
+  import { ExamStateEnum } from '../../config';
 
   const QuestionPaperCfg = defineAsyncComponent(() => import('./questionPaperCfg.vue'));
   const AnswerPaperCfg = defineAsyncComponent(() => import('./answerPaperCfg.vue'));
@@ -33,6 +32,10 @@
   const setVisible = (value: boolean) => {
     visible.value = value;
   };
+  const updateDetail = () => {
+    emits('onClose');
+    setVisible(false);
+  };
   defineExpose({
     setUploadVisible: setVisible,
   });
@@ -48,18 +51,18 @@
       width="60%"
       ok-text="关闭"
       hide-cancel
-      @on-ok="
-        () => {
-          $emit('onClose');
-          setVisible(false);
-        }
-      "
     >
       <template #title>
         {{ formDesc.title }}
       </template>
-      <QuestionPaperCfg v-if="type === 'questionPaper'" />
-      <AnswerPaperCfg v-else />
+      <QuestionPaperCfg
+        v-if="type === 'questionPaper'"
+        @on-change="updateDetail"
+      />
+      <AnswerPaperCfg
+        v-else
+        @on-change="updateDetail"
+      />
     </a-drawer>
   </div>
 </template>

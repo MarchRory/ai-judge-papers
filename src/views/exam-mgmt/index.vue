@@ -5,7 +5,7 @@
   import useTable from '@/hooks/table/useTable';
   import { deleteExamApi, getExamListApi, getGroupList } from '@/api/exam';
   import type { ExamFormData, ExamListItem } from '@/api/exam';
-  import { examStateMap } from './config';
+  import { ExamStateEnum, examStateMap } from './config';
 
   /* 考试table crud */
   const ExamFormModal = defineAsyncComponent(() => import('./components/formModal.vue'));
@@ -239,10 +239,10 @@
               <a-table-column
                 title="状态"
                 data-index="state"
-                :width="100"
+                :width="120"
               >
                 <template #cell="{ record }">
-                  {{ examStateMap[record.state]?.text || '' }}
+                  {{ now <= record.timeLimit ? examStateMap[ExamStateEnum.beforeStart].text : examStateMap[record.state].text }}
                 </template>
               </a-table-column>
               <a-table-column

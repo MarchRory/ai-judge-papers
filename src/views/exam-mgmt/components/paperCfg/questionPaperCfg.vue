@@ -1,25 +1,30 @@
 <script setup lang="ts">
-  import { ref, inject, computed, type Ref } from 'vue';
+  import { ref, inject, computed, defineAsyncComponent, type Ref } from 'vue';
   import { sum } from 'lodash';
-  import { type ExamListItem, getProblemList, uploadExamTemplateApi } from '@/api/exam';
-  import useLoading from '@/hooks/loading';
+  import { type ExamListItem, getProblemList, uploadExamTemplateApi, deletePaperQuestion } from '@/api/exam';
   import { Question } from '@/api/question';
+  import useLoading from '@/hooks/loading';
   import { DescData } from '@arco-design/web-vue/es/descriptions/interface';
   import dayjs from 'dayjs';
   import { RequestOption } from '@arco-design/web-vue/es/upload';
   import { Message } from '@arco-design/web-vue';
   import DisplayLatex from '@/components/latex/index.vue';
   import { getSpecificValueArr } from '@/utils/arrayHelper';
-  import { ExamStateEnum } from '../config';
+  import { ExamStateEnum } from '../../config';
 
   const { examDetail, currentState } = inject('examDetail') as { examDetail: Ref<ExamListItem>; currentState: Ref<ExamStateEnum> };
-
+  const ExchangeQuestionBtn = defineAsyncComponent(() => import('./questionExchange.vue'));
+  const emits = defineEmits<{
+    (e: 'onChange'): void;
+  }>();
   // 试题列表预览
   const problemList = ref<Question[]>([]);
   const problemTotal = ref(examDetail.value.number);
+  const exchangeQuestionId = ref(-1);
   const { loading: listLoding, setLoading: setListLoading } = useLoading(false);
   const { loading: uploadLoading, setLoading: setUploadLoading } = useLoading(false);
   const loadQuestionList = () => {
+    exchangeQuestionId.value = -1;
     setListLoading(true);
     getProblemList(+examDetail.value.id)
       .then((res) => {
@@ -46,7 +51,7 @@
 
   // @ts-ignore
   const descData = computed<DescData[]>(() => {
-    const { subject, time, timeLimit, total } = examDetail.value;
+    const { subject, time, timeLimit } = examDetail.value;
     const start = dayjs
       .unix(time / 1000)
       .format('YYYY-MM-DD HH:mm:ss')
@@ -77,6 +82,7 @@
           if (success) {
             Message.success(`试题${problemTotal.value === 0 ? '录入' : '追加'}成功`);
             loadQuestionList();
+            emits('onChange');
           }
         })
         .finally(() => {
@@ -85,7 +91,46 @@
     /* eslint-disable */
   };
 
-  //
+  // 题目更换交互逻辑
+
+  const handleExchangeClose = () => {
+    exchangeQuestionId.value = -1;
+  };
+  const choseExchangeQuestion = (id: number) => {
+    exchangeQuestionId.value = exchangeQuestionId.value === id ? -1 : id;
+  };
+  const handleQuestionExchange = () => {
+    handleExchangeClose();
+    loadQuestionList();
+  };
+
+  const hasOrder = computed<number[]>(() => {
+    return getSpecificValueArr(problemList.value, 'order');
+  });
+  provide('hasOrder', hasOrder);
+  // 题目删除逻辑
+  const { loading: deleteLoading, setLoading: setDeleteLoading } = useLoading(false);
+  const deleteQuestion = (question: Question) => {
+    setDeleteLoading(true);
+    const data = {
+      examId: examDetail.value.id,
+      order: question.score,
+      score: question.score,
+      problemId: question.problemId,
+    };
+    deletePaperQuestion(data)
+      .then((res) => {
+        const { success } = res;
+        if (success) {
+          Message.success('题目删除成功');
+          loadQuestionList();
+          handleExchangeClose();
+        }
+      })
+      .finally(() => {
+        setDeleteLoading(false);
+      });
+  };
 
   const setupComp = () => {
     loadQuestionList();
@@ -97,10 +142,7 @@
 <template>
   <div class="wh-full">
     <section>
-      <a-card
-        title="题卷上传"
-        :loading="uploadLoading"
-      >
+      <a-card title="题卷上传">
         <div class="flex justify-between w-1/1 h-auto">
           <div class="w-2/5">
             <a-descriptions
@@ -115,13 +157,19 @@
               v-if="currentState === ExamStateEnum.beforeStart"
               class="w-1/1"
             >
-              <!--@vue-ignore-->
-              <a-upload
-                draggable
-                :tip="problemTotal === 0 ? '录入试题, 文件格式为.xlsx' : '追加录入, 文件格式为.xlsx'"
-                accept=".xlsx"
-                :custom-request="handleQuestionUplad"
-              />
+              <a-spin
+                class="w-1/1"
+                tip="题卷上传中, 请稍后"
+                :loading="uploadLoading"
+              >
+                <!--@vue-ignore-->
+                <a-upload
+                  draggable
+                  :tip="problemTotal === 0 ? '录入试题, 文件格式为.xlsx' : '追加录入, 文件格式为.xlsx'"
+                  accept=".xlsx"
+                  :custom-request="handleQuestionUplad"
+                />
+              </a-spin>
             </div>
             <div v-else>
               <a-result
@@ -136,33 +184,48 @@
       </a-card>
     </section>
     <section class="mt-5">
-      <a-card
-        title="试题预览"
-        :loading="listLoding"
-      >
+      <a-card title="试题预览">
         <template #extra>
-          <a-button
-            type="text"
-            @click="loadQuestionList"
-          >
-            <template #icon>
-              <icon-sync :spin="listLoding" />
-            </template>
-            刷新
-          </a-button>
+          <div flex="~ items-center">
+            <a-button
+              type="text"
+              @click="loadQuestionList"
+            >
+              <template #icon>
+                <icon-sync :spin="listLoding" />
+              </template>
+              刷新
+            </a-button>
+            <ExchangeQuestionBtn
+              :exam-id="+examDetail.id"
+              :subject-id="+examDetail.subjectId"
+              :subject="examDetail.subject"
+              @on-success="handleQuestionExchange"
+              @on-close="handleExchangeClose"
+            />
+          </div>
         </template>
         <a-list
           :data="problemList"
           :bordered="false"
           hoverable
+          :loading="listLoding"
         >
           <template #item="{ item, index }">
-            <a-list-item :key="index">
-              <div class="flex gap-2 items-start mb-2">
+            <a-list-item
+              :key="index"
+              class="relative"
+            >
+              <div
+                class="flex gap-2 items-start mb-2 transition-transform duration-250"
+                :style="{
+                  transform: `translateX(${exchangeQuestionId === item.problemId ? -100 : 0}px)`,
+                }"
+              >
                 <small class="bg-gray-200 text-center aspect-1/1 h-1.5rem line-height-1.5rem align-middle rounded-lg select-none mt-1">
                   {{ index + 1 }}.
                 </small>
-                <h3 class="my-1">
+                <h3 class="my-1 w-16/17">
                   <display-latex :latex="item.title" />
                 </h3>
               </div>
@@ -188,6 +251,50 @@
                   <i class="i-tabler:brand-snowflake mr-1"></i>
                   难度系数: {{ item.expectedDifficulty }}
                 </a-tag>
+              </div>
+              <div
+                v-if="currentState === ExamStateEnum.beforeStart"
+                class="absolute top-4 right-2 transition-transform duration-250"
+                :style="{
+                  transform: `translateX(${exchangeQuestionId === item.problemId ? 0 : 100}px)`,
+                }"
+              >
+                <a-button
+                  @click="choseExchangeQuestion(item.problemId)"
+                  class="mr-5"
+                >
+                  <template #icon>
+                    <icon-settings
+                      :strokeWidth="6"
+                      size="18"
+                      v-show="exchangeQuestionId !== item.problemId"
+                    />
+                    <icon-right
+                      :strokeWidth="6"
+                      size="18"
+                      v-show="exchangeQuestionId === item.problemId"
+                    />
+                  </template>
+                </a-button>
+                <a-popconfirm
+                  content="确定移除这道题目吗?"
+                  type="error"
+                  ok-text="删除"
+                  :ok-loading="deleteLoading"
+                  @ok="deleteQuestion(item)"
+                >
+                  <a-button
+                    type="primary"
+                    status="danger"
+                  >
+                    <icon-close-circle
+                      :strokeWidth="6"
+                      size="18"
+                      class="mr-1"
+                    />
+                    删除
+                  </a-button>
+                </a-popconfirm>
               </div>
             </a-list-item>
           </template>

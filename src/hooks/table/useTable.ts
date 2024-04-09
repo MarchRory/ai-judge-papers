@@ -39,7 +39,7 @@ export default function useTable<R extends object, T extends object>(config: Tab
   // 分页参数
   const pageParams = reactive<Paging<T>>({
     page: 1,
-    pageSize: 10,
+    pageSize: 20,
     ...(otherSearchParams as T),
   });
 
@@ -53,7 +53,7 @@ export default function useTable<R extends object, T extends object>(config: Tab
       showMore: true,
       showJumper: false,
       showPageSize: true,
-      pageSizeOptions: [10, 20, 30, 50],
+      pageSizeOptions: [20, 30, 40, 50],
       size: 'medium',
     };
   });

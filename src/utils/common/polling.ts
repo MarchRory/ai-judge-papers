@@ -1,7 +1,7 @@
-/* 简易轮询 */
+/* 简易轮询, 暂时这么写, 应付下答辩, 后面有空了优化一下 */
 import { sleep } from './performance';
 
-// 竞态令牌, 用于外界控制轮询进展
+// 竞态令牌
 type CancellationToken = {
   isCancelled: () => boolean;
   cancel: () => void;

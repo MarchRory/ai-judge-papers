@@ -1,5 +1,5 @@
 import request from '@/utils/request/index';
-import { Paging } from './types';
+import { ListResponse, Paging } from './types';
 import { createFormData } from './utils';
 
 /** backend type: ExamProblem */
@@ -7,7 +7,6 @@ export interface Question {
   problemId: number;
   title: string;
   content: string;
-  subject: number;
   state: number;
   expectedDifficulty: number;
   source: string;
@@ -33,10 +32,7 @@ export function listQuestion(
     subjectId?: number | string;
   }>,
 ) {
-  return request.post<{
-    total: number;
-    list: QuestionListItem[];
-  }>('/study/problem/list', data);
+  return request.post<ListResponse<QuestionListItem>>('/study/problem/list', data);
 }
 
 export function getQuestionDetail(id: number) {
