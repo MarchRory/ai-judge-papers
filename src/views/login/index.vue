@@ -3,7 +3,7 @@
     <div class="logo">
       <img
         alt="logo"
-        src="//p3-armor.byteimg.com/tos-cn-i-49unhts6dw/dfdba5317c0c20ce20e64fac803d52bc.svg~tplv-49unhts6dw-image.image"
+        src="/logo.svg"
       />
       <div class="logo-text">文心大模型阅卷平台</div>
     </div>

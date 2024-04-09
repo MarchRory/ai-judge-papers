@@ -28,22 +28,23 @@
 
 <script lang="ts" setup>
   import { computed } from 'vue';
-  import bannerImage from '@/assets/images/login-banner.png';
+
+  const bannerImage = '/login-banner.svg';
 
   const carouselItem = computed(() => [
     {
-      slogan: '开箱即用的高质量模板',
-      subSlogan: '丰富的的页面模板，覆盖大多数典型业务场景',
+      slogan: '欢迎使用',
+      subSlogan: '文心大模型阅卷平台',
       image: bannerImage,
     },
     {
-      slogan: '内置了常见问题的解决方案',
-      subSlogan: '国际化，路由配置，状态管理应有尽有',
+      slogan: '欢迎使用',
+      subSlogan: '文心大模型阅卷平台',
       image: bannerImage,
     },
     {
-      slogan: '接入可视化增强工具AUX',
-      subSlogan: '实现灵活的区块式开发',
+      slogan: '欢迎使用',
+      subSlogan: '文心大模型阅卷平台',
       image: bannerImage,
     },
   ]);

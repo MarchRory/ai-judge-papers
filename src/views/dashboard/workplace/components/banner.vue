@@ -5,7 +5,7 @@
         :heading="5"
         style="margin-top: 0"
       >
-        '欢迎回来！' {{ userInfo.name }}
+        欢迎回来！{{ userInfo.name }}
       </a-typography-title>
     </a-col>
     <a-divider class="panel-border" />

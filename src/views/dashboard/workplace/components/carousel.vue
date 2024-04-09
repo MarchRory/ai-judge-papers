@@ -21,10 +21,9 @@
 
 <script lang="ts" setup>
   const imageSrc = [
-    '//p3-armor.byteimg.com/tos-cn-i-49unhts6dw/5cc3cd1d994b7ef9db6a1f619a22addd.jpg~tplv-49unhts6dw-image.image',
-    '//p3-armor.byteimg.com/tos-cn-i-49unhts6dw/f256cbcc287139e191fecea9d255a1f0.jpg~tplv-49unhts6dw-image.image',
-    '//p3-armor.byteimg.com/tos-cn-i-49unhts6dw/b557ff0cd44146a2e471b477af2f30d0.jpg~tplv-49unhts6dw-image.image',
-    '//p3-armor.byteimg.com/tos-cn-i-49unhts6dw/665106f4bbd2a2df96eaf7aec52f7bc3.jpg~tplv-49unhts6dw-image.image',
-    '//p3-armor.byteimg.com/tos-cn-i-49unhts6dw/ea095a2c9c72b5d8f2f2818040db736d.jpg~tplv-49unhts6dw-image.image',
+    'https://images.unsplash.com/photo-1606326608606-aa0b62935f2b?q=80&w=1974&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1560785477-d43d2b34e0df?q=80&w=1974&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=2070&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1644055066046-054ac0fc7213?q=80&w=2071&auto=format&fit=crop',
   ];
 </script>

@@ -35,8 +35,6 @@
     { text: '班级列表', icon: 'icon-file' },
     { text: '教师列表', icon: 'icon-storage' },
     { text: '考试列表', icon: 'icon-settings' },
-    { text: 'TODO', icon: 'icon-mobile' },
-    { text: 'TODO', icon: 'icon-fire' },
   ];
 </script>
 
