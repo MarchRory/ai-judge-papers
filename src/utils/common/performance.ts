@@ -42,3 +42,16 @@ export function throttle(callback: (...args: any[]) => any, delay = 3 * 1000) {
     }
   };
 }
+
+/**
+ * 阻塞指定时间
+ * @param delay 睡眠时间, 单位是秒
+ * @returns
+ */
+export function sleep(wait = 2000) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(true);
+    }, wait);
+  });
+}

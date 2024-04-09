@@ -97,7 +97,7 @@
     const submitFn = props.create === 'create' ? createExamApi : updateExamApi;
     const timeLimit = (formInfo.value.time as number) + (formInfo.value.examTimeLength as number) * 60 * 1000;
     formInfo.value.timeLimit = timeLimit;
-    formInfo.value.subject = formInfo.value.subjectId;
+    // formInfo.value.subject = formInfo.value.subjectId;
     delete formInfo.value.subjectId;
     delete formInfo.value.examTimeLength;
     submitFn({ ...formInfo.value, state: 1 })
@@ -147,7 +147,7 @@
         <!--@vue-ignore-->
         <a-select
           v-model:model-value="formInfo.groupId"
-          :options="groupOpts"
+          :options="groupOpts.slice(1, groupOpts.length)"
           allow-search
           placeholder="输入关键词搜索"
         >

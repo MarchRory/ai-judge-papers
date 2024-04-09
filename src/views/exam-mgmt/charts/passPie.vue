@@ -4,6 +4,7 @@
   import BaseChart from '@/components/chart/index.vue';
 
   const props = defineProps<{
+    passScore: number;
     stuScoreList: StuExamRank[];
   }>();
   const chartOpt = ref({});
@@ -74,7 +75,7 @@
   watch(
     () => props.stuScoreList,
     (newVal) => {
-      const notPassValue = newVal.filter((item) => item.score < 60).length;
+      const notPassValue = newVal.filter((item) => item.score < props.passScore).length;
       const passValue = newVal.length - notPassValue;
       const data = [
         { value: notPassValue, name: '不及格' },

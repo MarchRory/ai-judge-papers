@@ -15,7 +15,9 @@ const enum statisticsApi {
   gradeList = `${statisticsSchema}/group/gradeDistribution`, // 成绩分布
   questions = `${statisticsSchema}/questionDifficulty`, // 难点题目
   stuProgress = `${statisticsSchema}/studentProgress`, // 进步学生
-  stuRank = `${statisticsSchema}/group/studentRank`, // 学生排名
+  stuRank = `${statisticsSchema}/studentRank`, // 单科考试学生排名，
+  groupStuRank = `${statisticsSchema}/group/studentRank`, // group学生排名
+  wordCloud = `${statisticsSchema}/wordCount`, // 词云
 }
 
 export interface ClassScore {
@@ -47,7 +49,7 @@ export interface ChartQuestion {
   id: number;
   key: string[];
   order: number;
-  rate: number;
+  rate: number | string;
   score: number;
   type: number;
   [property: string]: any;
@@ -73,6 +75,11 @@ export interface StuExamRank {
   [property: string]: any;
 }
 
+export interface WordCloudItem {
+  word: string;
+  count: number;
+}
+
 /* 考试详情相关API */
 export function classScoreApi(data: Paging<{ id: number }>) {
   return request.post<ListResponse<ClassScore>>(statisticsApi.classComp, data);
@@ -96,5 +103,14 @@ export function stuProgressListApi(data: Paging<{ subjectId: number; id: number 
 
 export function stuExamRankList(data: Paging<{ id: number }>) {
   return request.post<ListResponse<StuExamRank>>(statisticsApi.stuRank, data);
+}
+
+/**
+ * @description 词云
+ * @param id examId或者groupId, 和type配合
+ * @param type 1-指定考试, 2-考试组
+ */
+export function getWordCloudApi(id: number, type: 1 | 2) {
+  return request.post<ListResponse<WordCloudItem>>(statisticsApi.wordCloud, { id, type });
 }
 /* 考试详情相关API */

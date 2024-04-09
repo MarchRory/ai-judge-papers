@@ -30,7 +30,7 @@
             }
             dataSource.value = list ?? [];
 
-            if (!total) {
+            if (!dataSource.value.length) {
               Message.warning(`${props.title} 暂无数据`);
             }
           })

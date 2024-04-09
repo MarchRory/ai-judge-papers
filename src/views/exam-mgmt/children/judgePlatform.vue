@@ -21,8 +21,8 @@
   const router = useRouter();
   const route = useRoute();
   const query = route.query as unknown as ExamListItem;
-  const userId = 50; // TODO：修改为query传入学生 id
-  const examId = 19; // TODO：修改为 Number(query.id);
+  const userId = 47; // TODO：修改为query传入学生 id
+  const examId = 23; // TODO：修改为 Number(query.id);
 
   const el = ref<HTMLElement | null>(null);
   const { isFullscreen, toggle } = useFullscreen(el);

@@ -93,7 +93,7 @@
     if (renderChart.value) {
       setTimeout(() => {
         loadFunc();
-      }, 300);
+      }, 500);
     }
   });
   onBeforeUnmount(() => {

@@ -148,12 +148,12 @@
     id: '标识',
     subject: '学科',
     title: '题目',
-    expectedDifficulty: '难易程度',
+    expectedDifficulty: '难度系数',
     source: '来源',
     $operation: '操作',
   }).map(([dataIndex, title]) => ({ dataIndex, slotName: title }));
 
-  const otherSearchParams = { key: '', subjectId: '' };
+  const otherSearchParams = { key: '', subjectId: 0 };
   const { tableData, pagination, loading, loadList, handlePageChange, handleSizeChange, page, key, subjectId } = useTable<
     QuestionListItem,
     typeof otherSearchParams
@@ -161,7 +161,7 @@
     requestApi: listQuestion,
     otherSearchParams,
   });
-  const subjectOptions = ref<{ name: string; id: number | string }[]>([{ name: '全部', id: '' }]);
+  const subjectOptions = ref<{ name: string; id: number | string }[]>([{ name: '全部', id: 0 }]);
 
   // 查询
   async function query() {
@@ -171,7 +171,7 @@
   // 重置
   async function reset() {
     key.value = '';
-    subjectId.value = '';
+    subjectId.value = 0;
     form.title = '';
     form.subject = '';
     form.grade = 1;
@@ -179,7 +179,7 @@
   }
   // 删除
   function QuestionDelete(record: QuestionListItem) {
-    const { id } = record;
+    const { id = 0 } = record;
     deleteQuestion(id as number).then((res) => {
       const { message } = res;
       if (message === 'success') {

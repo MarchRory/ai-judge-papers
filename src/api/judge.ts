@@ -1,5 +1,6 @@
 import { Pagination } from '@/types/global';
 import request from '@/utils/request/index';
+import { StuPaperStateEnum } from '@/views/exam-mgmt/config';
 import { ListResponse } from './types';
 
 const schema = '/study/judge';
@@ -97,7 +98,7 @@ export const getReview = (data: {
    * 4 阅卷结束
    * @docs https://swpu.feishu.cn/docx/OMK2df7zOokZgRx0HDScniKPnMb
    */
-  state: 1 | 2 | 3 | 4;
+  state: StuPaperStateEnum;
 }) => {
   return request.post<ListResponse<number>>(JudgeApi.getReview, data);
 };

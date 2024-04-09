@@ -3,7 +3,7 @@
   import { Message } from '@arco-design/web-vue';
   import { useRouter } from 'vue-router';
   import useTable from '@/hooks/table/useTable';
-  import { deleteExamApi, getExamListApi, getGroupList, Group } from '@/api/exam';
+  import { deleteExamApi, getExamListApi, getGroupList } from '@/api/exam';
   import type { ExamFormData, ExamListItem } from '@/api/exam';
   import { examStateMap } from './config';
 

@@ -3,8 +3,18 @@
   import { useRoute } from 'vue-router';
   import { useFullscreen } from '@vueuse/core';
   import { type ExamListItem } from '@/api/exam';
-  import { stuExamRankList, StuExamRank, stuProgressListApi, importantQustionsApi, focusStuApi, FocusStu, ProgressStu } from '@/api/data';
+  import {
+    stuExamRankList,
+    StuExamRank,
+    stuProgressListApi,
+    importantQustionsApi,
+    focusStuApi,
+    FocusStu,
+    ProgressStu,
+    ChartQuestion,
+  } from '@/api/data';
   import { Message } from '@arco-design/web-vue';
+  import { questionTypeMap } from '../config';
 
   // chart components
   const AutoScrollTable = defineAsyncComponent(() => import('@/components/customTable/autoScrollTable.vue'));
@@ -131,7 +141,10 @@
           flex="~ col items-center justify-around"
         >
           <div class="chartBox h-5/16">
-            <PassPieChart :stu-score-list="stuScoreDetail" />
+            <PassPieChart
+              :pass-score="parseInt((query.total || 100) * 0.6 + '', 10)"
+              :stu-score-list="stuScoreDetail"
+            />
           </div>
           <div class="chartBox h-5/16">
             <ScoreDistriChart />
@@ -147,7 +160,14 @@
                 { name: '得分率', dataIndex: 'rate' },
               ]"
               :load-api="importantQustionsApi"
-              :request-params="{ id: +query.subjectId, ...tableListPageParams }"
+              :request-params="{ id: +query.id, ...tableListPageParams }"
+              :formart="
+                (item: ChartQuestion) => {
+                  item.rate = ((item.rate as number) * 100).toFixed(2) + '%';
+                  // @ts-ignore
+                  item.type = questionTypeMap[item.type];
+                }
+              "
             />
           </div>
         </section>
@@ -178,7 +198,12 @@
                 { name: '班级', dataIndex: 'className' },
                 { name: '分数', dataIndex: 'score' },
               ]"
-              :request-params="{ id: +query.subjectId, ...tableListPageParams }"
+              :request-params="{ id: +query.id, ...tableListPageParams }"
+              :formart="
+                (item) => {
+                  item.score = parseInt('' + item.score, 10);
+                }
+              "
             />
           </div>
           <div class="chartBox h-5/16">
