@@ -68,7 +68,7 @@
     question.score = modifiedScore.value;
   };
 
-  const popupContainer = document.getElementById('id-for-judge-container');
+  const popupContainer = document.getElementById('id-for-judge-container')!;
 </script>
 
 <template>
@@ -136,7 +136,7 @@
             </a-typography-paragraph>
           </a-typography-paragraph>
           <a-popconfirm
-            :popup-container="popupContainer!"
+            :popup-container="popupContainer"
             position="lt"
             @before-ok="handleModifyResult"
           >

@@ -20,7 +20,7 @@
   const userIdRef = ref<number>(); // 需要请求得到
 
   const el = ref<HTMLElement | null>(null);
-  const { isFullscreen, toggle } = useFullscreen(el);
+  const { isFullscreen, toggle, exit: exitFullscreen } = useFullscreen(el);
 
   /** 需求请求多个接口，请求时展示loading */
   const loadingDataStatus = ref('loading');
@@ -86,6 +86,7 @@
 
   const submitModalVisible = ref(false);
   const submitThis = async () => {
+    exitFullscreen(); // 退出全屏，因为modal挂载点有问题
     const ok = await reviewFulfil({ userId: userIdRef.value!, examId });
     if (ok) submitModalVisible.value = true;
     reviewIds.value = (await getReview({ state: 2, examId, pageSize: 9999 })).data.list;
@@ -122,8 +123,12 @@
             :percent="reviewDoneIds.length / (reviewIds.length + reviewDoneIds.length)"
           >
             <template #text="scope">
-              <span> 阅卷进度 {{ reviewDoneIds.length }}/{{ reviewIds.length + reviewDoneIds.length }}</span>
-              <span class="text-slate-4"> ({{ (scope.percent * 100).toFixed(1) }}%) </span>
+              <span
+                :title="`${(scope.percent * 100).toFixed(1)}%`"
+                class="cursor-help"
+              >
+                阅卷进度 {{ reviewDoneIds.length }}/{{ reviewIds.length + reviewDoneIds.length }}</span
+              >
             </template>
           </a-progress>
           <a-button
@@ -138,6 +143,7 @@
           >
           <a-modal
             v-model:visible="submitModalVisible"
+            popup-container="id-for-judge-container"
             width="auto"
             :on-before-ok="handleSubmitModal"
             @cancel="submitModalVisible = false"
