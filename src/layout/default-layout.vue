@@ -46,7 +46,7 @@
           <a-layout-content p="5px">
             <PageLayout />
           </a-layout-content>
-          <Footer v-if="false" />
+          <!-- <Footer /> -->
         </a-layout>
       </a-layout>
     </a-layout>

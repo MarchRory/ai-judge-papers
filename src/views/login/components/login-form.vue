@@ -63,13 +63,6 @@
         >
           登录
         </a-button>
-        <a-button
-          type="text"
-          long
-          class="login-form-register-btn"
-        >
-          注册账号
-        </a-button>
       </a-space>
     </a-form>
   </div>

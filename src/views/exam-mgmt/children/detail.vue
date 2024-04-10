@@ -1,12 +1,12 @@
 <script setup lang="ts">
   import { ref, computed, defineAsyncComponent, provide, watch } from 'vue';
   import { ExamListItem, getExamDetailApi, getAnswerSheetListApi } from '@/api/exam';
-  import { useRoute, useRouter } from 'vue-router';
-  import { DescData, Message } from '@arco-design/web-vue';
+  import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router';
+  import { DescData, Message, Notification } from '@arco-design/web-vue';
   import { StuScoreItem, beginAiJudge, getReview } from '@/api/judge';
   import useLoading from '@/hooks/loading';
   import dayjs from 'dayjs';
-  import { usePolling } from '@/utils/common/polling';
+  import { CancellationToken, createCancellationToken, usePolling } from '@/utils/common/polling';
   import { StuExamRank } from '@/api/data';
   import { examStateMap, ExamStateEnum, StuPaperStateEnum } from '../config';
 
@@ -16,12 +16,14 @@
   const StuListTab = defineAsyncComponent(() => import('../components/detailTab/detatilStuListTab.vue'));
   const WordCloudTab = defineAsyncComponent(() => import('../components/detailTab/wordCloudTab.vue'));
   const PassPieChart = defineAsyncComponent(() => import('../charts/passPie.vue'));
+  const ChatBot = defineAsyncComponent(() => import('@/components/chatBot/index.vue'));
 
   const route = useRoute();
   const router = useRouter();
   const { loading: initLoading, setLoading: setInitLoading } = useLoading(true);
   const query = route.query as unknown as ExamListItem;
   const examDetail = ref({} as ExamListItem);
+  const now = ref(new Date().getTime());
 
   const getExamDetail = () => {
     setInitLoading(true);
@@ -29,6 +31,7 @@
       .then((res) => {
         const { data, success } = res;
         examDetail.value = data;
+        now.value = new Date().getTime();
         // examStatus.value = data.state;
         if (!success) {
           Message.error('请刷新页面重试');
@@ -38,21 +41,28 @@
         setInitLoading(false);
       });
   };
+
+  const { loading: waitAIStart, setLoading: setWaitAIStart } = useLoading(false);
   const beginAIJudge = () => {
     if (!examDetail.value.number) {
-      Message.warning('当前未上传答题卡, 无法开启AI阅卷, 请确认答题卡是否完成上传');
+      Notification.warning('当前未上传答题卡, 无法开启AI阅卷, 请确认答题卡是否完成上传');
       return;
     }
-    beginAiJudge(+query.id).then((res) => {
-      const { success } = res;
-      if (success) {
-        Message.success('AI判卷已启动, 请耐心等待');
-        getExamDetail();
-      } else {
-        const { message } = res;
-        Message.warning(message);
-      }
-    });
+    setWaitAIStart(true);
+    beginAiJudge(+query.id)
+      .then((res) => {
+        const { success } = res;
+        if (success) {
+          Message.success('AI判卷已启动, 请耐心等待');
+          getExamDetail();
+        } else {
+          const { message } = res;
+          Message.warning(message);
+        }
+      })
+      .finally(() => {
+        setWaitAIStart(false);
+      });
   };
   const jumpToJudge = () => {
     // @ts-ignore
@@ -72,10 +82,9 @@
   const currentState = computed<ExamStateEnum>(() => {
     const { state: queryState, timeLimit } = query;
     const { state: reqState } = examDetail.value;
-    const now = new Date().getTime();
     // 初始值
     let realState = ExamStateEnum.beforeStart;
-    if (now <= timeLimit) {
+    if (now.value <= timeLimit) {
       realState = ExamStateEnum.beforeStart;
     } else {
       realState = queryState === reqState ? queryState : reqState;
@@ -138,7 +147,8 @@
       })
         .then((res) => {
           const { list } = res.data;
-          stateStuMap.value.set(state, list);
+          judgedNum.value = list.length;
+          // stateStuMap.value.set(state, list);
         })
         .finally(() => {
           resolve(true);
@@ -146,16 +156,26 @@
     });
   };
   // AI阅卷进度条, 待测试
+  let pollingCancelToken: CancellationToken | null = null;
   const beginWatchAiJuding = async () => {
     const updateAiJudingProgress = async () => {
-      await getSpecificStateStu(StuPaperStateEnum.juding);
-      judgedNum.value = (stateStuMap.value.get(StuPaperStateEnum.juding) || []).length;
+      await getSpecificStateStu(StuPaperStateEnum.judged);
+      // judgedNum.value = (stateStuMap.value.get(StuPaperStateEnum.juding) || []).length;
     };
+    pollingCancelToken = createCancellationToken();
     usePolling({
       method: updateAiJudingProgress,
       quitWhen: () => {
-        return judgedNum.value === examDetail.value.number;
+        const isAIDone = judgedNum.value === examDetail.value.number;
+        if (isAIDone) {
+          Notification.success('AI判卷已完成');
+          setTimeout(() => {
+            getExamDetail();
+          }, 2000);
+        }
+        return isAIDone;
       },
+      cancelToken: pollingCancelToken,
     });
   };
   watch(
@@ -213,6 +233,14 @@
   provide('examDetail', {
     examDetail,
     currentState,
+  });
+
+  onBeforeRouteLeave(() => {
+    if (currentState.value === ExamStateEnum.aiJudging && pollingCancelToken) {
+      pollingCancelToken.cancel();
+      pollingCancelToken = null;
+    }
+    return true;
   });
 </script>
 
@@ -293,94 +321,100 @@
             <div class="w-2/5">
               <div class="text-center text-1.3em font-extrabold mb-4">当前进度</div>
               <!--step是从1开始, 与state不同, step = currentState + 2-->
-              <a-steps
-                class="mb-6"
-                :current="currentState + 2"
-                small
+              <a-spin
+                class="w-full"
+                :loading="waitAIStart"
+                tip="AI阅卷启动中, 请稍后"
               >
-                <a-step
-                  v-for="(step, idx) in steps"
-                  :key="idx"
-                  :description="step.desc"
+                <a-steps
+                  class="mb-6"
+                  :current="currentState + 2"
+                  small
                 >
-                  {{ step.text }}
-                  <template #icon>
-                    <i
-                      v-if="step.value !== ExamStateEnum.aiJudging"
-                      class="text-1.3em"
-                      :class="step.stepIcon"
-                    />
-                    <icon-sync
-                      v-else
-                      :spin="step.value === currentState"
-                    />
-                  </template>
-                </a-step>
-              </a-steps>
-              <div class="flex justify-center flex-col items-center">
-                <!-- <a-button @click="openUploader('questionPaper')">录入题卷</a-button> -->
-                <!-- <a-button @click="openUploader('answerPaper')">录入答卷</a-button> -->
-                <!-- <a-button @click="jumpToDataAnalysis">可视化大屏</a-button> -->
-                <a-progress
-                  v-if="currentState === ExamStateEnum.aiJudging && examDetail.number"
-                  :percent="+(judgedNum / examDetail.number).toFixed(2)"
-                  :status="judgedNum === examDetail.number ? 'normal' : 'success'"
-                  type="line"
-                  size="large"
-                  animation
-                  track-color="var(--color-primary-light-1)"
-                >
-                  <template #text>
-                    <div class="text-gray-500 font-700">
-                      已完成{{ judgedNum }}份, 进度{{ +(judgedNum / examDetail.number).toFixed(2) * 100 }}%
-                    </div>
-                  </template>
-                </a-progress>
-                <span
-                  v-if="currentState === ExamStateEnum.aiJudging"
-                  class="text-gray text-1.2em mt-2"
-                >
-                  <i
-                    :class="examStateMap[currentState].btnIcon"
-                    class="text-1.4em mr-1 text-[#4c5b7ebd]"
-                  />
-                  {{ examStateMap[currentState].btnText }}
-                </span>
-                <div
-                  v-else
-                  class="flex items-center"
-                >
-                  <a-button
-                    type="outline"
-                    @click="stateFnTrigger"
+                  <a-step
+                    v-for="(step, idx) in steps"
+                    :key="idx"
+                    :description="step.desc"
+                  >
+                    {{ step.text }}
+                    <template #icon>
+                      <i
+                        v-if="step.value !== ExamStateEnum.aiJudging"
+                        class="text-1.3em"
+                        :class="step.stepIcon"
+                      />
+                      <icon-sync
+                        v-else
+                        :spin="step.value === currentState"
+                      />
+                    </template>
+                  </a-step>
+                </a-steps>
+                <div class="flex justify-center flex-col items-center">
+                  <!-- <a-button @click="openUploader('questionPaper')">录入题卷</a-button> -->
+                  <!-- <a-button @click="openUploader('answerPaper')">录入答卷</a-button> -->
+                  <!-- <a-button @click="jumpToDataAnalysis">可视化大屏</a-button> -->
+                  <a-progress
+                    v-if="currentState === ExamStateEnum.aiJudging && examDetail.number"
+                    :percent="+(judgedNum / examDetail.number).toFixed(2)"
+                    :status="judgedNum === examDetail.number ? 'normal' : 'success'"
+                    type="line"
+                    size="large"
+                    animation
+                    track-color="var(--color-primary-light-1)"
+                  >
+                    <template #text>
+                      <div class="text-gray-500 font-700">
+                        已完成{{ judgedNum }}份, 进度{{ parseInt((judgedNum / examDetail.number) * 100 + '', 10) }}%
+                      </div>
+                    </template>
+                  </a-progress>
+                  <span
+                    v-if="currentState === ExamStateEnum.aiJudging"
+                    class="text-gray text-1.2em mt-2"
                   >
                     <i
-                      class="text-1.3em mr-2"
                       :class="examStateMap[currentState].btnIcon"
+                      class="text-1.4em mr-1 text-[#4c5b7ebd]"
                     />
                     {{ examStateMap[currentState].btnText }}
-                  </a-button>
-
-                  <a-popconfirm
-                    v-if="currentState === ExamStateEnum.default && examDetail.number"
-                    content="启动AI阅卷后, 将开启大模型自动阅卷模式, 本堂考试将无法继续上传学生答题卡, 在此之前, 请确认答题卡上传完毕"
-                    type="warning"
-                    ok-text="确认启动"
-                    @ok="beginAIJudge"
+                  </span>
+                  <div
+                    v-else
+                    class="flex items-center"
                   >
                     <a-button
-                      class="ml-2"
-                      status="success"
+                      type="outline"
+                      @click="stateFnTrigger"
                     >
-                      启动AI阅卷
-                      <template #icon>
-                        <icon-robot />
-                      </template>
+                      <i
+                        class="text-1.3em mr-2"
+                        :class="examStateMap[currentState].btnIcon"
+                      />
+                      {{ examStateMap[currentState].btnText }}
                     </a-button>
-                  </a-popconfirm>
+
+                    <a-popconfirm
+                      v-if="currentState === ExamStateEnum.default && examDetail.number"
+                      content="启动AI阅卷后, 将开启大模型自动阅卷模式, 本堂考试将无法继续上传学生答题卡, 在此之前, 请确认答题卡上传完毕"
+                      type="warning"
+                      ok-text="确认启动"
+                      @ok="beginAIJudge"
+                    >
+                      <a-button
+                        class="ml-2"
+                        status="success"
+                      >
+                        启动AI阅卷
+                        <template #icon>
+                          <icon-robot />
+                        </template>
+                      </a-button>
+                    </a-popconfirm>
+                  </div>
+                  <!-- <a-button @click="jumpToJudge">跳转到阅卷平台</a-button> -->
                 </div>
-                <!-- <a-button @click="jumpToJudge">跳转到阅卷平台</a-button> -->
-              </div>
+              </a-spin>
             </div>
           </div>
         </a-layout-header>
@@ -439,6 +473,10 @@
       :type="PcfgType"
       :current-state="currentState"
       @on-close="handlePaperConfigClose"
+    />
+    <ChatBot
+      v-if="currentState === ExamStateEnum.complete"
+      :exam-id="examDetail.id || query.id"
     />
   </div>
 </template>
