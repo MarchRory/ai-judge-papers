@@ -9,6 +9,7 @@
   import { CancellationToken, createCancellationToken, usePolling } from '@/utils/common/polling';
   import { StuExamRank } from '@/api/data';
   import { examStateMap, ExamStateEnum, StuPaperStateEnum } from '../config';
+  import StudentComposition from '../components/studentComposition.vue';
 
   type PaperCfgType = 'questionPaper' | 'answerPaper';
   const PapaerConfig = defineAsyncComponent(() => import('../components/paperCfg/paperConfig.vue'));
@@ -249,9 +250,9 @@
     <a-spin
       :loading="initLoading"
       :size="25"
-      class="wh-full"
+      class="wh-full min-h-60vh"
     >
-      <a-layout>
+      <a-layout v-if="!initLoading">
         <a-layout-header class="sticky t-0 flex">
           <div class="w-1/1 p-4 rounded-3 shadow-lg flex items-center bg-white">
             <div class="w-3/5 line">
@@ -464,6 +465,8 @@
               <div class="w-full h-11/35 bg-red"></div>
               <div class="w-full h-11/35 bg-teal"></div>
             </a-card> -->
+            <br />
+            <StudentComposition :exam-id="+query.id" />
           </a-card>
         </a-layout-content>
       </a-layout>
