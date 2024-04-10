@@ -8,8 +8,9 @@
   import { useRoute, useRouter } from 'vue-router';
   import { useFullscreen } from '@vueuse/core';
   import { ExamListItem, getProblemList } from '@/api/exam';
-  import { PaperDetail, getPaperDetail, getReview, reviewFulfil } from '@/api/judge';
+  import { PaperDetail, getPaperDetail, getReview, reviewFulfil, submitJudgeRes } from '@/api/judge';
   import { Question } from '@/api/question';
+  import { Message } from '@arco-design/web-vue';
   import SinglePaper from '../components/singlePaper.vue';
   import ActionButton from '../components/actionButton.vue';
 
@@ -82,6 +83,9 @@
       path: '/exam-mgmt/examDetail',
       query: route.query, // 和入口页面相同 query
     });
+    setTimeout(() => {
+      location.reload(); // eslint-disable-line
+    }, 1000);
   };
 
   const submitModalVisible = ref(false);
@@ -98,7 +102,11 @@
       // 切换到下一个 userId
       loadNextUser();
     } else {
-      back();
+      // 对考试的submit
+      const res = await submitJudgeRes(examId);
+      if (res.success) {
+        back();
+      }
     }
   };
 </script>

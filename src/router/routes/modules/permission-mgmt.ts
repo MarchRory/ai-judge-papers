@@ -46,4 +46,4 @@ const PERMISSION_MGMT: AppRouteRecordRaw = {
   ],
 };
 
-// export default PERMISSION_MGMT;
+export default PERMISSION_MGMT;

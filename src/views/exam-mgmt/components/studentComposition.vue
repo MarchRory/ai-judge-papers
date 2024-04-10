@@ -10,7 +10,6 @@
   const { examId } = defineProps<{
     examId: number;
   }>();
-
   const isLoading = ref(true);
   const chartOpt = ref({});
 

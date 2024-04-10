@@ -1,13 +1,12 @@
 <script setup lang="ts">
   import { ref, computed, defineAsyncComponent, provide, watch } from 'vue';
-  import { ExamListItem, getExamDetailApi, getAnswerSheetListApi } from '@/api/exam';
+  import { ExamListItem, getExamDetailApi } from '@/api/exam';
   import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router';
   import { DescData, Message, Notification } from '@arco-design/web-vue';
-  import { StuScoreItem, beginAiJudge, getReview } from '@/api/judge';
+  import { StuScoreItem, beginAiJudge, getReview, submitJudgeRes } from '@/api/judge';
   import useLoading from '@/hooks/loading';
   import dayjs from 'dayjs';
   import { CancellationToken, createCancellationToken, usePolling } from '@/utils/common/polling';
-  import { StuExamRank } from '@/api/data';
   import { examStateMap, ExamStateEnum, StuPaperStateEnum } from '../config';
   import StudentComposition from '../components/studentComposition.vue';
 
@@ -16,7 +15,6 @@
   const PaperListTab = defineAsyncComponent(() => import('../components/detailTab/detailPaperListTab.vue'));
   const StuListTab = defineAsyncComponent(() => import('../components/detailTab/detatilStuListTab.vue'));
   const WordCloudTab = defineAsyncComponent(() => import('../components/detailTab/wordCloudTab.vue'));
-  const PassPieChart = defineAsyncComponent(() => import('../charts/passPie.vue'));
   const ChatBot = defineAsyncComponent(() => import('@/components/chatBot/index.vue'));
 
   const route = useRoute();
@@ -25,6 +23,7 @@
   const query = route.query as unknown as ExamListItem;
   const examDetail = ref({} as ExamListItem);
   const now = ref(new Date().getTime());
+  const reviewedStuNum = ref(0);
 
   const getExamDetail = () => {
     setInitLoading(true);
@@ -73,11 +72,6 @@
     // @ts-ignore
     router.push({ path: '/exam-mgmt/chartPage', query });
   };
-  const getStuAnswerSheet = () => {
-    getAnswerSheetListApi({ page: 1, pageSize: 10, examId: +query.id, key: '' }).then((res) => {
-      const { list } = res.data;
-    });
-  };
 
   // 实际考试状态值
   const currentState = computed<ExamStateEnum>(() => {
@@ -87,6 +81,8 @@
     let realState = ExamStateEnum.beforeStart;
     if (now.value <= timeLimit) {
       realState = ExamStateEnum.beforeStart;
+    } else if (reqState === ExamStateEnum.aiDone && reviewedStuNum.value) {
+      realState = ExamStateEnum.checking;
     } else {
       realState = queryState === reqState ? queryState : reqState;
     }
@@ -134,8 +130,6 @@
   };
 
   // AI阅卷进度
-  // 先用map, 以后有可能会借助这个完成其他功能
-  const stateStuMap = ref(new Map<StuPaperStateEnum, number[]>());
   const judgedNum = ref(0);
   // 获取指定状态的学生id数组
   const getSpecificStateStu = (state: StuPaperStateEnum) => {
@@ -172,7 +166,7 @@
           Notification.success('AI判卷已完成');
           setTimeout(() => {
             getExamDetail();
-          }, 2000);
+          }, 1500);
         }
         return isAIDone;
       },
@@ -184,6 +178,14 @@
     (newVal) => {
       if (newVal === ExamStateEnum.aiJudging) {
         beginWatchAiJuding();
+      } else if (newVal === ExamStateEnum.checking) {
+        getReview({ page: 1, pageSize: examDetail.value.number, examId: query.id, state: StuPaperStateEnum.judged }).then(
+          ({ success, data }) => {
+            if (success) {
+              reviewedStuNum.value = data.list.length;
+            }
+          },
+        );
       }
     },
   );
@@ -225,9 +227,24 @@
     stuList.value = newStuList;
   };
 
+  const submitExam = () => {
+    setWaitAIStart(true);
+    submitJudgeRes(+examDetail.value.id)
+      .then(({ success }) => {
+        if (success) {
+          Notification.success('本堂考试全部阅卷结果提交成功');
+          setTimeout(() => {
+            getExamDetail();
+          }, 1500);
+        }
+      })
+      .finally(() => {
+        setWaitAIStart(false);
+      });
+  };
+
   const initPage = () => {
     getExamDetail();
-    getStuAnswerSheet();
   };
   initPage();
 
@@ -237,7 +254,7 @@
   });
 
   onBeforeRouteLeave(() => {
-    if (currentState.value === ExamStateEnum.aiJudging && pollingCancelToken) {
+    if (pollingCancelToken) {
       pollingCancelToken.cancel();
       pollingCancelToken = null;
     }
@@ -261,7 +278,7 @@
                   <a-button
                     class="backBtn"
                     shape="circle"
-                    @click="$router.back()"
+                    @click="$router.push({ path: '/exam-mgmt/examIndex' })"
                   >
                     <template #icon>
                       <icon-left
@@ -325,7 +342,7 @@
               <a-spin
                 class="w-full"
                 :loading="waitAIStart"
-                tip="AI阅卷启动中, 请稍后"
+                :tip="`${currentState === ExamStateEnum.default ? 'AI阅卷启动中, 请稍后...' : '本堂考试全部阅卷结果提交中, 请稍后...'}`"
               >
                 <a-steps
                   class="mb-6"
@@ -352,9 +369,6 @@
                   </a-step>
                 </a-steps>
                 <div class="flex justify-center flex-col items-center">
-                  <!-- <a-button @click="openUploader('questionPaper')">录入题卷</a-button> -->
-                  <!-- <a-button @click="openUploader('answerPaper')">录入答卷</a-button> -->
-                  <!-- <a-button @click="jumpToDataAnalysis">可视化大屏</a-button> -->
                   <a-progress
                     v-if="currentState === ExamStateEnum.aiJudging && examDetail.number"
                     :percent="+(judgedNum / examDetail.number).toFixed(2)"
@@ -412,8 +426,27 @@
                         </template>
                       </a-button>
                     </a-popconfirm>
+
+                    <a-popconfirm
+                      v-if="currentState === ExamStateEnum.checking"
+                      :content="`${
+                        reviewedStuNum === examDetail.number
+                          ? '提交阅卷结果, 获取考试数据分析'
+                          : '当前仍有学生的试卷没有被人工复审, 若直接提交, 剩余学生的成绩将使用AI阅卷结果'
+                      }`"
+                      type="warning"
+                      ok-text="确认提交"
+                      @ok="submitExam"
+                    >
+                      <a-button
+                        class="ml-2"
+                        type="primary"
+                        status="success"
+                      >
+                        提交复审结果
+                      </a-button>
+                    </a-popconfirm>
                   </div>
-                  <!-- <a-button @click="jumpToJudge">跳转到阅卷平台</a-button> -->
                 </div>
               </a-spin>
             </div>
@@ -451,19 +484,6 @@
             </a-tabs>
           </a-card>
           <a-card class="w-7/17 rounded-3 shadow-lg h-60rem">
-            <!-- <a-card
-              :title="`${className}班级数据`"
-              class="w-full flex flex-col justify-around items-center h-full"
-            >
-              <div class="w-full h-11/35">
-                <PassPieChart
-                  :pass-score="(examDetail.total || 100) * 0.6"
-                  :stu-score-list="stuList"
-                />
-              </div>
-              <div class="w-full h-11/35 bg-red"></div>
-              <div class="w-full h-11/35 bg-teal"></div>
-            </a-card> -->
             <br />
             <StudentComposition :exam-id="+query.id" />
           </a-card>

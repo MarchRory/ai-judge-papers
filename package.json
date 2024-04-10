@@ -53,7 +53,8 @@
     "vue-i18n": "^9.2.2",
     "vue-router": "^4.0.14",
     "vue-virtual-scroller": "^2.0.0-beta.8",
-    "vue3-seamless-scroll": "^2.0.1"
+    "vue3-seamless-scroll": "^2.0.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@arco-plugins/vite-vue": "^1.4.5",
