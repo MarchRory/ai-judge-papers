@@ -26,13 +26,17 @@
       });
   };
 
-  loadPaper();
+  const now = new Date().getTime();
+
+  if (now > examDetail.value.time && examDetail.value.id) {
+    loadPaper();
+  }
 </script>
 
 <template>
   <div class="w-full relative">
     <a-result
-      v-if="currentState === ExamStateEnum.beforeStart"
+      v-if="now < examDetail.time"
       class="abs-center"
       status="warning"
       title="提示"

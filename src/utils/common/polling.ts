@@ -2,7 +2,7 @@
 import { sleep } from './performance';
 
 // 竞态令牌
-type CancellationToken = {
+export type CancellationToken = {
   isCancelled: () => boolean;
   cancel: () => void;
 };
@@ -49,7 +49,7 @@ export async function usePolling<T = any>(params: PollingParams<T>) {
       // eslint-disable-line
       break;
     }
-    sleep(sleepTime);
+    await sleep(sleepTime); // eslint-disable-line
   } while (!quitWhen());
   // 释放token
   cancelToken && cancelToken.cancel(); // eslint-disable-line
