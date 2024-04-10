@@ -121,7 +121,10 @@
             class="w-full min-w-[16rem] mr-4"
             :percent="reviewDoneIds.length / (reviewIds.length + reviewDoneIds.length)"
           >
-            <template #text="scope"> 阅卷进度 {{ (scope.percent * 100).toFixed(1) }}% </template>
+            <template #text="scope">
+              <span> 阅卷进度 {{ reviewDoneIds.length }}/{{ reviewIds.length + reviewDoneIds.length }}</span>
+              <span class="text-slate-4"> ({{ (scope.percent * 100).toFixed(1) }}%) </span>
+            </template>
           </a-progress>
           <a-button
             type="primary"
@@ -147,7 +150,7 @@
       </template>
     </a-page-header>
 
-    <div :class="`flex px-2 bg-white rounded-lg relative ${isFullscreen ? 'h-92vh' : 'max-h-72vh'}`">
+    <div :class="`flex px-2 bg-white rounded-lg relative ${isFullscreen ? 'h-92vh' : 'max-h-[calc(92vh-50px)]'}`">
       <div
         v-if="loadingDataStatus === 'loading'"
         class="wh-full"

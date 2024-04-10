@@ -26,7 +26,7 @@
 
 <template>
   <a-button
-    size="mini"
+    size="small"
     long
     @click="collapse = !collapse"
     >{{ collapse ? '展开' : '折叠' }}识别结果
