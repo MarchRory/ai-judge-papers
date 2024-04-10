@@ -13,7 +13,7 @@
         <LoginForm />
       </div>
       <div class="footer">
-        <Footer />
+        <!-- <Footer /> -->
       </div>
     </div>
   </div>

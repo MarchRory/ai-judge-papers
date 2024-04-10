@@ -99,6 +99,12 @@
     const timeLimit = (formInfo.value.time as number) + (formInfo.value.examTimeLength as number) * 60 * 1000;
     formInfo.value.timeLimit = timeLimit;
     // formInfo.value.subject = formInfo.value.subjectId;
+    const originSubject = formInfo.value.subject;
+    if (props.create === 'edit' && Number.isNaN(+(originSubject as unknown as string))) {
+      const subjectId = subjectList.value.find((subject) => subject.label === formInfo.value.subject)?.value;
+      formInfo.value.subject = +(subjectId as string);
+      console.log(formInfo.value.subject, subjectId);
+    }
     delete formInfo.value.subjectId;
     delete formInfo.value.examTimeLength;
     submitFn({ ...formInfo.value, state: ExamStateEnum.default })
