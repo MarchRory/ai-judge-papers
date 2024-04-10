@@ -211,13 +211,18 @@
             <template #columns>
               <a-table-column
                 title="考试组"
-                :width="200"
+                :width="350"
                 data-index="groupName"
               ></a-table-column>
               <a-table-column
                 title="考试"
                 data-index="name"
-              ></a-table-column>
+                :width="350"
+              >
+                <template #cell="{ record }">
+                  <span class="font-bold text-1em">{{ record.name }}</span>
+                </template>
+              </a-table-column>
               <a-table-column
                 title="学科"
                 data-index="subject"
@@ -242,7 +247,19 @@
                 :width="120"
               >
                 <template #cell="{ record }">
-                  {{ now <= record.timeLimit ? examStateMap[ExamStateEnum.beforeStart].text : examStateMap[record.state].text }}
+                  <a-tag
+                    :color="
+                      now <= record.timeLimit ? examStateMap[ExamStateEnum.beforeStart].iconColor : examStateMap[+record.state].iconColor
+                    "
+                  >
+                    <i
+                      class="mr-2"
+                      :class="
+                        now <= record.timeLimit ? examStateMap[ExamStateEnum.beforeStart].stepIcon : examStateMap[+record.state].stepIcon
+                      "
+                    ></i>
+                    {{ now <= record.timeLimit ? examStateMap[ExamStateEnum.beforeStart].text : examStateMap[+record.state].text }}
+                  </a-tag>
                 </template>
               </a-table-column>
               <a-table-column
@@ -266,13 +283,24 @@
               <a-table-column
                 title="考试时长"
                 data-index="timeLimit"
+                :width="120"
               >
                 <template #cell="{ record }"> {{ ((record.timeLimit - record.time) / (1000 * 60)).toFixed() }}分钟 </template>
               </a-table-column>
               <a-table-column
                 title="其他信息"
                 data-index="description"
-              ></a-table-column>
+                :width="100"
+              >
+                <template #cell="{ record }">
+                  <a-popover title="附加信息">
+                    <icon-info-circle :size="20" />
+                    <template #content>
+                      {{ record.description || '暂无额外附加信息' }}
+                    </template>
+                  </a-popover>
+                </template>
+              </a-table-column>
 
               <a-table-column
                 title="操作"

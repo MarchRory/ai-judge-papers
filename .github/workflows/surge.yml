@@ -20,7 +20,8 @@ jobs:
           npm pkg delete resolutions.bin-wrapper
           npm install
           npm run build-no-check
-          tar -czvf dist/dist.tar.gz dist
+          tar -czvf dist.tar.gz dist
+          mv dist.tar.gz dist
           cp dist/index.html dist/200.html
 
       - name: Deploy 🚀

@@ -242,10 +242,24 @@
                     </template>
                   </a-button>
                   <span class="text-1.5em font-bold ml-2">{{ query.name }} </span>
+                  <a-popover title="附加信息">
+                    <icon-info-circle
+                      v-if="examDetail.description"
+                      :size="20"
+                      class="ml-2"
+                    />
+                    <template #content>
+                      {{ examDetail.description }}
+                    </template>
+                  </a-popover>
                   <a-tag
-                    class="ml-5"
+                    class="ml-8"
                     :color="examStateMap[currentState].iconColor || '#0fc6c2'"
                   >
+                    <i
+                      class="mr-2"
+                      :class="examStateMap[currentState].stepIcon"
+                    ></i>
                     {{ examStateMap[currentState].text }}
                   </a-tag>
                   <a-button

@@ -10,7 +10,7 @@
           :style="{ margin: 0, fontSize: '18px' }"
           :heading="5"
         >
-          文心大模型阅卷平台
+          {{ APP_TITLE }}
         </a-typography-title>
         <icon-menu-fold
           v-if="!topMenu && appStore.device === 'mobile'"
@@ -152,6 +152,7 @@
 
 <script lang="ts" setup>
   import { computed, ref, inject } from 'vue';
+  import APP_TITLE from '@/assets/globalVariable';
   import { Message } from '@arco-design/web-vue';
   import { useDark, useToggle, useFullscreen } from '@vueuse/core';
   import { useAppStore, useUserStore } from '@/store';
