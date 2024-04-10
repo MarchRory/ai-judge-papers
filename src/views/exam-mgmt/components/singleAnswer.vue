@@ -57,6 +57,7 @@
     if (res.success) {
       Message.success('修改成功');
       question.result = modifiedResult.value;
+      question.checked = true; // 已修改过
     } else {
       Message.error('修改失败');
     }
@@ -67,7 +68,7 @@
     question.score = modifiedScore.value;
   };
 
-  const popupContainer = document.getElementById('id-for-judge-container');
+  const popupContainer = document.getElementById('id-for-judge-container')!;
 </script>
 
 <template>
@@ -117,8 +118,14 @@
             blockquote
             class="transition group-hover:bg-stone-50 cursor-pointer"
           >
-            <div class="my-1">
+            <div class="my-1 flex items-center gap-3">
               <strong>评语</strong>
+              <a-tag
+                v-if="!question.checked && question.result"
+                size="small"
+                color="#0fc6c2"
+                >AI</a-tag
+              >
             </div>
             <a-typography-paragraph :type="question.result ? '' : 'warning'">
               <display-latex
@@ -129,7 +136,7 @@
             </a-typography-paragraph>
           </a-typography-paragraph>
           <a-popconfirm
-            :popup-container="popupContainer!"
+            :popup-container="popupContainer"
             position="lt"
             @before-ok="handleModifyResult"
           >

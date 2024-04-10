@@ -68,6 +68,8 @@ export interface PaperDetail {
   totalScore: number;
   url: string;
   studentAnswer: string;
+  /** 已修改评语 */
+  checked: boolean;
 }
 
 /**

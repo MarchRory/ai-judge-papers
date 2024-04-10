@@ -20,7 +20,7 @@
   const userIdRef = ref<number>(); // 需要请求得到
 
   const el = ref<HTMLElement | null>(null);
-  const { isFullscreen, toggle } = useFullscreen(el);
+  const { isFullscreen, toggle, exit: exitFullscreen } = useFullscreen(el);
 
   /** 需求请求多个接口，请求时展示loading */
   const loadingDataStatus = ref('loading');
@@ -38,7 +38,7 @@
       reviewIds.value = list;
       const [userId] = list; // 获取第一个考生
       if (!userId) {
-        throw new Error('已全部阅卷完毕！');
+        throw new Error('已全部阅卷完毕！完成当前考试组所有考试阅卷后，请前往考试组管理，提交本考试组阅卷结果！');
       }
       userIdRef.value = userId;
       reviewDoneIds.value = (await getReview({ state: 3, examId, pageSize: 9999 })).data.list;
@@ -86,6 +86,7 @@
 
   const submitModalVisible = ref(false);
   const submitThis = async () => {
+    exitFullscreen(); // 退出全屏，因为modal挂载点有问题
     const ok = await reviewFulfil({ userId: userIdRef.value!, examId });
     if (ok) submitModalVisible.value = true;
     reviewIds.value = (await getReview({ state: 2, examId, pageSize: 9999 })).data.list;
@@ -121,7 +122,14 @@
             class="w-full min-w-[16rem] mr-4"
             :percent="reviewDoneIds.length / (reviewIds.length + reviewDoneIds.length)"
           >
-            <template #text="scope"> 阅卷进度 {{ (scope.percent * 100).toFixed(1) }}% </template>
+            <template #text="scope">
+              <span
+                :title="`${(scope.percent * 100).toFixed(1)}%`"
+                class="cursor-help"
+              >
+                阅卷进度 {{ reviewDoneIds.length }}/{{ reviewIds.length + reviewDoneIds.length }}</span
+              >
+            </template>
           </a-progress>
           <a-button
             type="primary"
@@ -135,19 +143,24 @@
           >
           <a-modal
             v-model:visible="submitModalVisible"
+            popup-container="id-for-judge-container"
             width="auto"
             :on-before-ok="handleSubmitModal"
             @cancel="submitModalVisible = false"
           >
             <template #title>提交成功</template>
             <div v-if="reviewIds && reviewIds.length > 0">提交成功，是否转到下一张试卷？</div>
-            <div v-else>已评阅完成所有试卷，是否返回上一级页面？</div>
+            <div v-else>
+              <span>已评阅完成所有试卷，单击确定返回上一级页面。</span>
+              <br />
+              <strong>注意：完成当前考试组所有考试阅卷后，请前往考试组管理，提交本考试组阅卷结果！</strong>
+            </div>
           </a-modal>
         </a-space>
       </template>
     </a-page-header>
 
-    <div :class="`flex px-2 bg-white rounded-lg relative ${isFullscreen ? 'h-92vh' : 'max-h-72vh'}`">
+    <div :class="`flex px-2 bg-white rounded-lg relative ${isFullscreen ? 'h-92vh' : 'max-h-[calc(92vh-50px)]'}`">
       <div
         v-if="loadingDataStatus === 'loading'"
         class="wh-full"
