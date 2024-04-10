@@ -4,6 +4,7 @@
   import DisplayLatex from '@/components/latex/index.vue';
   import { debounce } from 'lodash';
   import { ref, watch, nextTick, onMounted } from 'vue';
+  import { Message } from '@arco-design/web-vue';
 
   interface chatListItem {
     text: string;
@@ -40,6 +41,10 @@
 
   const sendContent = () => {
     const text = editedDom.value.innerText;
+    if (!text) {
+      Message.error('请先输入问题');
+      return;
+    }
     chatList.value.push({
       isBot: false,
       text,
@@ -84,7 +89,6 @@
     },
   );
   onMounted(() => {
-    //
     chatList.value.push({
       isBot: true,
       text: '您好, 我是易智小助手, 关于这场考试, 您有什么想要咨询的吗? ',
@@ -203,6 +207,7 @@
                       @input="handleEdit"
                       @focus="setIsFocus(true)"
                       @blur="setIsFocus(false)"
+                      @keydown.enter="sendContent"
                     ></div>
                     <div
                       :diabled="inputLoading"
@@ -431,7 +436,5 @@
     display: flex;
     flex-direction: row-reverse;
     justify-content: flex-start;
-  }
-  .bot :deep(.arco-textarea-wrapper) {
   }
 </style>

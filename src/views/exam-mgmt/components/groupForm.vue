@@ -7,7 +7,7 @@
   import { debounce } from '@/utils/common/performance';
   import dayjs from 'dayjs';
   import { CalendarValue } from '@arco-design/web-vue/es/date-picker/interface';
-  import { examStateMap } from '../config';
+  import { ExamStateEnum, examStateMap } from '../config';
 
   const props = defineProps<{
     formCfg: {
@@ -57,12 +57,7 @@
     // 录入假数据, 临时取消限制
     // return dayjs(current).isBefore(dayjs(), 'day');
   };
-  const gruopStateOpts = Object.values(examStateMap).map((item) => {
-    return {
-      label: item.groupState,
-      value: item.value,
-    };
-  });
+  const gruopStateOpts = [{ label: '进行中', value: 1 }];
 </script>
 
 <template>
@@ -125,10 +120,11 @@
       <a-form-item
         field="description"
         label="其他信息"
+        :rules="[{ required: true, message: '请设置该考试组详细说明信息' }]"
       >
         <a-textarea
           v-model:model-value="form.description"
-          placeholder="考试其他附注信息"
+          placeholder="考试组详细说明信息"
           :max-length="{ length: 300, errorOnly: true }"
           allow-clear
           show-word-limit

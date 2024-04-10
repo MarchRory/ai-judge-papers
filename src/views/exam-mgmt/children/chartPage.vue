@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { ref, provide, defineAsyncComponent } from 'vue';
-  import { useRoute } from 'vue-router';
+  import { useRoute, useRouter } from 'vue-router';
   import { useFullscreen } from '@vueuse/core';
   import { type ExamListItem } from '@/api/exam';
   import {
@@ -25,6 +25,7 @@
 
   // 传值
   const route = useRoute();
+  const router = useRouter();
   const query = route.query as unknown as ExamListItem;
   /* 全屏逻辑 */
   const chartContainer = ref<HTMLElement | null>(null);
@@ -50,6 +51,13 @@
     fullScreenToggle();
   };
 
+  const back = () => {
+    router.push({
+      path: '/exam-mgmt/examDetail',
+      query: route.query, // 和入口页面相同 query
+    });
+  };
+
   const tableListPageParams = { page: 1, pageSize: 3000 };
   initPage();
   provide('examInfo', query);
@@ -68,6 +76,12 @@
         text-white
         bg="#1b2a5775"
       >
+        <icon-left
+          class="translate-x-15 cursor-pointer"
+          :size="40"
+          color="white"
+          @click="back"
+        />
         <div
           flex="~ col items-center justify-center"
           w="3/10"

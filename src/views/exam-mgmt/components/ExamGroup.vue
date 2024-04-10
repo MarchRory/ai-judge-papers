@@ -164,14 +164,14 @@
                 :width="300"
               >
                 <template #cell="{ record }">
-                  <!-- <a-button
+                  <a-button
                     v-if="record.state !== 4"
                     m="r-2"
                     type="primary"
                     status="success"
                     @click="submitGroupRes(record.id, record.name)"
                     >提交结果</a-button
-                  > -->
+                  >
                   <a-button
                     v-if="now < record.time"
                     m="r-2"

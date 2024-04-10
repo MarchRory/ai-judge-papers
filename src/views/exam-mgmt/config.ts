@@ -47,11 +47,11 @@ export const examStateMap: ExamStateMap = {
   [ExamStateEnum.aiJudging]: {
     value: ExamStateEnum.aiJudging,
     text: 'AI阅卷中',
-    groupState: '阅卷中',
+    groupState: '进行中',
     iconColor: 'orangered',
     btnText: '请等待AI阅卷结束',
     btnIcon: 'i-tabler:robot',
-    desc: '基于千帆大模型',
+    desc: '请等待AI阅卷结束',
     stepIcon: '',
   },
   [ExamStateEnum.aiDone]: {

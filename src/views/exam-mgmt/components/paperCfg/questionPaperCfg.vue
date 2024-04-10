@@ -10,6 +10,7 @@
   import { Message } from '@arco-design/web-vue';
   import DisplayLatex from '@/components/latex/index.vue';
   import { getSpecificValueArr } from '@/utils/arrayHelper';
+  import getXlsxSheets from '@/utils/common/xlsx';
   import { ExamStateEnum } from '../../config';
 
   const { examDetail, currentState } = inject('examDetail') as { examDetail: Ref<ExamListItem>; currentState: Ref<ExamStateEnum> };
@@ -67,20 +68,46 @@
   });
 
   // 上传逻辑
-  const handleQuestionUplad = (opt: RequestOption): void => {
-    setUploadLoading(true);
+  const sheetSelectVisible = ref(false);
+  const setSheetSelectVisible = (state: boolean) => {
+    sheetSelectVisible.value = state;
+  };
+  const { loading: sheetLoading, setLoading: setSheetLoading } = useLoading(false);
+  const uploadFile = ref<File | null>();
+  const xlsxSheets = ref<string[]>();
+  const chosenSheet = ref('');
+  const handleQuestionUplad = async (opt: RequestOption) => {
+    setSheetLoading(true);
     const { fileItem } = opt;
+    if (fileItem.file) {
+      uploadFile.value = fileItem.file;
+      const sheets = await getXlsxSheets(uploadFile.value);
+      xlsxSheets.value = sheets;
+      setSheetSelectVisible(true);
+    }
+    setSheetLoading(false);
+  };
+
+  const fileUpload = () => {
+    if (!chosenSheet.value) {
+      Message.warning('请先选择需要导入的sheet');
+      return;
+    }
+    setUploadLoading(true);
     /* eslint-disable */
-    fileItem.file &&
+    uploadFile.value &&
       uploadExamTemplateApi({
         examId: +examDetail.value.id,
-        sheet: '数学试卷',
-        file: fileItem.file,
+        sheet: chosenSheet.value,
+        file: uploadFile.value,
       })
-        .then((res) => {
-          const { success } = res;
+        .then(({ success }) => {
           if (success) {
             Message.success(`试题${problemTotal.value === 0 ? '录入' : '追加'}成功`);
+            chosenSheet.value = '';
+            setSheetSelectVisible(false);
+            setUploadLoading(false);
+            uploadFile.value = null;
             loadQuestionList();
             emits('onChange');
           }
@@ -92,7 +119,6 @@
   };
 
   // 题目更换交互逻辑
-
   const handleExchangeClose = () => {
     exchangeQuestionId.value = -1;
   };
@@ -159,8 +185,8 @@
             >
               <a-spin
                 class="w-1/1"
-                tip="题卷上传中, 请稍后"
-                :loading="uploadLoading"
+                tip="xlsx解析中..."
+                :loading="sheetLoading"
               >
                 <!--@vue-ignore-->
                 <a-upload
@@ -301,10 +327,64 @@
         </a-list>
       </a-card>
     </section>
+    <a-modal
+      class="sheetModal"
+      title="选择导入的sheet"
+      v-model:visible="sheetSelectVisible"
+      :mask-closable="false"
+      :footer="false"
+      :esc-to-close="false"
+      hide-cancel
+    >
+      <a-form
+        :model="{ chosenSheet }"
+        @submit-success="fileUpload"
+      >
+        <a-form-item
+          label="sheet"
+          field="groupId"
+        >
+          <div class="w-7/9 flex justify-start">
+            <a-tag
+              :checkable="chosenSheet === tag"
+              :color="chosenSheet === tag ? '#165dff' : 'gray'"
+              v-for="(tag, idx) in xlsxSheets"
+              :key="idx"
+              class="mr-3 cursor-pointer"
+              @click="chosenSheet = tag"
+            >
+              {{ tag }}
+            </a-tag>
+          </div>
+        </a-form-item>
+        <a-form-item>
+          <a-space>
+            <a-button
+              html-type="submit"
+              type="primary"
+              :loading="uploadLoading"
+              status="success"
+              >上传试题</a-button
+            >
+            <a-button
+              @click="
+                () => {
+                  chosenSheet = '';
+                  setSheetLoading(false);
+                  setSheetSelectVisible(false);
+                }
+              "
+            >
+              取消
+            </a-button>
+          </a-space>
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="less">
   .infoTag {
     display: flex;
     align-items: center;
@@ -314,5 +394,8 @@
     font-weight: bold;
     border-radius: 0.4rem;
     margin-right: 6px;
+  }
+  :deep(.sheetModal .arco-modal-footer) {
+    display: none;
   }
 </style>

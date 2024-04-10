@@ -54,6 +54,7 @@
       Message.warning('请设置题目序号后再提交');
       return;
     }
+    setSubmitLoading(true);
     const data = {
       examId: props.examId,
       order: form.value.order,
@@ -62,7 +63,6 @@
     };
     addPaperQuestion(data)
       .then((res) => {
-        setSubmitLoading(true);
         const { success } = res;
         if (success) {
           Message.success('题目创建成功');
