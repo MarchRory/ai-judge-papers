@@ -27,7 +27,7 @@ export const examStateMap: ExamStateMap = {
   [ExamStateEnum.beforeStart]: {
     value: ExamStateEnum.beforeStart,
     text: '筹备中',
-    groupState: '等待考试结束',
+    groupState: '等待考试开始',
     iconColor: '#ff5722',
     btnText: '上传试题卷',
     btnIcon: 'i-tabler:align-box-left-middle',
@@ -47,7 +47,7 @@ export const examStateMap: ExamStateMap = {
   [ExamStateEnum.aiJudging]: {
     value: ExamStateEnum.aiJudging,
     text: 'AI阅卷中',
-    groupState: '准备中',
+    groupState: '阅卷中',
     iconColor: 'orangered',
     btnText: '请等待AI阅卷结束',
     btnIcon: 'i-tabler:robot',

@@ -15,7 +15,9 @@
   const props = defineProps<{ latex: string }>();
 
   const ref = (el?: HTMLElement) => {
-    if (!el) return;
+    if (!el) {
+      return;
+    }
     const renderText = props.latex.replace(/\\n/g, '\n');
     el.innerHTML = render(renderText);
   };

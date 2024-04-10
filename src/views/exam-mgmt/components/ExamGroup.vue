@@ -4,8 +4,9 @@
    */
   import { ref, defineAsyncComponent } from 'vue';
   import useTable from '@/hooks/table/useTable';
-  import { getGroupList, type Group, deleteGroupApi } from '@/api/exam';
+  import { submitGroupResApi, getGroupList, type Group, deleteGroupApi } from '@/api/exam';
   import { type FormType } from '@/hooks/table/useForm';
+  import { Message } from '@arco-design/web-vue';
   import { examStateMap } from '../config';
 
   const GroupForm = defineAsyncComponent(() => import('./groupForm.vue'));
@@ -42,6 +43,16 @@
       formType: 'create' as FormType,
       formData: {} as Group,
     };
+  };
+
+  const submitGroupRes = (groupId: number, groupName: string) => {
+    submitGroupResApi(groupId).then((res) => {
+      const { success } = res;
+      if (success) {
+        Message.success(`考试组 ${groupName} 阅卷信息提交成功`);
+        loadList();
+      }
+    });
   };
 
   const setupComp = () => {
@@ -112,7 +123,11 @@
                 title="状态"
                 data-index="state"
               >
-                <template #cell="{ record }"> {{ examStateMap[record.state].text }}</template>
+                <template #cell="{ record }">
+                  <a-tag :color="examStateMap[record.state].iconColor">
+                    {{ examStateMap[record.state].groupState }}
+                  </a-tag>
+                </template>
               </a-table-column>
               <a-table-column
                 title="开考日期"
@@ -133,14 +148,32 @@
               <a-table-column
                 title="其他信息"
                 data-index="description"
-              ></a-table-column>
+                :width="100"
+              >
+                <template #cell="{ record }">
+                  <a-popover title="附加信息">
+                    <icon-info-circle :size="20" />
+                    <template #content>
+                      {{ record.description || '暂无额外附加信息' }}
+                    </template>
+                  </a-popover>
+                </template>
+              </a-table-column>
               <a-table-column
                 title="操作"
-                :width="200"
+                :width="300"
               >
                 <template #cell="{ record }">
                   <a-button
-                    v-if="now < record.timeLimit"
+                    v-if="record.state !== 4"
+                    m="r-2"
+                    type="primary"
+                    status="success"
+                    @click="submitGroupRes(record.id, record.name)"
+                    >提交结果</a-button
+                  >
+                  <a-button
+                    v-if="now < record.time"
                     m="r-2"
                     type="outline"
                     status="warning"

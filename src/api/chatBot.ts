@@ -16,6 +16,6 @@ export interface BotChatResponse {
  * @param data
  * @returns
  */
-export const getChatResponse = (data: { examId: number; userId: number; content: string }) => {
+export const getChatResponse = (data: { examId: number; content: string; userId: number }) => {
   return request.post<BotChatResponse>(ChatBotApi.chat, data);
 };
