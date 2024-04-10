@@ -16,6 +16,7 @@ const enum ExamApi {
   uploadAnswerSheet = `${schema}/answerSheet/upload`, // 上传答题卡zip
   sheetList = `${schema}/answerSheet/list`, // 获取上传到某考试中的学生的答题卡列表
   problemList = `${schema}/problemList`,
+  joinExamClassList = `${schema}/classList`, // 参加考试的班级列表
 }
 
 // 考试组crud接口
@@ -25,6 +26,11 @@ const enum ExamGroupApi {
   update = `${groupSchema}/update`,
   list = `${groupSchema}/list`,
   delete = `${groupSchema}/delete`,
+}
+
+// 试题卷试题增删
+const enum ExamQuestionApi {
+  editQuestion = `${schema}/addProblem`,
 }
 
 /**
@@ -89,6 +95,14 @@ export interface AnswerSheetItem {
   [property: string]: any;
 }
 
+export interface JoinExamClassItem {
+  classId: number;
+  className: string;
+  code: string;
+  grade: number;
+  [property: string]: any;
+}
+
 export function createExamApi(data: Omit<ExamFormData, 'id'>) {
   return request.post(ExamApi.create, data);
 }
@@ -124,6 +138,14 @@ export function getAnswerSheetListApi(data: Paging<{ examId: number; key?: strin
 export function getExamDetailApi(data: { id: number }) {
   return request.post<ExamListItem>(ExamApi.detail, data);
 }
+/**
+ * 参加考试的班级列表
+ * @param examId 考试id
+ * @returns
+ */
+export function getJoinExamClassListApi(examId: number) {
+  return request.post<ListResponse<JoinExamClassItem>>(ExamApi.joinExamClassList, { page: 1, pageSize: 500, examId });
+}
 
 export interface Group {
   id: number;
@@ -153,4 +175,22 @@ export function deleteGroupApi(id: number) {
 
 export function getProblemList(examId: number) {
   return request.post<ListResponse<Question>>(ExamApi.problemList, { examId });
+}
+
+/**
+ * 新增 / 替换原试卷的题目
+ * @param data
+ * @returns
+ */
+export function addPaperQuestion(data: { examId: number; problemId: number; score: number; order: number }) {
+  return request.post(ExamQuestionApi.editQuestion, { type: false, ...data });
+}
+
+/**
+ * 删除试题卷中指定试题
+ * @param data
+ * @returns
+ */
+export function deletePaperQuestion(data: { examId: number; problemId: number; score: number; order: number }) {
+  return request.post(ExamQuestionApi.editQuestion, { type: true, ...data });
 }

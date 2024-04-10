@@ -5,8 +5,11 @@
   import { DescData, Message } from '@arco-design/web-vue';
   import useTable from '@/hooks/table/useTable';
   import useLoading from '@/hooks/loading';
-  import { ExamStateEnum } from '../config';
+  import { ExamStateEnum } from '../../config';
 
+  const emits = defineEmits<{
+    (e: 'onChange'): void;
+  }>();
   const { examDetail, currentState } = inject('examDetail') as { examDetail: Ref<ExamListItem>; currentState: Ref<ExamStateEnum> };
   const otherSearchParams = { examId: +examDetail.value.id, key: '' };
   const {
@@ -48,6 +51,7 @@
           if (success) {
             Message.success(`试题${pagination.value.total === 0 ? '录入' : '追加'}成功`);
             loadList();
+            emits('onChange');
           }
         })
         .finally(() => {
@@ -67,10 +71,7 @@
 
 <template>
   <div class="wh-full flex flex-col">
-    <a-card
-      title="答卷配置"
-      :loading="uploadLoading"
-    >
+    <a-card title="答卷配置">
       <div class="flex justify-between w-1/1 h-auto">
         <div class="w-2/5">
           <a-descriptions
@@ -82,16 +83,22 @@
         </div>
         <div class="w-3/5 p-4">
           <div
-            v-if="currentState === ExamStateEnum.beforeStart"
+            v-if="currentState === ExamStateEnum.default"
             class="w-1/1"
           >
-            <!--@vue-ignore-->
-            <a-upload
-              draggable
-              :tip="pagination.total === 0 ? '录入答题卡压缩包, 文件格式为.zip' : '追加录入, 文件格式为.zip'"
-              accept=".zip"
-              :custom-request="handleAnswerSheetUplad"
-            />
+            <a-spin
+              class="w-1/1"
+              tip="答题卡上传中, 请稍后"
+              :loading="uploadLoading"
+            >
+              <!--@vue-ignore-->
+              <a-upload
+                draggable
+                :tip="pagination.total === 0 ? '录入答题卡压缩包, 文件格式为.zip' : '追加录入, 文件格式为.zip'"
+                accept=".zip"
+                :custom-request="handleAnswerSheetUplad"
+              />
+            </a-spin>
           </div>
           <div v-else>
             <a-result

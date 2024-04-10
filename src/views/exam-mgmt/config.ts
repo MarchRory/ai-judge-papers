@@ -12,7 +12,7 @@ interface stateConfig {
 // 考试整体状态的枚举
 export const enum ExamStateEnum {
   beforeStart = -1, // 考试结束前
-  waitUpload = 0, // 考试结束后, 启动判卷前, 数据录入
+  default = 0, // 默认值, 创建时候的默认值, 同时也是答题卡上传期间, 没有启动阅卷的状态
   aiJudging = 1, // AI判卷中
   aiDone = 2, // AI判卷结束
   checking = 3, // 复审中
@@ -34,8 +34,8 @@ export const examStateMap: ExamStateMap = {
     desc: '等待考试结束',
     stepIcon: 'i-tabler:align-box-left-middle',
   },
-  [ExamStateEnum.waitUpload]: {
-    value: ExamStateEnum.waitUpload,
+  [ExamStateEnum.default]: {
+    value: ExamStateEnum.default,
     text: '答题卡录入',
     groupState: '考试结束',
     iconColor: '#00b42a',

@@ -16,7 +16,8 @@
 
   const ref = (el?: HTMLElement) => {
     if (!el) return;
-    el.innerHTML = render(props.latex);
+    const renderText = props.latex.replace(/\\n/g, '\n');
+    el.innerHTML = render(renderText);
   };
 </script>
 

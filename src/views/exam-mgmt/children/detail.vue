@@ -1,19 +1,21 @@
 <script setup lang="ts">
-  import { ref, computed, defineAsyncComponent, provide } from 'vue';
+  import { ref, computed, defineAsyncComponent, provide, watch } from 'vue';
   import { ExamListItem, getExamDetailApi, getAnswerSheetListApi } from '@/api/exam';
   import { useRoute, useRouter } from 'vue-router';
   import { DescData, Message } from '@arco-design/web-vue';
-  import { beginAiJudge, getReview } from '@/api/judge';
+  import { StuScoreItem, beginAiJudge, getReview } from '@/api/judge';
   import useLoading from '@/hooks/loading';
   import dayjs from 'dayjs';
-  import { createCancellationToken, usePolling } from '@/utils/common/polling';
+  import { usePolling } from '@/utils/common/polling';
+  import { StuExamRank } from '@/api/data';
   import { examStateMap, ExamStateEnum, StuPaperStateEnum } from '../config';
 
   type PaperCfgType = 'questionPaper' | 'answerPaper';
-  const PapaerConfig = defineAsyncComponent(() => import('../components/paperConfig.vue'));
-  const PaperListTab = defineAsyncComponent(() => import('../components/detailPaperListTab.vue'));
-  const StuListTab = defineAsyncComponent(() => import('../components/detatilStuListTab.vue'));
-  const WordCloudTab = defineAsyncComponent(() => import('../components/wordCloudTab.vue'));
+  const PapaerConfig = defineAsyncComponent(() => import('../components/paperCfg/paperConfig.vue'));
+  const PaperListTab = defineAsyncComponent(() => import('../components/detailTab/detailPaperListTab.vue'));
+  const StuListTab = defineAsyncComponent(() => import('../components/detailTab/detatilStuListTab.vue'));
+  const WordCloudTab = defineAsyncComponent(() => import('../components/detailTab/wordCloudTab.vue'));
+  const PassPieChart = defineAsyncComponent(() => import('../charts/passPie.vue'));
 
   const route = useRoute();
   const router = useRouter();
@@ -22,6 +24,7 @@
   const examDetail = ref({} as ExamListItem);
 
   const getExamDetail = () => {
+    setInitLoading(true);
     getExamDetailApi({ id: +query.id })
       .then((res) => {
         const { data, success } = res;
@@ -72,10 +75,8 @@
     const now = new Date().getTime();
     // 初始值
     let realState = ExamStateEnum.beforeStart;
-    if (now < timeLimit) {
+    if (now <= timeLimit) {
       realState = ExamStateEnum.beforeStart;
-    } else if (now > timeLimit && reqState < ExamStateEnum.aiJudging) {
-      realState = ExamStateEnum.waitUpload;
     } else {
       realState = queryState === reqState ? queryState : reqState;
     }
@@ -119,20 +120,16 @@
     uploadCompRef.value.setUploadVisible(true);
   };
   const handlePaperConfigClose = () => {
-    if (currentState.value < ExamStateEnum.aiJudging) {
-      getExamDetail();
-    }
+    getExamDetail();
   };
 
   // AI阅卷进度
   // 先用map, 以后有可能会借助这个完成其他功能
-  const { loading: aiJudingLoad, setLoading: setAiJudingLoad } = useLoading(false);
   const stateStuMap = ref(new Map<StuPaperStateEnum, number[]>());
   const judgedNum = ref(0);
   // 获取指定状态的学生id数组
   const getSpecificStateStu = (state: StuPaperStateEnum) => {
     return new Promise((resolve) => {
-      setAiJudingLoad(true);
       getReview({
         page: 1,
         pageSize: examDetail.value.number || 500,
@@ -144,11 +141,11 @@
           stateStuMap.value.set(state, list);
         })
         .finally(() => {
-          setAiJudingLoad(false);
           resolve(true);
         });
     });
   };
+  // AI阅卷进度条, 待测试
   const beginWatchAiJuding = async () => {
     const updateAiJudingProgress = async () => {
       await getSpecificStateStu(StuPaperStateEnum.juding);
@@ -161,6 +158,14 @@
       },
     });
   };
+  watch(
+    () => currentState.value,
+    (newVal) => {
+      if (newVal === ExamStateEnum.aiJudging) {
+        beginWatchAiJuding();
+      }
+    },
+  );
 
   // state方法触发器
   const stateFnTrigger = () => {
@@ -168,7 +173,7 @@
       case ExamStateEnum.beforeStart:
         openUploader('questionPaper');
         break;
-      case ExamStateEnum.waitUpload:
+      case ExamStateEnum.default:
         openUploader('answerPaper');
         break;
       case ExamStateEnum.aiDone:
@@ -186,10 +191,18 @@
   // 主体tab页逻辑
   const chosenTabKey = ref(0);
   const tabs = [
-    { key: 0, title: '试题卷', allowState: ExamStateEnum.waitUpload },
-    { key: 1, title: '考生列表', allowState: ExamStateEnum.aiJudging },
+    { key: 0, title: '试题卷', allowState: ExamStateEnum.default },
+    { key: 1, title: '作答情况', allowState: ExamStateEnum.aiJudging },
     { key: 2, title: '词云分析', allowState: ExamStateEnum.aiDone },
   ];
+  const classId = ref(0);
+  const className = ref('');
+  const stuList = ref<StuScoreItem[]>([]);
+  const handleClassIdChange = (newClassId: number, newClassName: string, newStuList: StuScoreItem[]) => {
+    classId.value = newClassId;
+    className.value = newClassName;
+    stuList.value = newStuList;
+  };
 
   const initPage = () => {
     getExamDetail();
@@ -235,6 +248,16 @@
                   >
                     {{ examStateMap[currentState].text }}
                   </a-tag>
+                  <a-button
+                    v-if="currentState !== ExamStateEnum.complete"
+                    type="text"
+                    @click="getExamDetail"
+                  >
+                    <template #icon>
+                      <icon-sync :spin="initLoading" />
+                    </template>
+                    状态同步
+                  </a-button>
                 </div>
                 <div class="w-1/1 h-5/7 mt-5">
                   <a-descriptions
@@ -280,13 +303,28 @@
                   </template>
                 </a-step>
               </a-steps>
-              <div class="flex justify-center">
-                <!-- <a-button @click="openUploader('questionPaper')">录入题卷</a-button>
-              <a-button @click="openUploader('answerPaper')">录入答卷</a-button>
-              <a-button @click="jumpToDataAnalysis">可视化大屏</a-button> -->
+              <div class="flex justify-center flex-col items-center">
+                <!-- <a-button @click="openUploader('questionPaper')">录入题卷</a-button> -->
+                <!-- <a-button @click="openUploader('answerPaper')">录入答卷</a-button> -->
+                <!-- <a-button @click="jumpToDataAnalysis">可视化大屏</a-button> -->
+                <a-progress
+                  v-if="currentState === ExamStateEnum.aiJudging && examDetail.number"
+                  :percent="+(judgedNum / examDetail.number).toFixed(2)"
+                  :status="judgedNum === examDetail.number ? 'normal' : 'success'"
+                  type="line"
+                  size="large"
+                  animation
+                  track-color="var(--color-primary-light-1)"
+                >
+                  <template #text>
+                    <div class="text-gray-500 font-700">
+                      已完成{{ judgedNum }}份, 进度{{ +(judgedNum / examDetail.number).toFixed(2) * 100 }}%
+                    </div>
+                  </template>
+                </a-progress>
                 <span
                   v-if="currentState === ExamStateEnum.aiJudging"
-                  class="text-gray text-1.2em"
+                  class="text-gray text-1.2em mt-2"
                 >
                   <i
                     :class="examStateMap[currentState].btnIcon"
@@ -294,27 +332,39 @@
                   />
                   {{ examStateMap[currentState].btnText }}
                 </span>
-                <a-button
+                <div
                   v-else
-                  type="primary"
-                  @click="stateFnTrigger"
+                  class="flex items-center"
                 >
-                  <i
-                    class="text-1.3em mr-2"
-                    :class="examStateMap[currentState].btnIcon"
-                  />
-                  {{ examStateMap[currentState].btnText }}
-                </a-button>
+                  <a-button
+                    type="outline"
+                    @click="stateFnTrigger"
+                  >
+                    <i
+                      class="text-1.3em mr-2"
+                      :class="examStateMap[currentState].btnIcon"
+                    />
+                    {{ examStateMap[currentState].btnText }}
+                  </a-button>
 
-                <a-popconfirm
-                  v-if="currentState === ExamStateEnum.waitUpload && examDetail.number"
-                  content="启动AI阅卷后, 将开启大模型自动阅卷模式, 本堂考试无法继续上传学生答题卡, 请确认答题卡上传完毕"
-                  type="warning"
-                  ok-text="确认启动"
-                  @ok="beginAIJudge"
-                >
-                  <a-button> 启动AI阅卷 </a-button>
-                </a-popconfirm>
+                  <a-popconfirm
+                    v-if="currentState === ExamStateEnum.default && examDetail.number"
+                    content="启动AI阅卷后, 将开启大模型自动阅卷模式, 本堂考试将无法继续上传学生答题卡, 在此之前, 请确认答题卡上传完毕"
+                    type="warning"
+                    ok-text="确认启动"
+                    @ok="beginAIJudge"
+                  >
+                    <a-button
+                      class="ml-2"
+                      status="success"
+                    >
+                      启动AI阅卷
+                      <template #icon>
+                        <icon-robot />
+                      </template>
+                    </a-button>
+                  </a-popconfirm>
+                </div>
                 <!-- <a-button @click="jumpToJudge">跳转到阅卷平台</a-button> -->
               </div>
             </div>
@@ -335,13 +385,38 @@
                 :key="item.key"
                 :title="item.title"
               >
+                <div class="min-h-4xl h-auto">
+                  <PaperListTab
+                    v-if="chosenTabKey === 0"
+                    @on-open-question-cfg="openUploader('questionPaper')"
+                  />
+                  <StuListTab
+                    v-else-if="chosenTabKey === 1"
+                    @on-open-paper-cfg="openUploader('answerPaper')"
+                    @to-judge="jumpToJudge"
+                    @on-class-change="handleClassIdChange"
+                  />
+                  <WordCloudTab v-else-if="chosenTabKey === 2" />
+                </div>
               </a-tab-pane>
             </a-tabs>
-            <PaperListTab v-show="chosenTabKey === 0" />
-            <StuListTab v-show="chosenTabKey === 1" />
-            <WordCloudTab v-show="chosenTabKey === 2" />
           </a-card>
-          <a-card class="w-7/17 rounded-3 shadow-lg"> </a-card>
+          <a-card class="w-7/17 rounded-3 shadow-lg h-60rem">
+            这里不知道放什么好
+            <!-- <a-card
+              :title="`${className}班级数据`"
+              class="w-full flex flex-col justify-around items-center h-full"
+            >
+              <div class="w-full h-11/35">
+                <PassPieChart
+                  :pass-score="(examDetail.total || 100) * 0.6"
+                  :stu-score-list="stuList"
+                />
+              </div>
+              <div class="w-full h-11/35 bg-red"></div>
+              <div class="w-full h-11/35 bg-teal"></div>
+            </a-card> -->
+          </a-card>
         </a-layout-content>
       </a-layout>
     </a-spin>
@@ -356,15 +431,16 @@
 
 <style scoped lang="less">
   :deep(.backBtn) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     .arco-btn-size-medium {
       font-size: 1.5em;
       font-weight: 800;
     }
   }
-  :deep(.backBtn) {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  :deep(.arco-progress) {
+    width: 85%;
   }
   .line {
     &::before {

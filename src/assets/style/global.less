@@ -15,11 +15,7 @@ body {
 }
 
 .echarts-tooltip-diy {
-  background: linear-gradient(
-    304.17deg,
-    rgba(253, 254, 255, 0.6) -6.04%,
-    rgba(244, 247, 252, 0.6) 85.2%
-  ) !important;
+  background: linear-gradient(304.17deg, rgba(253, 254, 255, 0.6) -6.04%, rgba(244, 247, 252, 0.6) 85.2%) !important;
   border: none !important;
   backdrop-filter: blur(10px) !important;
   /* Note: backdrop-filter has minimal browser support */
@@ -91,4 +87,24 @@ body {
       background-color: rgb(var(--green-6));
     }
   }
+}
+
+// 滚动条样式统一
+::-webkit-scrollbar {
+  width: 4px;
+  height: 0;
+  background-color: rgba(212, 202, 244, 0.364);
+}
+::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background-color: #662bee5d;
+}
+::-webkit-scrollbar-button {
+  display: none;
+}
+::-webkit-scrollbar-track {
+  background-color: #83838300;
 }

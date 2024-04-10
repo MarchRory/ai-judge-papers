@@ -1,7 +1,7 @@
 import { Pagination } from '@/types/global';
 import request from '@/utils/request/index';
 import { StuPaperStateEnum } from '@/views/exam-mgmt/config';
-import { ListResponse } from './types';
+import { ListResponse, Paging } from './types';
 
 const schema = '/study/judge';
 
@@ -27,6 +27,18 @@ export interface KnowledgePoints {
   description: string;
   /** subject */
   type: number;
+}
+
+export interface StuScoreItem {
+  classId: number;
+  className: string;
+  order: number;
+  score: number;
+  studentName: string;
+  studentNumber: string;
+  url: string;
+  userId: number;
+  [property: string]: any;
 }
 
 /**
@@ -66,12 +78,25 @@ export const getPaperDetail = (data: Pagination & { examId: number; userId: numb
   return request.post<ListResponse<PaperDetail>>(JudgeApi.problemList, data);
 };
 
+interface reqStuScoreParams {
+  classId: number;
+  examId: number;
+  /**
+   * 学生姓名
+   */
+  key: string;
+  /**
+   * 分数正序/倒序
+   */
+  order: boolean;
+  [property: string]: any;
+}
 /**
  * 获取学生分数列表
  * @returns
  */
-export const getScoreList = () => {
-  return request.post(JudgeApi.stuScoreList);
+export const getScoreList = (data: Paging<reqStuScoreParams>) => {
+  return request.post<ListResponse<StuScoreItem>>(JudgeApi.stuScoreList, data);
 };
 
 /**

@@ -53,8 +53,11 @@
 
 <template>
   <div>
-    <a-layout h="1/1">
-      <a-layout-header>
+    <a-layout
+      h="full"
+      flex="~ col items-center justify-start"
+    >
+      <a-layout-header class="w-1/1">
         <a-card>
           <header class="pt-4 pb-8">
             <strong class="text-2xl"> 考试组配置 </strong>
@@ -88,10 +91,9 @@
           </section>
         </a-card>
       </a-layout-header>
-      <a-layout-content>
+      <a-layout-content class="flex-1">
         <a-card h="full">
           <a-table
-            h="2xl"
             :data="tableData"
             stripe
             :loading="loading"

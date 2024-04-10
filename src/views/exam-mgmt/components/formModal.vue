@@ -5,6 +5,7 @@
   import { getSubjectListAPI } from '@/api/subject';
   import { FormInstance, Message, SelectOptionData } from '@arco-design/web-vue';
   import dayjs from 'dayjs';
+  import { ExamStateEnum } from '../config';
 
   interface Props {
     visible: boolean;
@@ -100,7 +101,7 @@
     // formInfo.value.subject = formInfo.value.subjectId;
     delete formInfo.value.subjectId;
     delete formInfo.value.examTimeLength;
-    submitFn({ ...formInfo.value, state: 1 })
+    submitFn({ ...formInfo.value, state: ExamStateEnum.default })
       .then((res) => {
         const { code, message } = res;
         if (code === 200) {

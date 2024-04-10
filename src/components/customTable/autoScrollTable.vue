@@ -87,7 +87,17 @@
               }"
               class="text-white text-center mt-1"
             >
-              {{ item[t.dataIndex] }}
+              <span v-if="!Array.isArray(item[t.dataIndex])">{{ item[t.dataIndex] }}</span>
+              <!--有bug, 全屏模式下popover不生效-->
+              <a-popover
+                v-else
+                trigger="hover"
+              >
+                <div>{{ item[t.dataIndex][0] }}</div>
+                <template #content>
+                  {{ item[t.dataIndex].join(', ') }}
+                </template>
+              </a-popover>
             </span>
           </div>
         </vue3-seamless-scroll>
