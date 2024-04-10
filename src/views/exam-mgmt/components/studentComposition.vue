@@ -64,8 +64,8 @@
       v-if="!isLoading"
       auto-resize
       :options="chartOpt"
-      width="400px"
-      height="200px"
+      width="800px"
+      height="600px"
     />
   </a-spin>
 </template>

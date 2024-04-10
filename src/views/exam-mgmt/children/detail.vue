@@ -451,7 +451,6 @@
             </a-tabs>
           </a-card>
           <a-card class="w-7/17 rounded-3 shadow-lg h-60rem">
-            这里不知道放什么好
             <!-- <a-card
               :title="`${className}班级数据`"
               class="w-full flex flex-col justify-around items-center h-full"
