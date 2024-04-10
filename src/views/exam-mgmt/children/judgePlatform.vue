@@ -38,7 +38,7 @@
       reviewIds.value = list;
       const [userId] = list; // 获取第一个考生
       if (!userId) {
-        throw new Error('已全部阅卷完毕！');
+        throw new Error('已全部阅卷完毕！完成当前考试组所有考试阅卷后，请前往考试组管理，提交本考试组阅卷结果！');
       }
       userIdRef.value = userId;
       reviewDoneIds.value = (await getReview({ state: 3, examId, pageSize: 9999 })).data.list;
@@ -150,7 +150,11 @@
           >
             <template #title>提交成功</template>
             <div v-if="reviewIds && reviewIds.length > 0">提交成功，是否转到下一张试卷？</div>
-            <div v-else>已评阅完成所有试卷，是否返回上一级页面？</div>
+            <div v-else>
+              <span>已评阅完成所有试卷，单击确定返回上一级页面。</span>
+              <br />
+              <strong>注意：完成当前考试组所有考试阅卷后，请前往考试组管理，提交本考试组阅卷结果！</strong>
+            </div>
           </a-modal>
         </a-space>
       </template>
