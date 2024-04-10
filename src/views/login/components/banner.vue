@@ -28,23 +28,24 @@
 
 <script lang="ts" setup>
   import { computed } from 'vue';
+  import APP_TITLE from '@/assets/globalVariable';
 
   const bannerImage = '/login-banner.svg';
 
   const carouselItem = computed(() => [
     {
       slogan: '欢迎使用',
-      subSlogan: '文心大模型阅卷平台',
+      subSlogan: APP_TITLE,
       image: bannerImage,
     },
     {
       slogan: '欢迎使用',
-      subSlogan: '文心大模型阅卷平台',
+      subSlogan: APP_TITLE,
       image: bannerImage,
     },
     {
       slogan: '欢迎使用',
-      subSlogan: '文心大模型阅卷平台',
+      subSlogan: APP_TITLE,
       image: bannerImage,
     },
   ]);

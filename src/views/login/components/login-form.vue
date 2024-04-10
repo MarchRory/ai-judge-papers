@@ -1,7 +1,7 @@
 <template>
   <div class="login-form-wrapper">
-    <div class="login-form-title">登录 文心大模型阅卷平台</div>
-    <div class="login-form-sub-title">登录 文心大模型阅卷平台</div>
+    <div class="login-form-title">登录{{ APP_TITLE }}</div>
+    <div class="login-form-sub-title">登录 {{ APP_TITLE }}</div>
     <div class="login-form-error-msg">{{ errorMessage }}</div>
     <a-form
       ref="loginForm"
@@ -77,6 +77,7 @@
 
 <script lang="ts" setup>
   import { ref, reactive } from 'vue';
+  import APP_TITLE from '@/assets/globalVariable';
   import { RouteRecordRaw, useRouter } from 'vue-router';
   import { Message } from '@arco-design/web-vue';
   import { ValidatedError } from '@arco-design/web-vue/es/form/interface';

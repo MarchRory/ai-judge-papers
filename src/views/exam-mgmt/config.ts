@@ -51,7 +51,7 @@ export const examStateMap: ExamStateMap = {
     iconColor: 'orangered',
     btnText: '请等待AI阅卷结束',
     btnIcon: 'i-tabler:robot',
-    desc: '基于文心大模型',
+    desc: '基于千帆大模型',
     stepIcon: '',
   },
   [ExamStateEnum.aiDone]: {

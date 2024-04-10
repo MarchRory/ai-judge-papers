@@ -1,4 +1,4 @@
-# 基于文心大模型的智能阅卷平台
+# 易智阅AI阅卷平台
 
 ## 背景
 
@@ -172,7 +172,7 @@ const enum userAPI {
   register = `${schema}/front/register`,
   login = `${schema}/front/login`,
   getInfo = `${schema}/front/info`,
-  retrievePwd = `${schema}/front/retrieve`,
+  retrievePwd = `${schema}/front/retrieve`
 }
 /**
  * 用户登录
@@ -183,7 +183,7 @@ export function loginAPI(data: LoginParamsModel, expandConfig?: RequestExpandCon
   return request.post<LoginModel>(
     {
       url: userAPI.login,
-      data,
+      data
     },
     expandConfig
   );
