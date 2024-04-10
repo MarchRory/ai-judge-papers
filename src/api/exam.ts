@@ -26,6 +26,7 @@ const enum ExamGroupApi {
   update = `${groupSchema}/update`,
   list = `${groupSchema}/list`,
   delete = `${groupSchema}/delete`,
+  submit = `${groupSchema}/calculate`, // 提交考试组全部数据, mobile需要
 }
 
 // 试题卷试题增删
@@ -171,6 +172,10 @@ export function getGroupList(data: Paging<{ key: string; order: number }>) {
 
 export function deleteGroupApi(id: number) {
   return request.post(ExamGroupApi.delete, { id });
+}
+
+export function submitGroupResApi(groupId: number) {
+  return request.post(ExamGroupApi.submit, { id: groupId });
 }
 
 export function getProblemList(examId: number) {
