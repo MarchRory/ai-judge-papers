@@ -61,10 +61,9 @@
       <a-card>
         <header class="py-4 flex gap-4">
           <addQuestionModalButton></addQuestionModalButton>
-          <a-button>批量导入</a-button>
+          <UploadBtn @success="loadList" />
         </header>
         <a-table
-          :columns="columns"
           :data="tableData"
           stripe
           :loading="loading"
@@ -75,49 +74,80 @@
           @page-change="handlePageChange"
         >
           <template #columns>
-            <template
-              v-for="{ dataIndex, slotName } in columns"
-              :key="dataIndex"
+            <a-table-column
+              data-index="id"
+              :width="150"
+              title="标识"
+            ></a-table-column>
+            <a-table-column
+              title="科目"
+              :width="120"
             >
-              <a-table-column
-                v-if="!['$operation', 'subject'].includes(dataIndex as string)"
-                :title="slotName"
-                :data-index="dataIndex"
-              />
-              <a-table-column
-                v-else-if="dataIndex === 'subject'"
-                :title="slotName"
-              >
-                <template #cell="{ record }">
-                  {{ record.subject.title }}
-                </template>
-              </a-table-column>
-              <a-table-column
-                v-else-if="dataIndex === '$operation'"
-                :title="slotName"
-              >
-                <template #cell="{ record }">
-                  <detail-button
-                    :data="{
-                      ...record,
-                      subject: record.subject.title,
-                    }"
-                    :columns="columns"
-                  />
-                  <a-popconfirm
-                    content="确认要删除？"
-                    @ok="QuestionDelete(record)"
+              <template #cell="{ record }">
+                {{ record.subject.title }}
+              </template>
+            </a-table-column>
+            <a-table-column
+              title="题目内容"
+              :width="900"
+            >
+              <template #cell="{ record }">
+                <DisplayLatex :latex="record.title" />
+              </template>
+            </a-table-column>
+            <a-table-column
+              title="难度系数"
+              :width="120"
+            >
+              <template #cell="{ record }">
+                <a-tag
+                  color="purple"
+                  class="infoTag"
+                >
+                  <i class="i-tabler:brand-snowflake mr-1"></i>
+                  难度系数: {{ record.expectedDifficulty }}
+                </a-tag>
+              </template>
+            </a-table-column>
+            <a-table-column
+              title="来源"
+              :width="180"
+            >
+              <template #cell="{ record }">
+                <a-tag
+                  color="arcoblue"
+                  class="infoTag"
+                >
+                  <i class="i-tabler:world-search mr-1"></i>
+                  来源: {{ record.source }}
+                </a-tag>
+              </template>
+            </a-table-column>
+            <a-table-column
+              title="操作"
+              :width="150"
+            >
+              <template #cell="{ record }">
+                <detail-button
+                  :data="{
+                    ...record,
+                    subject: record.subject.title,
+                  }"
+                  :columns="columns"
+                />
+                <a-popconfirm
+                  content="确认要删除？"
+                  @ok="handleDelete(record)"
+                >
+                  <a-button
+                    type="text"
+                    status="danger"
                   >
-                    <a-button
-                      type="text"
-                      status="danger"
-                    >
-                      删除
-                    </a-button>
-                  </a-popconfirm>
-                </template>
-              </a-table-column>
-            </template>
+                    删除
+                  </a-button>
+                </a-popconfirm>
+              </template>
+            </a-table-column>
           </template>
         </a-table>
       </a-card>
@@ -127,11 +157,13 @@
 
 <script setup lang="ts">
   import { TableColumnData, Message } from '@arco-design/web-vue';
-  import { reactive, ref } from 'vue';
+  import { reactive, ref, provide } from 'vue';
   import DetailButton from '@/components/detail-button/index.vue';
   import { listQuestion, deleteQuestion, type QuestionListItem } from '@/api/question';
   import { getSubjectListAPI } from '@/api/subject';
   import useTable from '@/hooks/table/useTable';
+  import DisplayLatex from '@/components/latex/index.vue';
+  import UploadBtn from './components/uploadBtn.vue';
   import addQuestionModalButton from './components/addQuestionModalButton.vue';
 
   const form = reactive<{
@@ -151,15 +183,16 @@
     expectedDifficulty: '难度系数',
     source: '来源',
     $operation: '操作',
-  }).map(([dataIndex, title]) => ({ dataIndex, slotName: title }));
+  }).map(([dataIndex, slotName]) => ({ dataIndex, slotName }));
 
   const otherSearchParams = { key: '', subjectId: 0 };
-  const { tableData, pagination, loading, loadList, handlePageChange, handleSizeChange, page, key, subjectId } = useTable<
+  const { tableData, pagination, loading, loadList, handlePageChange, handleSizeChange, page, key, subjectId, handleDelete } = useTable<
     QuestionListItem,
     typeof otherSearchParams
   >({
     requestApi: listQuestion,
     otherSearchParams,
+    deleteApi: deleteQuestion,
   });
   const subjectOptions = ref<{ name: string; id: number | string }[]>([{ name: '全部', id: 0 }]);
 
@@ -176,17 +209,6 @@
     form.subject = '';
     form.grade = 1;
     await loadList();
-  }
-  // 删除
-  function QuestionDelete(record: QuestionListItem) {
-    const { id = 0 } = record;
-    deleteQuestion(id as number).then((res) => {
-      const { message } = res;
-      if (message === 'success') {
-        Message.success('删除成功');
-        loadList();
-      }
-    });
   }
 
   function initSelect() {
@@ -205,6 +227,7 @@
       });
   }
 
+  provide('subjectOptions', subjectOptions.value);
   // 初始化页面
   function pageInit() {
     loadList();

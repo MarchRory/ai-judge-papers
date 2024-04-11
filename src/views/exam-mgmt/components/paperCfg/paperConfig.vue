@@ -34,7 +34,6 @@
   };
   const updateDetail = () => {
     emits('onClose');
-    setVisible(false);
   };
   defineExpose({
     setUploadVisible: setVisible,

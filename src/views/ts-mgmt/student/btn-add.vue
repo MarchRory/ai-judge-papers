@@ -54,6 +54,8 @@
 
   <a-modal
     v-model:visible="modalVisible"
+    :mask-closable="false"
+    :esc-to-close="false"
     ok-text="确认添加"
     @before-ok="handleClick"
   >
@@ -114,7 +116,7 @@
           v-model="form.grade"
           :placeholder="`请输入${fieldsDescription.grade}...`"
       /></a-form-item>
-      <a-form-item
+      <!-- <a-form-item
         field="graduation"
         :tooltip="`学生${fieldsDescription.graduation}`"
         :label="fieldsDescription.graduation"
@@ -124,7 +126,7 @@
           :placeholder="`请输入${fieldsDescription.graduation}...`"
           mode="button"
         />
-      </a-form-item>
+      </a-form-item> -->
       <a-form-item
         field="state"
         :tooltip="`学生${fieldsDescription.state}`"

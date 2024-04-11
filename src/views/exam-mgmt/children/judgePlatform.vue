@@ -8,9 +8,10 @@
   import { useRoute, useRouter } from 'vue-router';
   import { useFullscreen } from '@vueuse/core';
   import { ExamListItem, getProblemList } from '@/api/exam';
+  import { Notification } from '@arco-design/web-vue';
   import { PaperDetail, getPaperDetail, getReview, reviewFulfil, submitJudgeRes } from '@/api/judge';
   import { Question } from '@/api/question';
-  import { Message } from '@arco-design/web-vue';
+  import useLoading from '@/hooks/loading';
   import SinglePaper from '../components/singlePaper.vue';
   import ActionButton from '../components/actionButton.vue';
 
@@ -22,9 +23,8 @@
 
   const el = ref<HTMLElement | null>(null);
   const { isFullscreen, toggle, exit: exitFullscreen } = useFullscreen(el);
-
   /** 需求请求多个接口，请求时展示loading */
-  const loadingDataStatus = ref('loading');
+  const loadingDataStatus = ref<'loading' | 'success' | 'error'>('loading');
   type ComposedData = PaperDetail & Question;
   const compositePaper = ref<ComposedData[]>();
   const error = ref<Error>();
@@ -39,7 +39,7 @@
       reviewIds.value = list;
       const [userId] = list; // 获取第一个考生
       if (!userId) {
-        throw new Error('已全部阅卷完毕！完成当前考试组所有考试阅卷后，请前往考试组管理，提交本考试组阅卷结果！');
+        throw new Error('已全部阅卷完毕！完成当前考试组所有考试阅卷后，请前往考试组管理，提交本考试组阅卷结果, 生成学生端数据');
       }
       userIdRef.value = userId;
       reviewDoneIds.value = (await getReview({ state: 3, examId, pageSize: 9999 })).data.list;
@@ -70,7 +70,6 @@
     } catch (e) {
       // for debug
       // eslint-disable-next-line no-console
-      console.error(e);
       error.value = e as Error;
       loadingDataStatus.value = 'error';
     }
@@ -83,18 +82,16 @@
       path: '/exam-mgmt/examDetail',
       query: route.query, // 和入口页面相同 query
     });
-    setTimeout(() => {
-      location.reload(); // eslint-disable-line
-    }, 1000);
   };
 
   const submitModalVisible = ref(false);
   const submitThis = async () => {
-    exitFullscreen(); // 退出全屏，因为modal挂载点有问题
+    // exitFullscreen(); // 退出全屏，因为modal挂载点有问题
     const ok = await reviewFulfil({ userId: userIdRef.value!, examId });
     if (ok) submitModalVisible.value = true;
     reviewIds.value = (await getReview({ state: 2, examId, pageSize: 9999 })).data.list;
   };
+  const { loading: submitLoading, setLoading: setSubmitLoading } = useLoading(false);
   const handleSubmitModal = async () => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const ids = reviewIds.value!;
@@ -103,10 +100,15 @@
       loadNextUser();
     } else {
       // 对考试的submit
+      setSubmitLoading(true);
       const res = await submitJudgeRes(examId);
       if (res.success) {
-        back();
+        Notification.success('本堂考试阅卷信息已全部提交, 即将回到详情页, 数据分析大屏已开放');
+        setTimeout(() => {
+          back();
+        }, 1500);
       }
+      setSubmitLoading(false);
     }
   };
 </script>
@@ -126,7 +128,7 @@
       <template #extra>
         <a-space>
           <a-progress
-            v-if="reviewIds && reviewDoneIds"
+            v-if="reviewIds && reviewDoneIds && loadingDataStatus === 'success'"
             class="w-full min-w-[16rem] mr-4"
             :percent="reviewDoneIds.length / (reviewIds.length + reviewDoneIds.length)"
           >
@@ -140,20 +142,26 @@
             </template>
           </a-progress>
           <a-button
+            v-if="loadingDataStatus === 'success'"
             type="primary"
             @click="toggle"
             >{{ isFullscreen ? '退出全屏' : '全屏阅卷' }}</a-button
           >
           <action-button
+            v-if="loadingDataStatus === 'success'"
             type="outline"
             @action="submitThis"
             >提交阅卷结果</action-button
           >
           <a-modal
             v-model:visible="submitModalVisible"
+            :render-to-body="false"
             popup-container="id-for-judge-container"
             width="auto"
+            :mask-closable="false"
+            :esc-to-close="false"
             :on-before-ok="handleSubmitModal"
+            :ok-loading="submitLoading"
             @cancel="submitModalVisible = false"
           >
             <template #title>提交成功</template>
@@ -161,7 +169,7 @@
             <div v-else>
               <span>已评阅完成所有试卷，单击确定返回上一级页面。</span>
               <br />
-              <strong>注意：完成当前考试组所有考试阅卷后，请前往考试组管理，提交本考试组阅卷结果！</strong>
+              <strong>注意：完成当前考试组所有考试阅卷后，请前往考试组管理，提交本考试组阅卷结果, 生成学生端数据</strong>
             </div>
           </a-modal>
         </a-space>

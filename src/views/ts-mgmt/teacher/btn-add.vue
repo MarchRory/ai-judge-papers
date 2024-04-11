@@ -52,6 +52,8 @@
 
   <a-modal
     v-model:visible="modalVisible"
+    :mask-closable="false"
+    :esc-to-close="false"
     ok-text="确认添加"
     @before-ok="handleClick"
   >

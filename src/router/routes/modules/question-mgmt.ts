@@ -5,9 +5,11 @@ const QUESTION_MGMT: AppRouteRecordRaw = {
   path: '/question-mgmt',
   name: 'question-mgmt',
   component: DEFAULT_LAYOUT, // TODO: replace me
+  redirect: '/question-mgmt/question',
   meta: {
     locale: '题库管理',
     requiresAuth: true,
+    hideChildrenInMenu: true,
     icon: 'icon-tags',
     order: 4,
     roles: ['root', 'problem'],
@@ -19,6 +21,7 @@ const QUESTION_MGMT: AppRouteRecordRaw = {
       component: () => import('@/views/question-mgmt/index.vue'),
       meta: {
         locale: '题库列表',
+        activeMenu: 'question-mgmt',
         requiresAuth: true,
         roles: ['root', 'problem'],
       },

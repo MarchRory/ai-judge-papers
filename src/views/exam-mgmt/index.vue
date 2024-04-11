@@ -84,7 +84,7 @@
           };
         });
         groupOpts.value.unshift({
-          label: '全部近期可用考试组',
+          label: '近期全部考试组',
           value: 0,
         });
       })

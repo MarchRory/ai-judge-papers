@@ -2,9 +2,11 @@
   /**
    * 此组件是一个按钮，点击后弹出模态窗
    */
-  import { ref, reactive } from 'vue';
+  import { ref, reactive, watch } from 'vue';
   import { type FileItem, Message } from '@arco-design/web-vue';
   import { uploadQuestion } from '@/api/question';
+  import useLoading from '@/hooks/loading';
+  import getXlsxSheets from '@/utils/common/xlsx';
 
   const emit = defineEmits<{
     /**
@@ -18,10 +20,12 @@
   const modalVisible = ref(false);
 
   const form = reactive<{ sheet: string }>({ sheet: '' });
+  const sheetsList = ref<string[]>([]);
+  const { loading: uploadLoading, setLoading: setUploadLoading } = useLoading(false);
   /**
    * 注意我们不使用arco自带的上传，因此只需要获得 File 对象即可
    */
-  const file = ref<FileItem>();
+  const file = ref<FileItem | null>();
 
   async function handleUpload(): Promise<boolean> {
     if (!file.value?.file) {
@@ -29,12 +33,17 @@
       return false;
     }
     try {
-      await uploadQuestion(file.value.file, form.sheet);
+      setUploadLoading(true);
+      const sendSheet = form.sheet === '全部' ? '' : form.sheet;
+      await uploadQuestion(file.value.file, sendSheet);
       Message.info('上传成功');
+      setUploadLoading(false);
       emit('success');
       return true;
     } catch {
       return false;
+    } finally {
+      setUploadLoading(false);
     }
   }
 
@@ -42,9 +51,23 @@
     file.value = undefined;
   };
 
-  const onChange = (_: unknown, currentFile: FileItem) => {
+  const onChange = async (_: unknown, currentFile: FileItem) => {
     file.value = currentFile;
+    sheetsList.value = await getXlsxSheets(currentFile.file as File);
+    sheetsList.value.unshift('全部');
   };
+
+  watch(
+    () => modalVisible.value,
+    (newVal) => {
+      if (!newVal) {
+        setTimeout(() => {
+          file.value = null;
+          form.sheet = '';
+        }, 400);
+      }
+    },
+  );
 </script>
 
 <template>
@@ -53,7 +76,10 @@
 
   <a-modal
     v-model:visible="modalVisible"
+    :mask-closable="false"
+    :esc-to-close="false"
     ok-text="确认导入"
+    :ok-loading="uploadLoading"
     @before-ok="handleUpload"
   >
     <template #title>{{ title }}</template>
@@ -64,13 +90,31 @@
     >
       <a-form-item
         field="sheet"
-        label="Sheet名称（可选）"
+        label="上传的Sheet"
         tooltip="Excel表格文件的Sheet名称"
+        :rules="[{ required: true, message: '请选择需要上传的Sheet' }]"
       >
-        <a-input
-          v-model="form.sheet"
-          placeholder="请输入..."
-        />
+        <div
+          v-if="file"
+          class="w-7/9 flex justify-start"
+        >
+          <a-tag
+            v-for="(tag, idx) in sheetsList"
+            :key="idx"
+            :checkable="form.sheet === tag"
+            :color="form.sheet === tag ? '#165dff' : 'gray'"
+            class="mr-3 cursor-pointer"
+            @click="form.sheet = tag"
+          >
+            {{ tag }}
+          </a-tag>
+        </div>
+        <div
+          v-else
+          class="text-1.2em color-gray font-800 text-center w-full"
+        >
+          文件上传后自动生成
+        </div>
       </a-form-item>
       <a-form-item
         field="file"
@@ -96,6 +140,7 @@
         <a-upload
           v-else
           list-type="text"
+          accept=".xlsx"
           :file-list="file ? [file] : []"
           :show-file-list="false"
           draggable

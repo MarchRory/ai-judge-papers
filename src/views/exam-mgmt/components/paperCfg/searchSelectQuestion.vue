@@ -175,6 +175,7 @@
               {{ idx + 1 }}
             </a-tag>
             <a-button
+              :disabled="orderList.length === hasOrder.length + 1"
               type="text"
               @click="orderList.length++"
             >

@@ -36,7 +36,7 @@
           </a-button>
         </a-tooltip>
       </li> -->
-      <li>
+      <!-- <li>
         <a-tooltip :content="theme === 'light' ? '点击切换为暗黑模式' : '点击切换为亮色模式'">
           <a-button
             class="nav-btn"
@@ -50,7 +50,7 @@
             </template>
           </a-button>
         </a-tooltip>
-      </li>
+      </li> -->
       <!-- <li>
         <a-tooltip :content="'消息通知'">
           <div class="message-box-trigger">

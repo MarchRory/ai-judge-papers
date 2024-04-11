@@ -64,7 +64,11 @@
 
   <!-- modal -->
 
-  <a-modal v-model:visible="modalVisible">
+  <a-modal
+    v-model:visible="modalVisible"
+    :mask-closable="false"
+    :esc-to-close="false"
+  >
     <template #title> {{ props.title || '详情' }} </template>
     <a-descriptions
       v-bind="props"

@@ -27,7 +27,7 @@
   const chatListContainer = ref();
   const { loading: inputLoading, setLoading: setInputLoading } = useLoading(false);
   const chatList = ref<chatListItem[]>([]);
-  const questionList = ['这场考试同学们的发挥怎样?', '同学们还有哪些需要提升的地方?'];
+  const questionList = ['这场考试同学们的发挥怎样?', '同学们还有哪些需要提升的地方?', '哪些知识点是同学们的薄弱环节?'];
   const handleChooseQuestion = (question: string) => {
     editedDom.value.innerText += question;
   };
@@ -99,7 +99,7 @@
 <template>
   <div>
     <a-popover>
-      <div class="chatEnter">
+      <div class="chatEntry">
         <icon-robot
           :size="50"
           color="white"
@@ -154,7 +154,7 @@
                         v-for="(item, index) in chatList"
                         :key="index"
                         class="chatItem"
-                        :class="[`${item.isBot ? 'botChat' : 'userChat'}`]"
+                        :class="[`${item.isBot ? 'botChat bot-enter' : 'userChat user-enter'}`]"
                       >
                         <div class="avatar">
                           <icon-robot
@@ -198,7 +198,7 @@
                   <a-spin
                     :loading="inputLoading"
                     class="w-1/1 h-1/1"
-                    tip="AI正在整理答案"
+                    tip="AI正在分析本堂考试信息, 整理回答, 请稍后....."
                   >
                     <div
                       ref="editedDom"
@@ -210,7 +210,7 @@
                       @keydown.enter="sendContent"
                     ></div>
                     <div
-                      :diabled="inputLoading"
+                      :style="{ opacity: inputLoading ? 0 : 1 }"
                       class="sendBtn"
                       @click="sendContent"
                     >
@@ -228,11 +228,11 @@
 </template>
 
 <style scoped lang="less">
-  .chatEnter {
+  .chatEntry {
     position: fixed;
     cursor: pointer;
-    bottom: 5vh;
-    right: 4vw;
+    bottom: 2.5vh;
+    right: 1.5vw;
     padding: 10px;
     border-radius: 50%;
     background-color: #9a8fe7;
@@ -249,11 +249,28 @@
     z-index: 1000; /* 保证其在顶层显示 */
     transition: all 0.4s ease; /* 添加过渡效果 */
   }
-  .glassify-fade-enter-active {
+  .fade-in-enter-active {
+    transition: opacity 0.3s ease;
     opacity: 0;
   }
+  .fade-in-leave-active {
+    transition: opacity 0.3s ease;
+    opacity: 0;
+  }
+  .glassify-fade-enter-active,
   .glassify-fade-leave-active {
     opacity: 0;
+  }
+
+  .botChat {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+  .userChat {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-start;
   }
   .mask {
     --c-rounded: 20px;
@@ -327,7 +344,6 @@
                 width: 100%;
                 height: auto;
                 margin-bottom: 20px;
-
                 .avatar {
                   padding: 10px;
                   height: min-content;
@@ -402,16 +418,20 @@
             }
             .sendBtn {
               position: absolute;
-              top: 15%;
+              opacity: 1;
+              transform: translateY(40%);
+              top: 0%;
               cursor: pointer;
-              padding: 15px;
+              padding: 8px;
               background-color: #e6e6e6;
               border-radius: 10%;
-              transition: all 0.3s ease;
+              transition:
+                color 0.3s ease,
+                backgound-color 0.3s ease;
               right: 3%;
               color: gray;
               i {
-                font-size: 2.5rem;
+                font-size: 2.3rem;
               }
               &:hover {
                 background-color: #9a8fe7;
@@ -426,15 +446,5 @@
   .editing {
     border: 3px solid rgb(120, 143, 247) !important;
     box-shadow: 0 0 0 2px rgba(219, 193, 252, 0.107);
-  }
-  .botChat {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-  }
-  .userChat {
-    display: flex;
-    flex-direction: row-reverse;
-    justify-content: flex-start;
   }
 </style>

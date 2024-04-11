@@ -6,9 +6,10 @@
   import { Question } from '@/api/question';
   import { ExamStateEnum } from '../../config';
 
-  const { examDetail, currentState } = inject('examDetail') as { examDetail: Ref<ExamListItem>; currentState: Ref<ExamStateEnum> };
+  const { examDetail } = inject('examDetail') as { examDetail: Ref<ExamListItem>; currentState: Ref<ExamStateEnum> };
   const emits = defineEmits<{
     (e: 'onOpenQuestionCfg'): void;
+    (e: 'onPaperLoad', data: { hasProblem: boolean; isUpdate: boolean }): void;
   }>();
   const { loading, setLoading } = useLoading(false);
   const problemList = ref<Question[]>([]);
@@ -20,22 +21,21 @@
         const { list, total } = res.data;
         problemList.value = list || [];
         problemTotal.value = total;
+        emits('onPaperLoad', { isUpdate: true, hasProblem: !!problemList.value.length });
       })
       .finally(() => {
         setLoading(false);
       });
   };
 
-  const now = new Date().getTime();
-
-  if (now > examDetail.value.time && examDetail.value.id) {
+  if (examDetail.value.id) {
     loadPaper();
   }
 </script>
 
 <template>
   <div class="w-full relative">
-    <a-result
+    <!-- <a-result
       v-if="now < examDetail.time"
       class="abs-center"
       status="warning"
@@ -51,11 +51,8 @@
           >
         </a-space>
       </template>
-    </a-result>
-    <div
-      v-else
-      class="h-4xl overflow-auto"
-    >
+    </a-result> -->
+    <div class="h-4xl overflow-auto">
       <a-list
         :data="problemList"
         :bordered="false"

@@ -16,6 +16,9 @@
     requestApi: getUserListAPI,
     otherSearchParams,
   });
+
+  const defaultAvatar = 'https://img0.baidu.com/it/u=1356523179,1772235027&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500';
+
   const formType = ref<'create' | 'edit'>('create');
   const isFormOpen = ref(false);
   const formRef = ref();
@@ -212,7 +215,7 @@
                   <a-avatar>
                     <img
                       alt="avatar"
-                      :src="record.avatar"
+                      :src="record.avatar || defaultAvatar"
                     />
                   </a-avatar>
                 </template>
@@ -271,6 +274,7 @@
       v-model:visible="isFormOpen"
       :title="`${formType === 'create' ? '创建' : '更新'}用户`"
       :mask-closable="false"
+      :esc-to-close="false"
       :ok-loading="okLoading"
       @ok="handleSubmit"
     >

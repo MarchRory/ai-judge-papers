@@ -64,7 +64,7 @@
 
 <script lang="ts" setup>
   import { PropType, computed } from 'vue';
-  import { useRouter, useRoute } from 'vue-router';
+  import { useRouter, useRoute, onBeforeRouteLeave, RouteRecordName } from 'vue-router';
   import { useTabBarStore } from '@/store';
   import type { TagProps } from '@/store/modules/tab-bar/types';
   import { DEFAULT_ROUTE_NAME, REDIRECT_ROUTE_NAME } from '@/router/constants';
@@ -99,6 +99,7 @@
   const goto = (tag: TagProps) => {
     router.push({ ...tag });
   };
+
   const tagList = computed(() => {
     return tabBarStore.getTabList;
   });

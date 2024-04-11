@@ -12,6 +12,8 @@
   <a-modal
     v-model:visible="visible"
     title="添加班级"
+    :mask-closable="false"
+    :esc-to-close="false"
     @cancel="handleCancel"
     @ok="handleOk"
   >

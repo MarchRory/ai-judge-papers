@@ -8,13 +8,13 @@
   import dayjs from 'dayjs';
   import { CancellationToken, createCancellationToken, usePolling } from '@/utils/common/polling';
   import { examStateMap, ExamStateEnum, StuPaperStateEnum } from '../config';
-  import StudentComposition from '../components/studentComposition.vue';
+  import PapaerConfig from '../components/paperCfg/paperConfig.vue';
+  // import StudentComposition from '../components/studentComposition.vue';
+  import WordCloudTab from '../components/detailTab/wordCloudTab.vue';
 
   type PaperCfgType = 'questionPaper' | 'answerPaper';
-  const PapaerConfig = defineAsyncComponent(() => import('../components/paperCfg/paperConfig.vue'));
   const PaperListTab = defineAsyncComponent(() => import('../components/detailTab/detailPaperListTab.vue'));
   const StuListTab = defineAsyncComponent(() => import('../components/detailTab/detatilStuListTab.vue'));
-  const WordCloudTab = defineAsyncComponent(() => import('../components/detailTab/wordCloudTab.vue'));
   const ChatBot = defineAsyncComponent(() => import('@/components/chatBot/index.vue'));
 
   const route = useRoute();
@@ -56,8 +56,7 @@
           Message.success('AI判卷已启动, 请耐心等待');
           getExamDetail();
         } else {
-          const { message } = res;
-          Message.warning(message);
+          Notification.error('AI运行环境异常, 请稍后重试');
         }
       })
       .finally(() => {
@@ -214,9 +213,8 @@
   // 主体tab页逻辑
   const chosenTabKey = ref(0);
   const tabs = [
-    { key: 0, title: '试题卷', allowState: ExamStateEnum.default },
+    { key: 0, title: '试题预览', allowState: ExamStateEnum.default },
     { key: 1, title: '作答情况', allowState: ExamStateEnum.aiJudging },
-    { key: 2, title: '词云分析', allowState: ExamStateEnum.aiDone },
   ];
   const classId = ref(0);
   const className = ref('');
@@ -225,6 +223,17 @@
     classId.value = newClassId;
     className.value = newClassName;
     stuList.value = newStuList;
+  };
+
+  const paperLoadState = ref({
+    hasProblem: false,
+    isUpdate: false,
+  });
+  const setPaperLoadState = (data: typeof paperLoadState.value) => {
+    paperLoadState.value = data;
+  };
+  const setPaperUpdateState = (state: boolean) => {
+    paperLoadState.value.isUpdate = state;
   };
 
   const submitExam = () => {
@@ -418,6 +427,7 @@
                     >
                       <a-button
                         class="ml-2"
+                        type="primary"
                         status="success"
                       >
                         启动AI阅卷
@@ -470,6 +480,7 @@
                 <div class="min-h-4xl h-auto">
                   <PaperListTab
                     v-if="chosenTabKey === 0"
+                    @on-paper-load="setPaperLoadState"
                     @on-open-question-cfg="openUploader('questionPaper')"
                   />
                   <StuListTab
@@ -477,15 +488,18 @@
                     @on-open-paper-cfg="openUploader('answerPaper')"
                     @to-judge="jumpToJudge"
                     @on-class-change="handleClassIdChange"
+                    @on-begin-judge="beginAIJudge"
                   />
-                  <WordCloudTab v-else-if="chosenTabKey === 2" />
                 </div>
               </a-tab-pane>
             </a-tabs>
           </a-card>
-          <a-card class="w-7/17 rounded-3 shadow-lg h-60rem">
-            <br />
-            <StudentComposition :exam-id="+query.id" />
+          <a-card class="w-7/17 rounded-3 shadow-lg h-50rem">
+            <!-- <StudentComposition :exam-id="+query.id" /> -->
+            <WordCloudTab
+              :paper-load-state="paperLoadState"
+              @on-redraw="setPaperUpdateState(false)"
+            />
           </a-card>
         </a-layout-content>
       </a-layout>

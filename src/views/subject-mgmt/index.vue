@@ -170,7 +170,10 @@
                 data-index="description"
               ></a-table-column>
 
-              <a-table-column title="操作">
+              <a-table-column
+                v-if="false"
+                title="操作"
+              >
                 <template #cell="{ record }">
                   <a-button
                     m="r-2"
@@ -206,6 +209,7 @@
       v-model:visible="isFormOpen"
       :title="`${formType === 'create' ? '创建' : '更新'}学科`"
       :mask-closable="false"
+      :esc-to-close="false"
       :ok-loading="okLoading"
       @ok="handleSubmit"
     >
