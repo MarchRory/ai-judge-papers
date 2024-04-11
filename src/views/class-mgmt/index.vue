@@ -85,7 +85,7 @@
       <a-card>
         <header class="py-4 flex gap-4">
           <addClassModalButton></addClassModalButton>
-          <importBtn></importBtn>
+          <importBtn @success="loadList"></importBtn>
         </header>
         <a-table
           :columns="columns"
@@ -158,7 +158,7 @@
   }>({
     state: '',
     graduation: '',
-    grade: '2021',
+    grade: '',
     name: '',
   });
 

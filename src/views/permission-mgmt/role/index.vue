@@ -257,6 +257,7 @@
       v-model:visible="isFormOpen"
       :title="`${formType === 'create' ? '创建' : '更新'}角色`"
       :mask-closable="false"
+      :esc-to-close="false"
       :ok-loading="okLoading"
       @ok="handleSubmit"
     >
@@ -306,6 +307,7 @@
 
     <a-modal
       v-model:visible="detailAuthVisible"
+      :esc-to-close="false"
       :mask-closable="false"
       :title="`${deatailAuthModalInfo.roleName}角色权限`"
       hide-cancel

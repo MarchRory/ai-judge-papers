@@ -3,13 +3,19 @@
   import useLoading from '@/hooks/loading';
   import * as echarts from 'echarts';
   import 'echarts-wordcloud';
-  import { ref, nextTick, inject, onMounted, onUnmounted, type Ref } from 'vue';
+  import { ref, watch, inject, onMounted, onUnmounted, type Ref } from 'vue';
   import { ExamListItem } from '@/api/exam';
   import { EChartsType } from 'echarts';
   import { Message } from '@arco-design/web-vue';
   import { ExamStateEnum } from '../../config';
   import { wordCloudBase64Img } from './base64';
 
+  const props = defineProps<{
+    paperLoadState: { hasProblem: boolean; isUpdate: boolean };
+  }>();
+  const emits = defineEmits<{
+    (e: 'onRedraw'): void;
+  }>();
   const { examDetail, currentState } = inject('examDetail') as { examDetail: Ref<ExamListItem>; currentState: Ref<ExamStateEnum> };
   const { loading: chartLoading, setLoading: setChartLoading } = useLoading(false);
   const opts = ref({} as any);
@@ -26,7 +32,7 @@
         {
           type: 'wordCloud',
           gridSize: 15,
-          sizeRange: [30, 100],
+          sizeRange: [25, 100],
           rotationRange: [0, 30],
           layoutAnimation: true,
           emphasis: {
@@ -44,7 +50,7 @@
             },
           },
           width: '100%',
-          height: '100%',
+          height: '95%',
           // maskImage, base64加进去会渲染不出来, 没看懂, cv的vue2那个项目里的base64，那个里面就没问题
           data,
         },
@@ -56,18 +62,18 @@
 
   const drawChart = (data: any) => {
     const chart = echarts.getInstanceByDom(wordCloud.value as HTMLDivElement);
-    if (!chart) {
+    if (!chart || !wordCloudChart.value) {
       wordCloudChart.value = echarts.init(wordCloud.value as HTMLDivElement);
-      opts.value = getWordCloudOpts(data);
-      wordCloudChart.value.setOption(opts.value);
     }
+    opts.value = getWordCloudOpts(data);
+    wordCloudChart.value.setOption(opts.value);
   };
 
   const init = () => {
     setChartLoading(false);
-    getWordCloudApi(23, 1) // 目前只有 23 有词云数据
+    getWordCloudApi(+examDetail.value.id, 1) // 目前只有 23 有词云数据
       .then((res) => {
-        const { list = [] } = res.data;
+        const list = res.data.list ?? [];
         const data = list.map((item) => {
           return {
             name: item.word,
@@ -87,6 +93,16 @@
         setChartLoading(false);
       });
   };
+
+  watch(
+    () => props.paperLoadState.isUpdate,
+    (newVal) => {
+      if (newVal) {
+        init();
+        emits('onRedraw');
+      }
+    },
+  );
   onMounted(() => {
     init();
   });
@@ -99,12 +115,12 @@
 <template>
   <div>
     <a-result
-      v-if="currentState !== ExamStateEnum.complete"
+      v-if="currentState === ExamStateEnum.beforeStart && !props.paperLoadState.hasProblem"
       class="abs-center"
       status="warning"
       title="提示"
     >
-      <template #subtitle> 提交全部阅卷结果后, 可查看本场考试词云 </template>
+      <template #subtitle> 配置试题卷后, 可查看本场考试知识点词云 </template>
     </a-result>
     <div
       v-else
@@ -115,6 +131,7 @@
         :loading="chartLoading"
         tip="词云加载中"
       >
+        <h1 class="text-center">知识点词云</h1>
         <div
           ref="wordCloud"
           class="wh-full"

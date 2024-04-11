@@ -4,8 +4,8 @@
    */
 
   import { ref, inject, onMounted, onUnmounted } from 'vue';
+  import { Notification } from '@arco-design/web-vue';
   import { Emitter } from 'mitt';
-  import { Message } from '@arco-design/web-vue';
   import { useIntersectionObserver } from '@vueuse/core';
   import { PaperDetail, updateJudge } from '@/api/judge';
   import { Question } from '@/api/question';
@@ -55,11 +55,11 @@
   const handleModifyResult = async () => {
     const res = await updateJudge({ id: question.id, result: modifiedResult.value });
     if (res.success) {
-      Message.success('修改成功');
+      Notification.success('试题得分修改成功');
       question.result = modifiedResult.value;
       question.checked = true; // 已修改过
     } else {
-      Message.error('修改失败');
+      Notification.error('试题得分修改失败');
     }
   };
   const handleModifyScore = async () => {

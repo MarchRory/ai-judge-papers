@@ -9,6 +9,7 @@
 
   const { examDetail, currentState } = inject('examDetail') as { examDetail: Ref<ExamListItem>; currentState: Ref<ExamStateEnum> };
   const emits = defineEmits<{
+    (e: 'onBeginJudge'): void;
     (e: 'onOpenPaperCfg'): void;
     (e: 'toJudge'): void;
     (e: 'onClassChange', classId: number, className: string, newStuList: StuScoreItem[]): void;
@@ -89,7 +90,7 @@
       title="提示"
     >
       <template #subtitle>
-        {{ currentState < ExamStateEnum.aiJudging ? '请完成考生答卷录入, 以及试卷评阅后, 再进行查看' : '请提交全部阅卷结果后查看' }}
+        {{ currentState < ExamStateEnum.aiJudging ? '请完成考生答卷录入, 以及试卷评阅后, 再进行查看' : '阅卷中, 暂未生成结果' }}
       </template>
       <template #extra>
         <a-space>
@@ -107,6 +108,25 @@
           >
             去复审
           </a-button>
+
+          <a-popconfirm
+            v-if="currentState === ExamStateEnum.default && examDetail.number"
+            content="启动AI阅卷后, 将开启大模型自动阅卷模式, 本堂考试将无法继续上传学生答题卡, 在此之前, 请确认答题卡上传完毕"
+            type="warning"
+            ok-text="确认启动"
+            @ok="emits('onBeginJudge')"
+          >
+            <a-button
+              class="ml-3"
+              type="primary"
+              status="success"
+            >
+              启动AI阅卷
+              <template #icon>
+                <icon-robot />
+              </template>
+            </a-button>
+          </a-popconfirm>
         </a-space>
       </template>
     </a-result>

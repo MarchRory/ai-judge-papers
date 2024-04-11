@@ -55,6 +55,8 @@
 
   onMounted(loadData);
 
+  // @ts-ignore
+  delete fieldsDescription.state;
   const columns: TableColumnData[] = Object.entries({
     ...fieldsDescription,
     $operation: '操作', // virtual
@@ -240,7 +242,7 @@
     <a-layout-content class="px-4">
       <a-card>
         <header class="py-4 flex gap-4">
-          <button-add @success="loadData" />
+          <!-- <button-add @success="loadData" /> -->
           <button-import @success="loadData" />
         </header>
         <a-table

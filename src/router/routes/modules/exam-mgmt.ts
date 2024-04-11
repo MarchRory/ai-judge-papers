@@ -11,7 +11,7 @@ const EXAM_MGMT: AppRouteRecordRaw = {
     requiresAuth: true,
     hideChildrenInMenu: true,
     roles: ['root', 'exam'],
-    icon: 'icon-subscribed', // TODO: replace me
+    icon: 'icon-subscribed',
     order: 5,
   },
   children: [

@@ -15,14 +15,12 @@
   }>();
   const now = new Date().getTime();
   const otherSearchParams = { key: '', order: 1 };
-  const { key, order, tableData, page, loading, pagination, loadList, handlePageChange, handleSizeChange, handleDelete } = useTable<
-    Group,
-    typeof otherSearchParams
-  >({
-    requestApi: getGroupList,
-    deleteApi: deleteGroupApi,
-    otherSearchParams,
-  });
+  const { key, order, tableData, page, loading, pagination, loadList, handlePageChange, handleSizeChange, handleDelete, setLoading } =
+    useTable<Group, typeof otherSearchParams>({
+      requestApi: getGroupList,
+      deleteApi: deleteGroupApi,
+      otherSearchParams,
+    });
   const formCfg = ref({
     visible: false,
     formType: 'create' as FormType,
@@ -46,13 +44,18 @@
   };
 
   const submitGroupRes = (groupId: number, groupName: string) => {
-    submitGroupResApi(groupId).then((res) => {
-      const { success } = res;
-      if (success) {
-        Message.success(`考试组 ${groupName} 阅卷信息提交成功`);
-        loadList();
-      }
-    });
+    setLoading(true);
+    submitGroupResApi(groupId)
+      .then((res) => {
+        const { success } = res;
+        if (success) {
+          Message.success(`考试组 ${groupName} 阅卷信息提交成功`);
+          loadList();
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const setupComp = () => {

@@ -20,7 +20,10 @@
         </a-grid-item>
       </a-grid>
     </div>
-    <div class="right-side">
+    <div
+      v-if="false"
+      class="right-side"
+    >
       <a-grid
         :cols="24"
         :row-gap="16"

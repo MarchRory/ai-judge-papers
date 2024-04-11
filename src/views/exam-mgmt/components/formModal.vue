@@ -96,14 +96,17 @@
   const submit = () => {
     submitLoading.value = true;
     const submitFn = props.create === 'create' ? createExamApi : updateExamApi;
-    const timeLimit = (formInfo.value.time as number) + (formInfo.value.examTimeLength as number) * 60 * 1000;
-    formInfo.value.timeLimit = timeLimit;
+    const end = (formInfo.value.time as number) + (formInfo.value.examTimeLength as number) * 60 * 1000;
+    const timeLimit = new Date(end);
+    timeLimit.setSeconds(0);
+    timeLimit.setMilliseconds(0);
+    // 结束时间精确到分钟
+    formInfo.value.timeLimit = timeLimit.getTime();
     // formInfo.value.subject = formInfo.value.subjectId;
     const originSubject = formInfo.value.subject;
     if (props.create === 'edit' && Number.isNaN(+(originSubject as unknown as string))) {
       const subjectId = subjectList.value.find((subject) => subject.label === formInfo.value.subject)?.value;
       formInfo.value.subject = +(subjectId as string);
-      console.log(formInfo.value.subject, subjectId);
     }
     delete formInfo.value.subjectId;
     delete formInfo.value.examTimeLength;
@@ -137,6 +140,7 @@
     :visible="props.visible"
     :title="`${create === 'create' ? '创建' : '更新'}考试`"
     :mask-closable="false"
+    :esc-to-close="false"
     :ok-loading="okLoading"
     :footer="false"
     @cancel="emits('onCancel')"
