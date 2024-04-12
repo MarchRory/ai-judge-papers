@@ -88,6 +88,7 @@
           <importBtn @success="loadList"></importBtn>
         </header>
         <a-table
+          class="h-4xl"
           :columns="columns"
           :data="tableData"
           stripe

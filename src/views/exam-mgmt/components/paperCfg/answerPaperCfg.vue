@@ -113,6 +113,7 @@
     </a-card>
     <a-table
       :data="tableData"
+      class="h-4xl"
       :loading="listLoding"
       page-position="br"
       :pagination="pagination"

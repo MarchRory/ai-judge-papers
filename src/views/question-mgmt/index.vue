@@ -64,6 +64,7 @@
           <UploadBtn @success="loadList" />
         </header>
         <a-table
+          class="h-4xl"
           :data="tableData"
           stripe
           :loading="loading"
@@ -85,6 +86,16 @@
             >
               <template #cell="{ record }">
                 {{ record.subject.title }}
+              </template>
+            </a-table-column>
+            <a-table-column
+              title="类别"
+              :width="120"
+            >
+              <template #cell="{ record }: { record: QuestionListItem }">
+                <a-tag :color="QuestionTypeConfigMap[record.type].tagColor">
+                  {{ QuestionTypeConfigMap[record.type].label }}
+                </a-tag>
               </template>
             </a-table-column>
             <a-table-column
@@ -128,13 +139,11 @@
               :width="150"
             >
               <template #cell="{ record }">
-                <detail-button
-                  :data="{
-                    ...record,
-                    subject: record.subject.title,
-                  }"
-                  :columns="columns"
-                />
+                <a-button
+                  type="text"
+                  @click="jumpToDeatil(record)"
+                  >详情信息</a-button
+                >
                 <a-popconfirm
                   content="确认要删除？"
                   @ok="handleDelete(record)"
@@ -156,15 +165,16 @@
 </template>
 
 <script setup lang="ts">
-  import { TableColumnData, Message } from '@arco-design/web-vue';
+  import { Message } from '@arco-design/web-vue';
   import { reactive, ref, provide } from 'vue';
-  import DetailButton from '@/components/detail-button/index.vue';
   import { listQuestion, deleteQuestion, type QuestionListItem } from '@/api/question';
   import { getSubjectListAPI } from '@/api/subject';
   import useTable from '@/hooks/table/useTable';
   import DisplayLatex from '@/components/latex/index.vue';
+  import { useRouter } from 'vue-router';
   import UploadBtn from './components/uploadBtn.vue';
   import addQuestionModalButton from './components/addQuestionModalButton.vue';
+  import { QuestionTypeConfigMap } from './config';
 
   const form = reactive<{
     subject: string;
@@ -175,15 +185,6 @@
     title: '',
     grade: 1,
   });
-
-  const columns: TableColumnData[] = Object.entries({
-    id: '标识',
-    subject: '学科',
-    title: '题目',
-    expectedDifficulty: '难度系数',
-    source: '来源',
-    $operation: '操作',
-  }).map(([dataIndex, slotName]) => ({ dataIndex, slotName }));
 
   const otherSearchParams = { key: '', subjectId: 0 };
   const { tableData, pagination, loading, loadList, handlePageChange, handleSizeChange, page, key, subjectId, handleDelete } = useTable<
@@ -226,6 +227,15 @@
         Message.error('学科信息获取失败, 请刷新页面重试');
       });
   }
+
+  const router = useRouter();
+  const jumpToDeatil = (data: QuestionListItem) => {
+    const { id, expectedDifficulty, source, type } = data;
+    router.push({
+      path: '/question-mgmt/questionAnswer',
+      query: { id, expectedDifficulty, source, type },
+    });
+  };
 
   provide('subjectOptions', subjectOptions.value);
   // 初始化页面
