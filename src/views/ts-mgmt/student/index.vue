@@ -53,6 +53,8 @@
   // @ts-ignore
   delete fieldsDescription.graduation;
   // @ts-ignore
+  delete fieldsDescription.grade;
+  // @ts-ignore
   delete fieldsDescription.state;
   const columns: TableColumnData[] = Object.entries({
     ...fieldsDescription,
@@ -165,7 +167,7 @@
               </a-col>
             </a-row>
             <a-row :gutter="16">
-              <a-col :span="8">
+              <!-- <a-col :span="8">
                 <a-form-item
                   field="grade"
                   label="年级"
@@ -176,7 +178,7 @@
                     placeholder="请输入年级"
                   />
                 </a-form-item>
-              </a-col>
+              </a-col> -->
               <a-col :span="8">
                 <a-form-item
                   field="class"
@@ -189,7 +191,7 @@
                   />
                 </a-form-item>
               </a-col>
-              <a-col :span="8">
+              <!-- <a-col :span="8">
                 <a-form-item
                   field="state"
                   label="账号启用"
@@ -204,7 +206,7 @@
                     <a-option :value="1">启用</a-option>
                   </a-select>
                 </a-form-item>
-              </a-col>
+              </a-col> -->
             </a-row>
           </a-form>
 

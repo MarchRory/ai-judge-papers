@@ -21,36 +21,26 @@
 
 <script lang="ts" setup>
   import useLoading from '@/hooks/loading';
-  import useChartOption from '@/hooks/chart-option';
+  import { SubjectDistriItem, getExamDistri } from '@/api/dashboard';
+  import { ref } from 'vue';
+  import { getSpecificValueArr } from '@/utils/arrayHelper';
+  import { SubjectItem } from '@/api/subject';
 
-  const props = withDefaults(
-    // TODO: 删除 withDefaults，仅测试
-    // 亦可直接请求数据
-    defineProps<{
-      data: Record<string, number>;
-    }>(),
-    {
-      data: () => ({
-        语文: 123,
-        数学: 456,
-        英语: 789,
-      }),
-    },
-  );
+  const { loading, setLoading } = useLoading();
+  const chartOption = ref({});
+  const getOpt = (data: SubjectDistriItem[]) => {
+    const label: string[] = getSpecificValueArr(data, 'subjectName');
+    const values: number[] = getSpecificValueArr(data, 'count');
 
-  const { loading } = useLoading();
-  const { chartOption } = useChartOption((isDark) => {
-    // echarts support https://echarts.apache.org/zh/theme-builder.html
-    // It's not used here
     return {
       legend: {
         left: 'center',
-        data: Object.keys(props.data),
+        data: label,
         bottom: 0,
         icon: 'circle',
         itemWidth: 8,
         textStyle: {
-          color: isDark ? 'rgba(255, 255, 255, 0.7)' : '#4E5969',
+          color: '#4E5969',
         },
         itemStyle: {
           borderWidth: 0,
@@ -69,7 +59,7 @@
             style: {
               text: '考试场次',
               textAlign: 'center',
-              fill: isDark ? '#ffffffb3' : '#4E5969',
+              fill: '#4E5969',
               fontSize: 14,
             },
           },
@@ -79,9 +69,9 @@
             top: '50%',
             style: {
               // 此处计算总考试场次
-              text: Object.values(props.data).reduce((acc, cur) => acc + cur, 0),
+              text: Object.values(values).reduce((acc, cur) => acc + cur, 0),
               textAlign: 'center',
-              fill: isDark ? '#ffffffb3' : '#1D2129',
+              fill: '#1D2129',
               fontSize: 16,
               fontWeight: 500,
             },
@@ -96,20 +86,38 @@
           label: {
             formatter: '{d}%',
             fontSize: 14,
-            color: isDark ? 'rgba(255, 255, 255, 0.7)' : '#4E5969',
+            color: '#4E5969',
           },
           itemStyle: {
-            borderColor: isDark ? '#232324' : '#fff',
+            borderColor: '#fff',
             borderWidth: 1,
           },
-          data: Object.entries(props.data).map(([name, count]) => ({
-            name,
-            value: [count],
-          })),
+          data: data.map((item) => {
+            return {
+              name: item.subjectName,
+              value: item.count,
+            };
+          }),
         },
       ],
     };
-  });
+  };
+
+  const initData = () => {
+    setLoading(true);
+    getExamDistri()
+      .then(({ success, data }) => {
+        if (success) {
+          const opt = getOpt(data.list);
+          chartOption.value = opt;
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  initData();
 </script>
 
 <style scoped lang="less"></style>

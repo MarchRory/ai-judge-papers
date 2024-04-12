@@ -6,7 +6,7 @@
     :body-style="{ padding: '15px 20px 13px 20px' }"
   >
     <template #extra>
-      <a-link>查看更多</a-link>
+      <a-link @click="$router.push({ name: 'exam-mgmt' })">查看更多</a-link>
     </template>
     <div>
       <div
@@ -17,8 +17,9 @@
         <a-tag
           :color="item.type"
           size="small"
-          >{{ item.label }}</a-tag
         >
+          {{ item.label }}
+        </a-tag>
         <span class="item-content">
           {{ item.content }}
         </span>

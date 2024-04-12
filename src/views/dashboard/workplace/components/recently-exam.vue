@@ -10,7 +10,7 @@
     >
       <template #title> 近期考试 </template>
       <template #extra>
-        <a-link>查看更多</a-link>
+        <a-link @click="$router.push({ name: 'exam-mgmt' })">查看更多</a-link>
       </template>
       <a-space
         direction="vertical"
@@ -56,21 +56,25 @@
               </template>
             </a-table-column>
             <a-table-column
-              title="说明"
-              data-index="description"
-              :sortable="{
-                sortDirections: ['ascend', 'descend'],
-              }"
+              title="状态"
+              data-index="state"
+              :width="120"
             >
-              <!--              <template #cell="{ record }">-->
-              <!--                <div class="increases-cell">-->
-              <!--                  <span>{{ record.increases }}%</span>-->
-              <!--                  <icon-caret-up-->
-              <!--                    v-if="record.increases !== 0"-->
-              <!--                    style="color: #f53f3f; font-size: 8px"-->
-              <!--                  />-->
-              <!--                </div>-->
-              <!--              </template>-->
+              <template #cell="{ record }">
+                <a-tag
+                  :color="
+                    now <= record.timeLimit ? examStateMap[ExamStateEnum.beforeStart].iconColor : examStateMap[+record.state].iconColor
+                  "
+                >
+                  <i
+                    class="mr-2"
+                    :class="
+                      now <= record.timeLimit ? examStateMap[ExamStateEnum.beforeStart].stepIcon : examStateMap[+record.state].stepIcon
+                    "
+                  ></i>
+                  {{ now <= record.timeLimit ? examStateMap[ExamStateEnum.beforeStart].text : examStateMap[+record.state].text }}
+                </a-tag>
+              </template>
             </a-table-column>
           </template>
         </a-table>
@@ -80,20 +84,23 @@
 </template>
 
 <script lang="ts" setup>
-  import { getExamListApi } from '@/api/exam';
+  import { ExamListItem, getExamListApi } from '@/api/exam';
   import useLoading from '@/hooks/loading';
   import type { TableData } from '@arco-design/web-vue/es/table/interface';
   import dayjs from 'dayjs';
   import { ref } from 'vue';
+  import { ExamStateEnum, examStateMap } from '@/views/exam-mgmt/config';
 
-  const type = ref(1);
+  const type = ref(2);
+  const now = ref(new Date().getTime());
   const { loading, setLoading } = useLoading();
   const renderList = ref<TableData[]>();
   const fetchData = async (contentType: number) => {
     try {
       setLoading(true);
-      const { data } = await getExamListApi({ page: 1, pageSize: 5, subjectId: contentType });
+      const { data } = await getExamListApi({ page: 1, pageSize: 5, subjectId: contentType, state: ExamStateEnum.aiJudging });
       renderList.value = data.list;
+      now.value = new Date().getTime();
     } catch (err) {
       // you can report use errorHandler or other
     } finally {

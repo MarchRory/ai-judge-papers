@@ -5,6 +5,7 @@
   import useTable from '@/hooks/table/useTable';
   import { deleteExamApi, getExamListApi, getGroupList } from '@/api/exam';
   import type { ExamFormData, ExamListItem } from '@/api/exam';
+  import { getSubjectListAPI } from '@/api/subject';
   import { ExamStateEnum, examStateMap } from './config';
 
   /* 考试table crud */
@@ -12,8 +13,8 @@
   const ExamGroup = defineAsyncComponent(() => import('./components/ExamGroup.vue'));
   const now = new Date().getTime();
   const router = useRouter();
-  const otherSearchParams = { key: '', groupId: 0 };
-  const { key, loading, page, groupId, tableData, pagination, loadList, handleSizeChange, handlePageChange } = useTable<
+  const otherSearchParams = { key: '', groupId: 0, subjectId: 0, state: ExamStateEnum.default };
+  const { key, groupId, subjectId, state, loading, page, tableData, pagination, loadList, handleSizeChange, handlePageChange } = useTable<
     ExamListItem,
     typeof otherSearchParams
   >({
@@ -21,10 +22,30 @@
     otherSearchParams,
   });
 
+  const subjectOptions = ref<{ name: string; id: number | string }[]>([{ name: '全部', id: 0 }]);
+
+  function initSelect() {
+    getSubjectListAPI({ page: 1, pageSize: 100, key: '' }, { cache: true })
+      .then((res) => {
+        const { list } = res.data;
+        list.forEach((item) => {
+          subjectOptions.value.push({
+            id: item.id as number,
+            name: item.name,
+          });
+        });
+      })
+      .catch(() => {
+        Message.error('学科信息获取失败, 请刷新页面重试');
+      });
+  }
+
   function reset() {
     key.value = '';
     page.value = 1;
     groupId.value = 0;
+    subjectId.value = 0;
+    state.value = 0;
     loadList();
   }
   const isFormOpen = ref(false);
@@ -111,6 +132,7 @@
   );
   /* 考试组 逻辑 */
   const initPage = () => {
+    initSelect();
     initGroupSelectData();
     loadList();
   };
@@ -120,30 +142,124 @@
 
 <template>
   <div>
-    <a-layout h="5xl">
+    <a-layout h="full">
       <a-layout-header>
         <a-card>
           <header class="pt-4 pb-8">
             <strong class="text-2xl"> 考试管理 </strong>
           </header>
-          <section
-            w="full"
-            p="x-4"
-            flex="~ justify-between items-center"
-          >
-            <div
-              w="max"
-              flex="~"
-            >
-              <a-input-search
-                v-model="key"
-                allow-clear
-                placeholder="输入关键字查找考试"
-                search-button
-                @search="loadList"
-              />
+          <div class="grid grid-cols-[1fr_auto]">
+            <a-form :model="form">
+              <a-row :gutter="16">
+                <a-col :span="8">
+                  <a-form-item
+                    field="groupId"
+                    label="考试组"
+                    label-col-flex="60px"
+                  >
+                    <a-select
+                      v-model:model-value="groupId"
+                      m="l-10"
+                      :options="groupOpts"
+                      allow-search
+                      placeholder="输入关键词搜索"
+                    >
+                      <template #label="{ data }">
+                        <span>{{ data.label }}</span>
+                      </template>
+                    </a-select>
+                  </a-form-item>
+                </a-col>
+                <a-col :span="8">
+                  <a-form-item
+                    field="title"
+                    label="考试名称"
+                  >
+                    <a-input
+                      v-model="form.title"
+                      placeholder="考试名称查询"
+                    ></a-input>
+                  </a-form-item>
+                </a-col>
+                <a-col :span="8">
+                  <a-form-item
+                    filed="subject"
+                    label="学科"
+                    label-col-flex="32px"
+                  >
+                    <a-select
+                      v-model="subjectId"
+                      :options="subjectOptions"
+                      :field-names="{ label: 'name', value: 'id' }"
+                    />
+                  </a-form-item>
+                </a-col>
+              </a-row>
+              <a-row :gutter="16">
+                <a-col :span="8">
+                  <a-form-item
+                    filed="state"
+                    label="考试状态"
+                    label-col-flex="64px"
+                  >
+                    <a-select v-model:model-value="state">
+                      <a-option :value="0">全部</a-option>
+                      <!-- <a-option :value="1">
+                        <a-tag>数据录入</a-tag>
+                      </a-option> -->
+                      <a-option :value="ExamStateEnum.aiJudging">
+                        <a-tag :color="examStateMap[ExamStateEnum.aiJudging].iconColor"
+                          ><i
+                            class="mr-2"
+                            :class="examStateMap[ExamStateEnum.aiJudging].stepIcon"
+                          ></i
+                          >{{ examStateMap[ExamStateEnum.aiJudging].text }}</a-tag
+                        >
+                      </a-option>
+                      <a-option :value="ExamStateEnum.aiDone">
+                        <a-tag :color="examStateMap[ExamStateEnum.aiDone].iconColor"
+                          ><i
+                            class="mr-2"
+                            :class="examStateMap[ExamStateEnum.aiDone].stepIcon"
+                          ></i
+                          >{{ examStateMap[ExamStateEnum.aiDone].text }}</a-tag
+                        >
+                      </a-option>
+                      <a-option :value="ExamStateEnum.checking">
+                        <a-tag :color="examStateMap[ExamStateEnum.checking].iconColor"
+                          ><i
+                            class="mr-2"
+                            :class="examStateMap[ExamStateEnum.checking].stepIcon"
+                          ></i
+                          >{{ examStateMap[ExamStateEnum.checking].text }}</a-tag
+                        >
+                      </a-option>
+                      <a-option :value="ExamStateEnum.complete">
+                        <a-tag :color="examStateMap[ExamStateEnum.complete].iconColor"
+                          ><i
+                            class="mr-2"
+                            :class="examStateMap[ExamStateEnum.complete].stepIcon"
+                          ></i
+                          >{{ examStateMap[ExamStateEnum.complete].text }}</a-tag
+                        >
+                      </a-option>
+                    </a-select>
+                  </a-form-item>
+                </a-col>
+              </a-row>
+            </a-form>
+            <a-side class="pl-8 ml-8 mb-[20px] flex flex-col justify-between border-l border-l-solid border-[#E5E6EB]">
               <a-button
-                m="l-2"
+                type="primary"
+                @click="loadList"
+              >
+                <template #icon>
+                  <icon-search />
+                </template>
+                <template #default> 查询 </template>
+              </a-button>
+              <a-button
+                class="mt-4"
                 @click="reset"
               >
                 <template #icon>
@@ -151,18 +267,22 @@
                 </template>
                 <template #default> 重置 </template>
               </a-button>
-              <a-select
-                v-model:model-value="groupId"
-                m="l-10"
-                :options="groupOpts"
-                allow-search
-                placeholder="输入关键词搜索"
-              >
-                <template #label="{ data }">
-                  <span>{{ data.label }}</span>
-                </template>
-              </a-select>
-            </div>
+            </a-side>
+          </div>
+        </a-card>
+      </a-layout-header>
+
+      <a-layout-content>
+        <a-card
+          h="full"
+          flex="~ col"
+        >
+          <section
+            w="full"
+            p="x-4"
+            flex="~ justify-between items-center"
+            m="b-3"
+          >
             <div w="1/4">
               <a-tooltip content="创建考试前, 请先创建对应考试组, 以便正常使用数据分析功能">
                 <a-button
@@ -193,10 +313,6 @@
               </a-tooltip>
             </div>
           </section>
-        </a-card>
-      </a-layout-header>
-      <a-layout-content>
-        <a-card h="full">
           <a-table
             h="4xl"
             :data="tableData"

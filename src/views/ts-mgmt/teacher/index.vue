@@ -199,7 +199,7 @@
                   />
                 </a-form-item>
               </a-col>
-              <a-col :span="8">
+              <!-- <a-col :span="8">
                 <a-form-item
                   field="state"
                   label="账号启用"
@@ -214,7 +214,7 @@
                     <a-option :value="1">启用</a-option>
                   </a-select>
                 </a-form-item>
-              </a-col>
+              </a-col> -->
             </a-row>
           </a-form>
 

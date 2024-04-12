@@ -1,4 +1,5 @@
 import request from '@/utils/request';
+import { ExamStateEnum } from '@/views/exam-mgmt/config';
 import { ListResponse, Paging } from './types';
 import { Question } from './question';
 
@@ -116,7 +117,9 @@ export function deleteExamApi(id: number) {
   return request.post(ExamApi.delete, { id });
 }
 
-export function getExamListApi(data: Paging & { key: string }) {
+export function getExamListApi(
+  data: Paging & { key: string; state: Omit<ExamStateEnum, 'beforeStart'>; subjectId: number; groupId: number },
+) {
   return request.post<ListResponse<ExamListItem>>(ExamApi.list, data);
 }
 
