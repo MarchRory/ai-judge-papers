@@ -4,12 +4,8 @@
    *
    * ！！务必注意 katex.css 的样式问题！！！
    */
-  import { render } from './async';
-  /**
-   * katex 会自动加载当前网页路径下的 css，但没有选项禁止
-   * 所以忽略控制台的 404 信息
-   * 这里需要手动导入
-   */
+
+  import render from './latex';
   import 'katex/dist/katex.css';
 
   const props = defineProps<{ latex: string }>();
@@ -19,7 +15,7 @@
       return;
     }
     try {
-      el.innerHTML = await render(props.latex);
+      el.innerHTML = render(props.latex);
     } catch {
       el.textContent = props.latex;
     }
@@ -38,6 +34,10 @@
   .ai-judge-papers-latex * {
     padding: 0;
     margin: 0;
+  }
+
+  [aria-hidden] {
+    display: none;
   }
 
   .katex .katex-mathml {
