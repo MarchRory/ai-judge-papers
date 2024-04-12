@@ -1,8 +1,8 @@
 import { mergeConfig } from 'vite';
 import { createHtmlPlugin } from 'vite-plugin-html';
 import baseConfig from './vite.config.base';
-import configCompressPlugin from './plugin/compress';
 import configVisualizerPlugin from './plugin/visualizer';
+import configCompressPlugin from './plugin/compress';
 import configArcoResolverPlugin from './plugin/arcoResolver'; // 这个插件会导致build失败，暂不使用
 import configImageminPlugin from './plugin/imagemin';
 import getViteEnv from '../src/utils/common/title';
@@ -12,8 +12,8 @@ export default mergeConfig(
   {
     mode,
     plugins: [
-      configCompressPlugin('gzip'),
       configVisualizerPlugin(),
+      // configCompressPlugin('gzip'),
       // configArcoResolverPlugin(),
       configImageminPlugin(),
       createHtmlPlugin({
@@ -25,6 +25,9 @@ export default mergeConfig(
       }),
     ],
     build: {
+      // sourcemap: true,
+      reportCompressedSize: false,
+      minify: false,
       rollupOptions: {
         output: {
           manualChunks: {

@@ -4,7 +4,7 @@
    *
    * ！！务必注意 katex.css 的样式问题！！！
    */
-  import { render } from './latex';
+  import { render } from './async';
   /**
    * katex 会自动加载当前网页路径下的 css，但没有选项禁止
    * 所以忽略控制台的 404 信息
@@ -14,12 +14,15 @@
 
   const props = defineProps<{ latex: string }>();
 
-  const ref = (el?: HTMLElement) => {
+  const ref = async (el?: HTMLElement) => {
     if (!el) {
       return;
     }
-    const renderText = props.latex.replace(/\\n/g, '\n');
-    el.innerHTML = render(renderText);
+    try {
+      el.innerHTML = await render(props.latex);
+    } catch {
+      el.textContent = props.latex;
+    }
   };
 </script>
 
