@@ -1,16 +1,12 @@
-/* eslint-disable spaced-comment */
-//@ts-ignore
-import { parse, HtmlGenerator } from 'latex.js';
-//@ts-ignore
-import autoRender from 'katex/contrib/auto-render';
-
-export function renderLatex(latex: string) {
+export async function renderLatex(latex: string) {
+  const { parse, HtmlGenerator } = await import('latex.js');
   const generator = new HtmlGenerator({ hyphenate: false });
   const doc: Document = parse(latex, { generator }).htmlDocument();
   return doc.documentElement.outerHTML;
 }
 
-export function renderKatex(latex: string) {
+export async function renderKatex(latex: string) {
+  const { default: autoRender } = import('katex/contrib/auto-render');
   const el = document.createElement('div');
   el.innerHTML = latex;
   autoRender(el, { throwOnError: false });
@@ -19,15 +15,15 @@ export function renderKatex(latex: string) {
   return html;
 }
 
-export function render(latex: string): string {
+export async function render(latex: string): Promise<string> {
   latex = latex.replace(/\\n/g, '\n'); // just fix the source text
   try {
     // first try latex.js
-    return renderLatex(latex);
+    return await renderLatex(latex);
   } catch (e) {
     try {
       // then fallback to katex
-      return renderKatex(latex);
+      return await renderKatex(latex);
     } catch (e) {
       return latex;
     }
