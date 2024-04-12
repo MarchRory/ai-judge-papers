@@ -26,6 +26,17 @@ const QUESTION_MGMT: AppRouteRecordRaw = {
         roles: ['root', 'problem'],
       },
     },
+    {
+      path: 'questionAnswer',
+      name: 'questionAnswer',
+      component: () => import('@/views/question-mgmt/children/answer-mgmt.vue'),
+      meta: {
+        locale: '试题答案配置',
+        activeMenu: 'question-mgmt',
+        requiresAuth: true,
+        roles: ['root', 'problem'],
+      },
+    },
   ],
 };
 
