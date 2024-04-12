@@ -70,10 +70,12 @@
     () => chatList.value.length,
     (newVal) => {
       nextTick(() => {
-        chatListDom.value?.scrollTo({
-          top: chatListDom.value.scrollHeight,
-          behavior: 'smooth',
-        });
+        setTimeout(() => {
+          chatListDom.value?.scrollTo({
+            top: chatListDom.value.scrollHeight,
+            behavior: 'smooth',
+          });
+        }, 400);
       });
     },
   );

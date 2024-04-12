@@ -9,6 +9,7 @@
   const props = defineProps<{
     title: string;
     columns: { name: string; dataIndex: string }[];
+    fullScreenDom?: HTMLElement;
     loadApi: (...args: any[]) => Promise<HttpResponse<ListResponse<any>>>;
     requestParams: Record<string, any>;
     formart?: (...args: any[]) => any;
@@ -88,7 +89,7 @@
               class="text-white text-center mt-1"
             >
               <span v-if="!Array.isArray(item[t.dataIndex])">{{ item[t.dataIndex] }}</span>
-              <!--有bug, 全屏模式下popover不生效-->
+              <!--挂载点修改为被全屏的元素, 但是不知道为什么不生效-->
               <a-popover
                 v-else
                 trigger="hover"
