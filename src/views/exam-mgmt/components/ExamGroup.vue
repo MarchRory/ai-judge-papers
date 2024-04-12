@@ -109,6 +109,7 @@
         <a-card h="full">
           <a-table
             :data="tableData"
+            class="h-4xl"
             stripe
             :loading="loading"
             page-position="br"

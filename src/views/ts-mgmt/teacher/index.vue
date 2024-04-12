@@ -247,6 +247,7 @@
         </header>
         <a-table
           :columns="columns"
+          class="h-4xl"
           :data="displayData"
           :loading="isLoading"
           size="small"
