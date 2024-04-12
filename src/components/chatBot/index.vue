@@ -5,6 +5,7 @@
   import { debounce } from 'lodash';
   import { ref, watch, nextTick, onMounted } from 'vue';
   import { Message } from '@arco-design/web-vue';
+  import { sleep } from '@/utils/common/performance';
 
   interface chatListItem {
     text: string;
@@ -27,7 +28,8 @@
   const chatListContainer = ref();
   const { loading: inputLoading, setLoading: setInputLoading } = useLoading(false);
   const chatList = ref<chatListItem[]>([]);
-  const questionList = ['这场考试同学们的发挥怎样?', '同学们还有哪些需要提升的地方?', '哪些知识点是同学们的薄弱环节?'];
+
+  const questionList = ref<string[]>([]);
   const handleChooseQuestion = (question: string) => {
     editedDom.value.innerText += question;
   };
@@ -90,11 +92,47 @@
       }
     },
   );
+
+  // 获取智能预设问题文本
+  const getPreQuestionTriggerText =
+    '我是这门考试的负责老师,根据这些信息你可以为我回答哪些关于学生学习情况、学习进步、提高方法的问题,只输出问题5个问题, 不带序号, 模拟老师, 使用第一人称, 且使用json格式';
+  const defaultQuestion = ['本堂考试, 同学们表现得怎么样? ', '同学们进步多吗?', '同学们还需要在哪些知识点上针对性巩固?'];
+  const { loading: preQuestionLoading, setLoading: setPreQLoading } = useLoading(false);
+  const getPreQuestionList = () => {
+    setPreQLoading(true);
+    getChatResponse({
+      examId: +props.examId,
+      content: getPreQuestionTriggerText,
+      userId: 0,
+    })
+      .then(({ success, data }) => {
+        if (success) {
+          const json = data.content.replace(/```|json|\(|\)|\n/g, '').trim();
+          const arr = JSON.parse(json);
+          setPreQLoading(false);
+          arr.forEach((preQuestion: string, index: number) => {
+            const delay = index === 0 ? 0 : 200 * index;
+            setTimeout(() => {
+              questionList.value.push(preQuestion);
+            }, delay);
+          });
+        } else {
+          questionList.value = defaultQuestion;
+        }
+      })
+      .finally(() => {
+        setPreQLoading(false);
+      });
+  };
+
   onMounted(() => {
     chatList.value.push({
       isBot: true,
       text: '您好, 我是易智小助手, 关于这场考试, 您有什么想要咨询的吗? ',
     });
+    if (!questionList.value.length) {
+      getPreQuestionList();
+    }
   });
 </script>
 
@@ -116,8 +154,9 @@
       <Transition name="glassify-fade">
         <!--遮罩层-->
         <main
-          v-if="chatWindowVisible"
+          v-show="chatWindowVisible"
           class="mask glassify"
+          @scroll.stop
         >
           <!--聊天区-->
           <div class="chatContainer shadow-gray">
@@ -132,13 +171,35 @@
               </div>
             </header>
             <main>
-              <aside>
+              <!--侧边栏-->
+              <aside class="flex flex-col">
                 <div class="aiAvatar">
                   <icon-robot :size="100" />
                   <h2 class="tip"><i class="i-tabler:adjustments-star mr-2"></i>易智Bot</h2>
                 </div>
-                <div class="todoList"></div>
+                <h3 class="text-center text-neutral-500">智能提问</h3>
+                <a-spin
+                  class="wh-full preSpin"
+                  :loading="preQuestionLoading"
+                  tip="智能预设问题生成中"
+                >
+                  <div class="preList">
+                    <section class="questionList">
+                      <TransitionGroup name="fade-in">
+                        <div
+                          v-for="(item, index) in questionList"
+                          :key="index"
+                          class="questionItem"
+                          @click="handleChooseQuestion(item)"
+                        >
+                          {{ item }}
+                        </div>
+                      </TransitionGroup>
+                    </section>
+                  </div>
+                </a-spin>
               </aside>
+              <!--对话区-->
               <div class="chatArea">
                 <section
                   ref="chatListContainer"
@@ -175,20 +236,16 @@
                             marginRight: `${item.isBot ? 0 : 10}px`,
                           }"
                         >
-                          <DisplayLatex :latex="item.text" />
+                          <DisplayLatex
+                            :class="{
+                              'pl-6': item.isBot,
+                              'userText': !item.isBot,
+                            }"
+                            :latex="item.text"
+                          />
                         </div>
                       </div>
                     </TransitionGroup>
-                  </div>
-                </section>
-                <section class="questionList">
-                  <div
-                    v-for="(item, index) in questionList"
-                    :key="index"
-                    class="questionItem"
-                    @click="handleChooseQuestion(item)"
-                  >
-                    {{ item }}
                   </div>
                 </section>
                 <div
@@ -230,6 +287,24 @@
 </template>
 
 <style scoped lang="less">
+  :deep(.preSpin) {
+    .arco-spin-mask {
+      background-color: transparent;
+    }
+  }
+  :deep(.arco-spin-icon) {
+    font-size: 2em;
+    color: #9a8fe7;
+  }
+  :deep(.arco-spin-tip) {
+    font-size: 1.2em;
+    color: #9a8fe7;
+  }
+  .userText {
+    font-size: 1.2em;
+    font-weight: 700;
+    color: #7f7f7f;
+  }
   .chatEntry {
     position: fixed;
     cursor: pointer;
@@ -252,13 +327,10 @@
     transition: all 0.4s ease; /* 添加过渡效果 */
   }
   .fade-in-enter-active {
-    transition: opacity 0.3s ease;
-    opacity: 0;
+    transition: transform 0.3s ease;
+    transform: translateX(-100%);
   }
-  .fade-in-leave-active {
-    transition: opacity 0.3s ease;
-    opacity: 0;
-  }
+
   .glassify-fade-enter-active,
   .glassify-fade-leave-active {
     opacity: 0;
@@ -274,6 +346,7 @@
     flex-direction: row-reverse;
     justify-content: flex-start;
   }
+
   .mask {
     --c-rounded: 20px;
     --c-pxy: 10px;
@@ -313,16 +386,44 @@
           border-radius: var(--c-rounded);
           .aiAvatar {
             width: 100%;
-            height: 200px;
+            height: 180px;
             display: flex;
             align-items: center;
             flex-direction: column;
             justify-content: flex-start;
             padding: 10px 0;
           }
-          .todoList {
+          .preList {
             flex: 1;
             width: 100%;
+            overflow-y: auto;
+            .questionList {
+              width: 100%;
+              height: auto;
+              overflow-x: hidden;
+              display: flex;
+              flex-direction: column;
+              justify-content: flex-start;
+              align-items: flex-start;
+              margin-bottom: 15px;
+              .questionItem {
+                word-wrap: break-word;
+                word-break: break-all;
+                padding: 8px 5px;
+                border-radius: 3px;
+                font-size: 1.2em;
+                font-weight: bold;
+                background-color: transparent;
+                margin-bottom: 10px;
+                color: #5d5d5d;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                &:hover {
+                  background-color: #a8a8a8;
+                  color: white;
+                }
+              }
+            }
           }
         }
         .chatArea {
@@ -355,6 +456,7 @@
                 }
                 .chatContent {
                   max-width: 60%;
+                  white-space: pre-line;
                   word-break: break-all;
                   word-wrap: normal;
                   padding: 15px;
@@ -366,34 +468,8 @@
               }
             }
           }
-          .questionList {
-            width: 100%;
-            overflow-x: hidden;
-            height: 3%;
-            border-radius: var(--c-rounded);
-            display: flex;
-            flex-direction: row;
-            justify-content: flex-start;
-            align-items: center;
-            transform: translateX(15px);
-            .questionItem {
-              padding: 5px 10px;
-              border-radius: 5px;
-              font-size: 13px;
-              font-weight: bold;
-              background-color: white;
-              color: #5d5d5d;
-              cursor: pointer;
-              transition: all 0.3s ease;
-              margin-right: 10px;
-              &:hover {
-                background-color: #a8a8a8;
-                color: white;
-              }
-            }
-          }
           .inputArea {
-            margin-top: 6px;
+            margin-top: 25px;
             width: 100%;
             height: 11%;
             border-radius: var(--c-rounded);

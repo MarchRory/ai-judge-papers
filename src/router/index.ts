@@ -56,7 +56,7 @@ const router = createRouter({
       ],
     },
     // @ts-ignore TODO: 下面这行处于调试目的，待权限系统完成可删
-    // ...formatModules(import.meta.glob('./routes/modules/*.ts', { eager: true }), []),
+    ...formatModules(import.meta.glob('./routes/modules/*.ts', { eager: true }), []),
     // REDIRECT_MAIN,
     NOT_FOUND_ROUTE,
   ],
