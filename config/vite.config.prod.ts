@@ -2,7 +2,7 @@ import { mergeConfig } from 'vite';
 import { createHtmlPlugin } from 'vite-plugin-html';
 import baseConfig from './vite.config.base';
 import configVisualizerPlugin from './plugin/visualizer';
-import configCompressPlugin from './plugin/compress';
+import configCompressPlugin from './plugin/compress'; // 暂不需要
 import configArcoResolverPlugin from './plugin/arcoResolver'; // 这个插件会导致build失败，暂不使用
 import configImageminPlugin from './plugin/imagemin';
 import getViteEnv from '../src/utils/common/title';
@@ -25,9 +25,6 @@ export default mergeConfig(
       }),
     ],
     build: {
-      // sourcemap: true,
-      reportCompressedSize: false,
-      minify: false,
       rollupOptions: {
         output: {
           manualChunks: {
@@ -38,6 +35,8 @@ export default mergeConfig(
         },
       },
       chunkSizeWarningLimit: 2000,
+      reportCompressedSize: false,
+      // sourcemap: true,
     },
   },
   baseConfig,

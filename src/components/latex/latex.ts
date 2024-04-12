@@ -1,35 +1,22 @@
-/* eslint-disable spaced-comment */
-//@ts-ignore
-import { parse, HtmlGenerator } from 'latex.js';
-//@ts-ignore
-import autoRender from 'katex/contrib/auto-render';
+import markdownit from 'markdown-it';
+// @ts-ignore
+import mk from '@vscode/markdown-it-katex';
 
-export function renderLatex(latex: string) {
-  const generator = new HtmlGenerator({ hyphenate: false });
-  const doc: Document = parse(latex, { generator }).htmlDocument();
-  return doc.documentElement.outerHTML;
-}
-
-export function renderKatex(latex: string) {
-  const el = document.createElement('div');
-  el.innerHTML = latex;
-  autoRender(el, { throwOnError: false });
-  const html = el.innerHTML;
-  el.remove();
-  return html;
-}
-
-export function render(latex: string): string {
-  latex = latex.replace(/\\n/g, '\n'); // just fix the source text
-  try {
-    // first try latex.js
-    return renderLatex(latex);
-  } catch (e) {
-    try {
-      // then fallback to katex
-      return renderKatex(latex);
-    } catch (e) {
-      return latex;
-    }
-  }
+/**
+ * @returns HTML字符串
+ */
+export default function render(src: string) {
+  // @docs https://github.com/markdown-it/markdown-it
+  const md = markdownit({
+    html: false,
+    linkify: true,
+    typographer: true,
+  });
+  md.use(mk, {
+    throwOnError: false,
+    // 渲染失败时染色
+    errorColor: ' #cc0000',
+  });
+  // 渲染HTML时永远注意XSS问题
+  return md.render(src);
 }
