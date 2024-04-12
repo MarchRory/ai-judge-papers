@@ -8,7 +8,7 @@
         <div class="grid grid-cols-[1fr_auto]">
           <a-form :model="form">
             <a-row :gutter="16">
-              <a-col :span="8">
+              <!-- <a-col :span="8">
                 <a-form-item
                   filed="sate"
                   label="状态"
@@ -19,8 +19,8 @@
                     placeholder="请选择班级状态"
                   ></a-input>
                 </a-form-item>
-              </a-col>
-              <a-col :span="8">
+              </a-col> -->
+              <!-- <a-col :span="8">
                 <a-form-item
                   field="graduation"
                   label="毕业届数"
@@ -31,8 +31,8 @@
                     placeholder="请选择毕业年份"
                   ></a-input>
                 </a-form-item>
-              </a-col>
-              <a-col :span="8">
+              </a-col> -->
+              <!-- <a-col :span="8">
                 <a-form-item
                   filed="grade"
                   label="年级"
@@ -44,7 +44,7 @@
                     <a-option :value="2023">2023</a-option>
                   </a-select>
                 </a-form-item>
-              </a-col>
+              </a-col> -->
             </a-row>
             <a-row :gutter="16">
               <a-col :span="8">
@@ -84,7 +84,7 @@
     <a-layout-content class="px-4">
       <a-card>
         <header class="py-4 flex gap-4">
-          <addClassModalButton></addClassModalButton>
+          <!-- <addClassModalButton></addClassModalButton> -->
           <importBtn @success="loadList"></importBtn>
         </header>
         <a-table
@@ -120,11 +120,12 @@
             >
           </template> -->
           <template #$operation="{ record }">
-            <detail-button
+            <!-- <detail-button
               :data="record"
               :columns="columns"
-            />
+            /> -->
             <a-popconfirm
+              type="error"
               content="确认要删除？"
               @ok="classDelete(record)"
             >
@@ -174,12 +175,12 @@
 
   const columns: TableColumnData[] = Object.entries({
     id: '序号',
-    graduation: '毕业届数',
+    // graduation: '毕业届数',
     name: '班级',
     grade: '当前年级',
     memberCount: '学生人数',
-    classType: '班级类型',
-    state: '班级状态',
+    // classType: '班级类型',
+    // state: '班级状态',
     $operation: '操作', // 伪列
   }).map(([dataIndex, title]) => ({ dataIndex, title, slotName: dataIndex }));
 

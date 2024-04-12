@@ -12,7 +12,7 @@
     >
       <template #title>考试数据 <span text="sm gray">（近7日）</span></template>
       <template #extra>
-        <a-link>查看更多</a-link>
+        <a-link @click="$router.push({ name: 'exam-mgmt' })">查看更多</a-link>
       </template>
       <Chart
         height="289px"
