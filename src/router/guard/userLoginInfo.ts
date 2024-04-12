@@ -56,7 +56,6 @@ export default function setupUserLoginInfoGuard(router: Router) {
           }
           next();
         } catch (error) {
-          console.log('err: ', error);
           await userStore.logout();
           next({
             name: 'login',
