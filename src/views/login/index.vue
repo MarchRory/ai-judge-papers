@@ -46,34 +46,26 @@
   import APP_TITLE from '@/assets/globalVariable';
   import { Notification } from '@arco-design/web-vue';
   import { reactive, onMounted, ref } from 'vue';
-  import { useRouter } from 'vue-router';
+  import { useRoute } from 'vue-router';
   import ParticlesConfig from '@/assets/specialEffect/particlesjs-config';
   import useLoading from '@/hooks/loading';
   import { sleep } from '@/utils/common/performance';
-  import { toLength } from 'lodash';
-  import LoginBanner from './components/banner.vue';
   import LoginForm from './components/login-form.vue';
 
-  const router = useRouter();
   const { loading, setLoading } = useLoading(true);
   const { loading: botVisible, setLoading: setBotvisible } = useLoading(true);
-  const count = ref(0);
 
-  router.afterEach((to, from) => {
-    const { name: toName } = to;
-    const { name: fromName } = from;
-    if (toName === 'login' && typeof fromName === 'undefined') {
-      count.value = 2;
-    }
-  });
-
+  const route = useRoute();
+  const isRefreash = ref(route.meta.isRefreash ?? 0);
   // 放options是为了响应式, 这样方便调试
   const options = reactive(ParticlesConfig);
   const particlesLoaded = async (container: any) => {
     // 避免loading过短, 导致bg的异常布局展示出来
-    if (count.value !== 2) {
-      count.value = 2;
-    } else {
+    // 刷新时, 第一次走这里
+    // 0 表示是刷新
+    if (isRefreash.value === 0) {
+      isRefreash.value = 2;
+    } else if (isRefreash.value === 2) {
       await sleep(600);
       setBotvisible(false);
       await sleep(300);
