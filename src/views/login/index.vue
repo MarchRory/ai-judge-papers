@@ -58,10 +58,11 @@
   // 放options是为了响应式, 这样方便调试
   const options = reactive(ParticlesConfig);
   const particlesLoaded = async (container: any) => {
-    Notification.success(`欢迎使用${APP_TITLE}`);
+    // 避免loading过短, 导致bg的异常布局展示出来
     await sleep(600);
     setTimeout(() => {
       setLoading(false);
+      Notification.success(`欢迎使用${APP_TITLE}`);
     }, 300);
     setBotvisible(false);
   };
