@@ -1,5 +1,31 @@
 <template>
   <div class="pageContainer">
+    <Transition name="fade-out">
+      <div
+        v-if="loading"
+        class="loadingMask wh-full flex items-center justify-center flex-col"
+      >
+        <div
+          :style="{
+            opacity: botVisible ? 1 : 0,
+          }"
+          class="transition-all transition-duration-600 ease-in"
+        >
+          <div>
+            <div class="custom-loading-jump loading-bot">
+              <icon-robot
+                :size="180"
+                color="#293145"
+              />
+            </div>
+          </div>
+          <div>
+            <h1 class="text-#293145 text-center">加载中...</h1>
+          </div>
+        </div>
+      </div>
+    </Transition>
+
     <vue-particles
       id="tsparticles"
       :options="options"
@@ -21,16 +47,24 @@
   import { Notification } from '@arco-design/web-vue';
   import { reactive, onMounted } from 'vue';
   import ParticlesConfig from '@/assets/specialEffect/particlesjs-config';
+  import useLoading from '@/hooks/loading';
+  import { sleep } from '@/utils/common/performance';
   import LoginBanner from './components/banner.vue';
   import LoginForm from './components/login-form.vue';
+
+  const { loading, setLoading } = useLoading(true);
+  const { loading: botVisible, setLoading: setBotvisible } = useLoading(true);
 
   // 放options是为了响应式, 这样方便调试
   const options = reactive(ParticlesConfig);
   const particlesLoaded = async (container: any) => {
     Notification.success(`欢迎使用${APP_TITLE}`);
+    await sleep(600);
+    setTimeout(() => {
+      setLoading(false);
+    }, 300);
+    setBotvisible(false);
   };
-
-  onMounted(() => {});
 </script>
 
 <style lang="less" scoped>
@@ -86,5 +120,25 @@
         width: 25%;
       }
     }
+  }
+  .loading-bot {
+    position: relative;
+    top: 0px;
+  }
+  .loadingMask {
+    position: fixed;
+    z-index: 9999;
+    background-color: #1b1e3439;
+    backdrop-filter: blur(1000px);
+  }
+  .fade-out-enter-active {
+    background-color: #1b1e3439;
+    backdrop-filter: blur(1000px);
+    transition: all 0.8s ease;
+  }
+  .fade-out-leave-to {
+    background-color: transparent;
+    backdrop-filter: blur(0px);
+    transition: all 0.8s ease;
   }
 </style>

@@ -206,22 +206,22 @@
         background-color: var(--normal-dark);
       }
     }
-
     :deep(.arco-input) {
       font-size: 1.2em;
       font-weight: 700;
     }
     :deep(.arco-input-wrapper) {
       border-radius: 5px;
+      border: 3px solid transparent;
     }
     :deep(.arco-input-wrapper:focus-within, .arco-input-wrapper.arco-input-focus) {
       border-radius: 5px;
-      border: 3px solid transparent;
       border-color: var(--normal-dark);
     }
 
     :deep(.arco-checkbox-checked .arco-checkbox-icon) {
       background-color: var(--normal-dark);
+      color: white;
     }
   }
 </style>
