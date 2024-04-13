@@ -15,8 +15,14 @@ export default function setupPermissionGuard(router: Router) {
       useTreeStore().init();
     }
     // eslint-disable-next-line no-lonely-if
-    if (permissionsAllow) next();
-    else {
+    const { name: toName } = to;
+    const { name: fromName } = from;
+    if (permissionsAllow) {
+      if (toName === 'login') {
+        to.meta.isRefreash = typeof fromName === 'undefined' ? 0 : 2;
+      }
+      next();
+    } else {
       next(NOT_FOUND);
     }
     NProgress.done();
