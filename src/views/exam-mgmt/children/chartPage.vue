@@ -191,7 +191,10 @@
           flex="~ col items-center justify-around"
         >
           <div class="chartBox h-11/25">
-            <DegreeChart :stu-score-list="stuScoreDetail" />
+            <DegreeChart
+              :stu-score-list="stuScoreDetail"
+              :pass-score="parseInt((query.total || 100) * 0.6 + '', 10)"
+            />
           </div>
           <div class="chartBox h-13/25">
             <ClassScoreChart />
