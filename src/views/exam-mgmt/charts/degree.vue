@@ -5,6 +5,7 @@
 
   const props = defineProps<{
     stuScoreList: StuExamRank[];
+    passScore: number;
   }>();
   const chartOpt = ref({});
   const getOpt = (val: number) => {
@@ -107,7 +108,7 @@
   watch(
     () => props.stuScoreList,
     (newVal) => {
-      const notPassValue = newVal.filter((item) => item.score < 90).length;
+      const notPassValue = newVal.filter((item) => item.score < props.passScore).length;
       const degree = (notPassValue / newVal.length).toFixed(2);
       const val = Number.isNaN(+degree) ? 0.0 : +degree;
       chartOpt.value = getOpt(val);
