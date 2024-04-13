@@ -61,7 +61,7 @@
               </a-col>
             </a-row>
           </a-form>
-          <a-side class="pl-8 ml-8 mb-[20px] flex flex-col justify-between border-l border-l-solid border-[#E5E6EB]">
+          <div class="pl-8 ml-8 mb-[20px] flex flex-col justify-between border-l border-l-solid border-[#E5E6EB]">
             <a-button
               type="primary"
               @click="query"
@@ -71,13 +71,16 @@
               </template>
               <template #default> 查询 </template>
             </a-button>
-            <a-button @click="reset">
+            <a-button
+              class="mt-4"
+              @click="reset"
+            >
               <template #icon>
                 <icon-refresh />
               </template>
               <template #default> 重置 </template>
             </a-button>
-          </a-side>
+          </div>
         </div>
       </a-card>
     </a-layout-header>

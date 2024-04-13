@@ -27,7 +27,7 @@
           <a-radio :value="3"> 英语 </a-radio>
         </a-radio-group>
         <a-table
-          :data="renderList!!"
+          :data="renderList"
           :pagination="false"
           :bordered="false"
           :scroll="{ x: '100%', y: '264px' }"
@@ -110,7 +110,7 @@
   const typeChange = (contentType: number) => {
     fetchData(contentType);
   };
-  fetchData(1);
+  fetchData(2);
   const dateFormat = (timestamp: number) => {
     return dayjs.unix(timestamp).format('YYYY年MM月DD日');
   };
