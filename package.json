@@ -10,7 +10,7 @@
     "build": "vue-tsc --noEmit && vite build --config ./config/vite.config.prod.ts",
     "build-no-check": "vite build --config ./config/vite.config.prod.ts",
     "report": "cross-env REPORT=true npm run build",
-    "preview": "npm run build && vite preview --host",
+    "preview": "npm run build-no-check && vite preview --host",
     "type:check": "vue-tsc --noEmit --skipLibCheck",
     "lint-staged": "npx lint-staged",
     "prepare": "husky install"

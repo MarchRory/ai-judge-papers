@@ -1,4 +1,4 @@
-import type { RouteRecordRaw, Router } from 'vue-router';
+import type { Router } from 'vue-router';
 import NProgress from 'nprogress'; // progress bar
 import usePermission from '@/hooks/permission';
 import { useUserStore } from '@/store';

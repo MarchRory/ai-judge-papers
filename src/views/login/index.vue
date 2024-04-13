@@ -60,11 +60,10 @@
   const particlesLoaded = async (container: any) => {
     // 避免loading过短, 导致bg的异常布局展示出来
     await sleep(600);
-    setTimeout(() => {
-      setLoading(false);
-      Notification.success(`欢迎使用${APP_TITLE}`);
-    }, 300);
     setBotvisible(false);
+    await sleep(300);
+    setLoading(false);
+    Notification.success(`欢迎使用${APP_TITLE}`);
   };
 </script>
 
@@ -135,7 +134,6 @@
   .fade-out-enter-active {
     background-color: #1b1e3439;
     backdrop-filter: blur(1000px);
-    transition: all 0.8s ease;
   }
   .fade-out-leave-to {
     background-color: transparent;
