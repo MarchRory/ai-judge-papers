@@ -72,6 +72,13 @@
       setLoading(false);
       Notification.success(`欢迎使用${APP_TITLE}`);
     }
+
+    // 兜底策略, 3秒内必须加载出来
+    setTimeout(async () => {
+      setBotvisible(false);
+      await sleep(300);
+      setLoading(false);
+    }, 3000);
   };
 </script>
 
