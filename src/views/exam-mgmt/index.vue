@@ -384,16 +384,17 @@
                 data-index="time"
               >
                 <template #cell="{ record }">
-                  {{ new Date(record.time).toLocaleString().replace(/\//g, '-') }}
+                  {{ new Date(record.time).toLocaleString().replace(/\//g, '-').slice(0, 15) }}
                 </template>
               </a-table-column>
               <a-table-column
+                v-if="false"
                 title="交卷时间"
                 :width="200"
                 data-index="time"
               >
                 <template #cell="{ record }">
-                  {{ new Date(record.timeLimit).toLocaleString().replace(/\//g, '-') }}
+                  {{ new Date(record.timeLimit).toLocaleString().replace(/\//g, '-').slice(0, 15) }}
                 </template>
               </a-table-column>
               <a-table-column
@@ -431,7 +432,6 @@
                     >详情</a-button
                   >
                   <a-button
-                    v-if="now < record.time"
                     m="r-2"
                     type="outline"
                     status="warning"

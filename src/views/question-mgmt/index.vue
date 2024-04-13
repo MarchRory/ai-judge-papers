@@ -78,7 +78,7 @@
             <a-table-column
               data-index="id"
               :width="150"
-              title="标识"
+              title="序号"
             ></a-table-column>
             <a-table-column
               title="科目"

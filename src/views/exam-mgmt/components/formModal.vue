@@ -96,6 +96,10 @@
   const submit = () => {
     submitLoading.value = true;
     const submitFn = props.create === 'create' ? createExamApi : updateExamApi;
+    const start = new Date(formInfo.value.time as number);
+    start.setSeconds(0);
+    start.setMilliseconds(0);
+    formInfo.value.time = start.getTime();
     const end = (formInfo.value.time as number) + (formInfo.value.examTimeLength as number) * 60 * 1000;
     const timeLimit = new Date(end);
     timeLimit.setSeconds(0);

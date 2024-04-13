@@ -108,7 +108,7 @@
     >
       <template #columns>
         <a-table-column
-          title="标识"
+          title="序号"
           data-index="id"
           :width="80"
         >
