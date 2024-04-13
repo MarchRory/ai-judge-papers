@@ -1,13 +1,10 @@
 <template>
-  <div class="container">
-    <div class="logo">
-      <img
-        alt="logo"
-        src="/logo.svg"
-      />
-      <div class="logo-text">{{ APP_TITLE }}</div>
-    </div>
-    <LoginBanner />
+  <div class="pageContainer">
+    <vue-particles
+      id="tsparticles"
+      :options="options"
+      @particles-loaded="particlesLoaded"
+    />
     <div class="content">
       <div class="content-inner">
         <LoginForm />
@@ -21,15 +18,26 @@
 
 <script lang="ts" setup>
   import APP_TITLE from '@/assets/globalVariable';
-  import Footer from '@/components/footer/index.vue';
+  import { Notification } from '@arco-design/web-vue';
+  import { reactive, onMounted } from 'vue';
+  import ParticlesConfig from '@/assets/specialEffect/particlesjs-config';
   import LoginBanner from './components/banner.vue';
   import LoginForm from './components/login-form.vue';
+
+  // 放options是为了响应式, 这样方便调试
+  const options = reactive(ParticlesConfig);
+  const particlesLoaded = async (container: any) => {
+    Notification.success(`欢迎使用${APP_TITLE}`);
+  };
+
+  onMounted(() => {});
 </script>
 
 <style lang="less" scoped>
-  .container {
+  .pageContainer {
     display: flex;
     height: 100vh;
+    width: 100vw;
 
     .banner {
       width: 550px;

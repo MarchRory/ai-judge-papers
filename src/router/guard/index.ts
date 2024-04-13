@@ -11,11 +11,13 @@ function setupPageGuard(router: Router) {
 }
 
 // 路由切换时, 从部分页面离开会出现目的路由无法加载的问题, 需要手动reload
-const needReload: RouteRecordName[] = ['judgePlatform'];
+const needReloadFrom: RouteRecordName[] = ['judgePlatform'];
+const needReoladTo: RouteRecordName[] = [''];
 function setupAfterPageGuard(router: Router) {
-  router.afterEach((_, from) => {
-    const { name } = from;
-    if (name && needReload.includes(name)) {
+  router.afterEach((to, from) => {
+    const { name: fromName } = from;
+    const { name: toName } = to;
+    if (fromName && needReloadFrom.includes(fromName)) {
       setTimeout(() => {
         location.reload(); // eslint-disable-line
       }, 1000);
