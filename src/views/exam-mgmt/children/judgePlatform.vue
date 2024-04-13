@@ -103,10 +103,10 @@
       setSubmitLoading(true);
       const res = await submitJudgeRes(examId);
       if (res.success) {
-        Notification.success('本堂考试阅卷信息已全部提交, 即将回到详情页, 数据分析大屏已开放');
+        Notification.success('本堂考试阅卷信息已全部提交, 即将回到详情页。数据分析大屏、本堂考试专属AI小助理已开放');
         setTimeout(() => {
           back();
-        }, 1500);
+        }, 3000);
       }
       setSubmitLoading(false);
     }
