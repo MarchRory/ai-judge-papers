@@ -34,11 +34,11 @@
         >
           <template #columns>
             <a-table-column
-              title="时间"
+              title="开考时间"
               data-index="time"
             >
               <template #cell="{ record }">
-                {{ dateFormat(record.time) }}
+                {{ new Date(record.time).toLocaleString().replace(/\//g, '-').slice(0, 15) }}
               </template>
             </a-table-column>
             <a-table-column

@@ -432,6 +432,7 @@
                     >详情</a-button
                   >
                   <a-button
+                    v-if="now < record.time"
                     m="r-2"
                     type="outline"
                     status="warning"
