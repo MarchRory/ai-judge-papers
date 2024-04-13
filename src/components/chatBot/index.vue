@@ -5,7 +5,7 @@
   import { debounce } from 'lodash';
   import { ref, watch, nextTick, onMounted } from 'vue';
   import { Message } from '@arco-design/web-vue';
-  import { sleep } from '@/utils/common/performance';
+  import preContent from './preContent';
 
   interface chatListItem {
     text: string;
@@ -94,15 +94,13 @@
   );
 
   // 获取智能预设问题文本
-  const getPreQuestionTriggerText =
-    '我是这门考试的负责老师,根据这些信息你可以为我回答哪些关于学生学习情况、学习进步、提高方法的问题, 只输出问题5个问题, 不带序号, 模拟老师, 使用第一人称, 且使用json格式。另外, 在接下来的每一个回答中, 你需要结合学生作答内容, 给出针对性';
   const defaultQuestion = ['本堂考试, 同学们表现得怎么样? ', '同学们进步多吗?', '同学们还需要在哪些知识点上针对性巩固?'];
   const { loading: preQuestionLoading, setLoading: setPreQLoading } = useLoading(false);
   const getPreQuestionList = () => {
     setPreQLoading(true);
     getChatResponse({
       examId: +props.examId,
-      content: getPreQuestionTriggerText,
+      content: preContent,
       userId: 0,
     })
       .then(({ success, data }) => {
