@@ -144,7 +144,7 @@
         class="flex flex-col items-center"
       >
         <div class="text-gray-400">
-          <h2 v-if="!(answerList && answerList.length)">暂无参考答案, 开始配置</h2>
+          <h2 v-if="!(answerList && answerList.length) && !isEdit">暂无参考答案, 开始配置</h2>
           <a-textarea
             v-else
             v-model="answerCache"
