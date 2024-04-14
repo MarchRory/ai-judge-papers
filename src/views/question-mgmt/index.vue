@@ -8,13 +8,13 @@
         <div class="grid grid-cols-[1fr_auto]">
           <a-form :model="form">
             <a-row :gutter="16">
-              <a-col :span="10">
+              <a-col :span="8">
                 <a-form-item
                   field="title"
                   label="请输入题目关键词"
                 >
                   <a-input
-                    v-model="form.title"
+                    v-model="key"
                     placeholder="请输入题目关键词"
                   ></a-input>
                 </a-form-item>
@@ -30,6 +30,24 @@
                     :options="subjectOptions"
                     :field-names="{ label: 'name', value: 'id' }"
                   />
+                </a-form-item>
+              </a-col>
+              <a-col :span="8">
+                <a-form-item
+                  filed="type"
+                  label="题型"
+                  label-col-flex="32px"
+                >
+                  <a-select v-model:model-value="type">
+                    <a-option :value="-1">全部</a-option>
+                    <a-option
+                      v-for="(item, index) in Object.values(QuestionTypeConfigMap)"
+                      :key="index"
+                      :value="item.value"
+                    >
+                      <a-tag :color="item.tagColor">{{ item.label }}</a-tag>
+                    </a-option>
+                  </a-select>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -186,15 +204,13 @@
     grade: 1,
   });
 
-  const otherSearchParams = { key: '', subjectId: 0 };
-  const { tableData, pagination, loading, loadList, handlePageChange, handleSizeChange, page, key, subjectId, handleDelete } = useTable<
-    QuestionListItem,
-    typeof otherSearchParams
-  >({
-    requestApi: listQuestion,
-    otherSearchParams,
-    deleteApi: deleteQuestion,
-  });
+  const otherSearchParams = { key: '', subjectId: 0, type: -1 };
+  const { tableData, pagination, loading, type, loadList, handlePageChange, handleSizeChange, page, key, subjectId, handleDelete } =
+    useTable<QuestionListItem, typeof otherSearchParams>({
+      requestApi: listQuestion,
+      otherSearchParams,
+      deleteApi: deleteQuestion,
+    });
   const subjectOptions = ref<{ name: string; id: number | string }[]>([{ name: '全部', id: 0 }]);
 
   // 查询
@@ -209,6 +225,7 @@
     form.title = '';
     form.subject = '';
     form.grade = 1;
+    type.value = -1;
     await loadList();
   }
 
