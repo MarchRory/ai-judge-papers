@@ -22,7 +22,7 @@ export const QuestionTypeConfigMap: QuestionTypeConfigMap = {
     tagColor: '#0fc6c2',
   },
   [QuestionTypeEnum.choice]: {
-    value: QuestionTypeEnum.shortAnswer,
+    value: QuestionTypeEnum.choice,
     label: '选择题',
     tagColor: '#ff7d00',
   },

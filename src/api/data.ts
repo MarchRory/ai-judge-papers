@@ -110,7 +110,7 @@ export function stuExamRankList(data: Paging<{ id: number }>) {
  * @param id examId或者groupId, 和type配合
  * @param type 1-指定考试, 2-考试组
  */
-export function getWordCloudApi(id: number, type: 1 | 2) {
-  return request.post<ListResponse<WordCloudItem>>(statisticsApi.wordCloud, { id, type });
+export function getWordCloudApi(id: number, type: 1 | 2, cache: boolean) {
+  return request.post<ListResponse<WordCloudItem>>(statisticsApi.wordCloud, { id, type }, {}, { cache });
 }
 /* 考试详情相关API */

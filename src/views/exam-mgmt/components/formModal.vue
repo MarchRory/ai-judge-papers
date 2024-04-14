@@ -5,13 +5,13 @@
   import { getSubjectListAPI } from '@/api/subject';
   import { FormInstance, Message, SelectOptionData } from '@arco-design/web-vue';
   import dayjs from 'dayjs';
+  import useLoading from '@/hooks/loading';
   import { ExamStateEnum } from '../config';
 
   interface Props {
     visible: boolean;
     formData: ExamFormData;
     create: 'create' | 'edit';
-    groupOpts: { label: string; value: number }[];
   }
   // 组件通信定义
   const props = withDefaults(defineProps<Props>(), {
@@ -47,16 +47,39 @@
     timeLimit: 0,
     type: undefined,
   };
+
+  const { loading: groupLoading, setLoading: setGroupLoading } = useLoading(false);
+  const groupOpts = ref<{ label: string; value: number }[]>([]);
+  const initGroupCanUse = async () => {
+    setGroupLoading(true);
+    getGroupList({ page: 1, pageSize: 100, key: '', order: 1, state: 1 })
+      .then((res) => {
+        const { list } = res.data;
+        groupOpts.value = list.map((item) => {
+          return {
+            label: item.name,
+            value: item.id,
+          };
+        });
+      })
+      .catch((e) => {
+        Message.error('可用考试组信息获取失败, 请稍后重试');
+      })
+      .finally(() => {
+        setGroupLoading(false);
+      });
+  };
   const formInfo = ref<ExamFormData & { examTimeLength?: number }>({ ...props.formData, examTimeLength: 60 });
   const formRef = ref<FormInstance>();
   const okLoading = ref(false);
   watch(
     () => props.visible,
-    (newVal) => {
+    async (newVal) => {
       if (newVal) {
+        await initGroupCanUse();
         if (props.create === 'edit') {
           const timeLength = ((props.formData.timeLimit - (props.formData.time as number)) / 60000).toFixed();
-          const groupName = props.groupOpts.find((item) => item.value === formInfo.value.groupId)?.label;
+          const groupName = groupOpts.value.find((item) => item.value === formInfo.value.groupId)?.label;
           formInfo.value = { ...props.formData, examTimeLength: +timeLength, groupName };
         } else {
           formInfo.value.examTimeLength = 60;
@@ -162,13 +185,15 @@
         <!--@vue-ignore-->
         <a-select
           v-model:model-value="formInfo.groupId"
-          :options="groupOpts.slice(1, groupOpts.length)"
+          :loading="groupLoading"
+          :options="groupOpts"
           allow-search
           placeholder="输入关键词搜索"
         >
           <template #label="{ data }">
             <span>{{ data.label }}</span>
           </template>
+          <template #empty> <span>当前暂无可用考试组</span></template>
         </a-select>
       </a-form-item>
       <a-form-item

@@ -10,6 +10,7 @@
   import { PaperDetail, updateJudge } from '@/api/judge';
   import { Question } from '@/api/question';
   import DisplayLatex from '@/components/latex/index.vue';
+  import { debounce } from 'lodash';
   import ActionButton from './actionButton.vue';
   import ImgPreview from './imgPreview.vue';
   import CollapseVertical from './collapseVertical.vue';

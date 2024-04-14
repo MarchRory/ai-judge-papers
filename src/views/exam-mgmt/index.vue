@@ -466,7 +466,6 @@
       :create="formType"
       :visible="isFormOpen"
       :form-data="form"
-      :group-opts="groupOpts"
       @on-cancel="isFormOpen = false"
       @on-succes="handleSubmitSuccess"
     />

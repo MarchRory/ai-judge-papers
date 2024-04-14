@@ -6,6 +6,7 @@
   import mitt from 'mitt';
   import { PaperDetail } from '@/api/judge';
   import { Question } from '@/api/question';
+  import { QuestionTypeConfigMap } from '@/views/question-mgmt/config';
   import SingleAnswer from './singleAnswer.vue';
   import collapsePanel from './collapsePanel.vue';
 
@@ -18,10 +19,10 @@
     compositePaper: Array<PaperDetail & Question>;
   }>();
 
-  /** 题目类型(1,简答,0选择,2填空,3判断) */
-  const types = ['选择题', '简答题', '填空题', '判断题'].map(
-    (name, type) => [name, props.compositePaper.filter((p) => p.type === type)] as const,
+  const types = Object.values(QuestionTypeConfigMap).map(
+    ({ label: name, value: type }) => [name, props.compositePaper.filter((p) => p.type === type)] as const,
   );
+
   // [题目类型，题目][]
 
   // 注入事件监听器，通知子组件自身需要调用 el.scrollIntoView
@@ -143,6 +144,7 @@
           v-for="question in questions"
           :key="question.problemId"
           :composite-question="question"
+          scroll-into-view
           @is-intersecting="handleIsIntersecting"
         />
       </div>

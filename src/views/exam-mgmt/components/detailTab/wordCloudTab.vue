@@ -71,7 +71,8 @@
 
   const init = () => {
     setChartLoading(false);
-    getWordCloudApi(+examDetail.value.id, 1) // 目前只有 23 有词云数据
+    const useCache = currentState.value > ExamStateEnum.beforeStart;
+    getWordCloudApi(+examDetail.value.id, 1, useCache) // 目前只有 23 有词云数据
       .then((res) => {
         const list = res.data.list ?? [];
         const data = list.map((item) => {
@@ -86,7 +87,7 @@
             wordCloudChart.value?.resize();
           });
         } else {
-          Message.warning('暂无数据');
+          Message.warning('试题获取失败, 无法生成试题词云');
         }
       })
       .finally(() => {
