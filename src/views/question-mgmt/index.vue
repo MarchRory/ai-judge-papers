@@ -34,7 +34,7 @@
               </a-col>
             </a-row>
           </a-form>
-          <a-side class="pl-8 ml-8 mb-[20px] flex flex-col justify-between border-l border-l-solid border-[#E5E6EB]">
+          <div class="pl-8 ml-8 mb-[20px] flex flex-col justify-between border-l border-l-solid border-[#E5E6EB]">
             <a-button
               type="primary"
               @click="query"
@@ -53,7 +53,7 @@
               </template>
               <template #default> 重置 </template>
             </a-button>
-          </a-side>
+          </div>
         </div>
       </a-card>
     </a-layout-header>
@@ -78,7 +78,7 @@
             <a-table-column
               data-index="id"
               :width="150"
-              title="标识"
+              title="序号"
             ></a-table-column>
             <a-table-column
               title="科目"

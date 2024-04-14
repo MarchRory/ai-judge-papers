@@ -248,7 +248,7 @@
                 </a-col>
               </a-row>
             </a-form>
-            <a-side class="pl-8 ml-8 mb-[20px] flex flex-col justify-between border-l border-l-solid border-[#E5E6EB]">
+            <div class="pl-8 ml-8 mb-[20px] flex flex-col justify-between border-l border-l-solid border-[#E5E6EB]">
               <a-button
                 type="primary"
                 @click="loadList"
@@ -267,7 +267,7 @@
                 </template>
                 <template #default> 重置 </template>
               </a-button>
-            </a-side>
+            </div>
           </div>
         </a-card>
       </a-layout-header>
@@ -384,16 +384,17 @@
                 data-index="time"
               >
                 <template #cell="{ record }">
-                  {{ new Date(record.time).toLocaleString().replace(/\//g, '-') }}
+                  {{ new Date(record.time).toLocaleString().replace(/\//g, '-').slice(0, 15) }}
                 </template>
               </a-table-column>
               <a-table-column
+                v-if="false"
                 title="交卷时间"
                 :width="200"
                 data-index="time"
               >
                 <template #cell="{ record }">
-                  {{ new Date(record.timeLimit).toLocaleString().replace(/\//g, '-') }}
+                  {{ new Date(record.timeLimit).toLocaleString().replace(/\//g, '-').slice(0, 15) }}
                 </template>
               </a-table-column>
               <a-table-column
@@ -465,7 +466,6 @@
       :create="formType"
       :visible="isFormOpen"
       :form-data="form"
-      :group-opts="groupOpts"
       @on-cancel="isFormOpen = false"
       @on-succes="handleSubmitSuccess"
     />

@@ -27,18 +27,18 @@
           <a-radio :value="3"> 英语 </a-radio>
         </a-radio-group>
         <a-table
-          :data="renderList!!"
+          :data="renderList"
           :pagination="false"
           :bordered="false"
           :scroll="{ x: '100%', y: '264px' }"
         >
           <template #columns>
             <a-table-column
-              title="时间"
+              title="开考时间"
               data-index="time"
             >
               <template #cell="{ record }">
-                {{ dateFormat(record.time) }}
+                {{ new Date(record.time).toLocaleString().replace(/\//g, '-').slice(0, 15) }}
               </template>
             </a-table-column>
             <a-table-column
@@ -110,7 +110,7 @@
   const typeChange = (contentType: number) => {
     fetchData(contentType);
   };
-  fetchData(1);
+  fetchData(2);
   const dateFormat = (timestamp: number) => {
     return dayjs.unix(timestamp).format('YYYY年MM月DD日');
   };

@@ -16,7 +16,7 @@ export interface Student extends TableData {
 }
 
 export const fieldsDescription: { [field in keyof Student]: string } = {
-  id: 'ID',
+  id: '序号',
   number: '学号',
   name: '姓名',
   sex: '性别',

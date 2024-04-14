@@ -5,7 +5,7 @@
   import { debounce } from 'lodash';
   import { ref, watch, nextTick, onMounted } from 'vue';
   import { Message } from '@arco-design/web-vue';
-  import { sleep } from '@/utils/common/performance';
+  import preContent from './preContent';
 
   interface chatListItem {
     text: string;
@@ -52,7 +52,7 @@
       text,
     });
     setInputLoading(true);
-    getChatResponse({ examId: props.examId, content: content.value, userId: 0 })
+    getChatResponse({ examId: props.examId, content: text, userId: 0 })
       .then((res) => {
         const { success, data } = res;
         if (success) {
@@ -94,15 +94,13 @@
   );
 
   // 获取智能预设问题文本
-  const getPreQuestionTriggerText =
-    '我是这门考试的负责老师,根据这些信息你可以为我回答哪些关于学生学习情况、学习进步、提高方法的问题,只输出问题5个问题, 不带序号, 模拟老师, 使用第一人称, 且使用json格式';
   const defaultQuestion = ['本堂考试, 同学们表现得怎么样? ', '同学们进步多吗?', '同学们还需要在哪些知识点上针对性巩固?'];
   const { loading: preQuestionLoading, setLoading: setPreQLoading } = useLoading(false);
   const getPreQuestionList = () => {
     setPreQLoading(true);
     getChatResponse({
       examId: +props.examId,
-      content: getPreQuestionTriggerText,
+      content: preContent,
       userId: 0,
     })
       .then(({ success, data }) => {
@@ -146,7 +144,7 @@
           @click="setChatWindowVisible(true)"
         />
       </div>
-      <template #content> 点击和AI小助手对话, 了解更多有关本场考试的AI分析 </template>
+      <template #content> 点击和AI小助理对话, 了解更多有关本场考试的AI分析 </template>
     </a-popover>
 
     <!--聊天区主体-->
@@ -161,7 +159,7 @@
           <!--聊天区-->
           <div class="chatContainer shadow-gray">
             <header>
-              <strong>易智阅卷 - AI小助手</strong>
+              <strong>AI小助理</strong>
               <div>
                 <a-button @click="setChatWindowVisible(false)">
                   <template #icon>

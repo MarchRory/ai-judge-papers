@@ -22,7 +22,7 @@ export interface Teacher extends TableData {
  * 字段转换为可读格式
  */
 export const fieldsDescription: { [field in keyof Teacher]: string } = {
-  id: 'ID',
+  id: '序号',
   name: '姓名',
   phone: '手机号',
   number: '教工号',

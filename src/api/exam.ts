@@ -169,8 +169,10 @@ export function updateGroupApi(data: Group) {
   return request.post(ExamGroupApi.update, data);
 }
 // order: 1-升序, 其他数字-降序
-export function getGroupList(data: Paging<{ key: string; order: number }>) {
-  return request.post<ListResponse<Group>>(ExamGroupApi.list, data);
+// state: 0-全部, 4-已提交, 1-未提交
+export function getGroupList(data: Paging<{ key: string; order: number; state?: number }>) {
+  const groupState = typeof data.state === 'number' ? data.state : 0;
+  return request.post<ListResponse<Group>>(ExamGroupApi.list, { ...data, state: groupState });
 }
 
 export function deleteGroupApi(id: number) {

@@ -30,6 +30,7 @@
   const error = ref<Error>();
   const reviewIds = ref<number[]>(); // state=2
   const reviewDoneIds = ref<number[]>(); // state=3
+  const submitModalVisible = ref(false);
 
   const loadNextUser = async () => {
     loadingDataStatus.value = 'loading';
@@ -61,12 +62,12 @@
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const problem = problems.find((p) => p.problemId === detail.problemId)!;
 
-        // console.log({ detail, problem, problems });
         wipComposedData.push(Object.assign(problem, detail));
       });
       compositePaper.value = wipComposedData;
       // done
       loadingDataStatus.value = 'success';
+      submitModalVisible.value = false;
     } catch (e) {
       // for debug
       // eslint-disable-next-line no-console
@@ -84,7 +85,6 @@
     });
   };
 
-  const submitModalVisible = ref(false);
   const submitThis = async () => {
     // exitFullscreen(); // 退出全屏，因为modal挂载点有问题
     const ok = await reviewFulfil({ userId: userIdRef.value!, examId });
@@ -98,16 +98,19 @@
     if (ids.length > 0) {
       // 切换到下一个 userId
       loadNextUser();
+      submitModalVisible.value = false;
     } else {
       // 对考试的submit
       setSubmitLoading(true);
       const res = await submitJudgeRes(examId);
       if (res.success) {
-        Notification.success('本堂考试阅卷信息已全部提交, 即将回到详情页, 数据分析大屏已开放');
+        Notification.success('本堂考试阅卷信息已全部提交, 即将回到详情页。数据分析大屏、本堂考试专属AI小助理已开放');
         setTimeout(() => {
           back();
-        }, 1500);
+        }, 3000);
+        submitModalVisible.value = false;
       }
+
       setSubmitLoading(false);
     }
   };
