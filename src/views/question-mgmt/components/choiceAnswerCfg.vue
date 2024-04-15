@@ -91,7 +91,7 @@
     <a-spin
       :loading="questionLoading"
       tip="答案加载中, 请稍后..."
-      class="wh-full flex wh-full items-center flex-col justify-start"
+      class="wh-full inline-flex wh-full items-center flex-col justify-start"
     >
       <div class="w-full h-auto p-10 text-1.4em font-600 text-gray-600 line-height-loose">
         <DisplayLatex :latex="content" />
@@ -151,5 +151,9 @@
     color: #50e98b;
     position: absolute;
     transform: translate(-20%, -50%);
+  }
+
+  .inline-flex.inline-flex {
+    display: inline-flex;
   }
 </style>

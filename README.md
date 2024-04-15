@@ -1,5 +1,7 @@
 # 易智阅AI阅卷平台
 
+[预览地址](https://ai-judge-papers.surge.sh/) [下载构建产物](https://ai-judge-papers.surge.sh/dist.tar.gz)
+
 ## 背景
 
 2024 服务外包项目
