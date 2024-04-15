@@ -169,7 +169,7 @@
               >
                 <template #cell="{ record }">
                   <a-button
-                    v-if="record.state !== 4"
+                    v-if="now > record.timeLimit && record.state !== 4"
                     m="r-2"
                     type="primary"
                     status="success"

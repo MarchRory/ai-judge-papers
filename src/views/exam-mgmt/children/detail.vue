@@ -65,7 +65,13 @@
   };
   const jumpToJudge = () => {
     // @ts-ignore
-    router.push({ path: '/exam-mgmt/judgePlatform', query });
+    router.push({
+      path: '/exam-mgmt/judgePlatform',
+      query: {
+        ...query,
+        number: examDetail.value.number,
+      },
+    });
   };
   const jumpToDataAnalysis = () => {
     // @ts-ignore
