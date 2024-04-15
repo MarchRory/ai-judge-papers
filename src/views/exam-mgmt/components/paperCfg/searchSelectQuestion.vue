@@ -16,7 +16,7 @@
   const emits = defineEmits<{
     (e: 'onExchange'): void;
   }>();
-  const otherSearchParams = { key: '', subjectId: +props.subjectId };
+  const otherSearchParams = { key: '', subjectId: +props.subjectId, type: -1 };
   const { key, tableData, pagination, loading, setLoading, loadList, handlePageChange, handleSizeChange } = useTable<
     QuestionListItem,
     typeof otherSearchParams
@@ -152,7 +152,7 @@
       v-model:visible="modalVisible"
       :ok-loading="submitLoading"
       title="配置新增题目信息"
-      ok-text="替换原题目"
+      ok-text="添加试题"
       :mask-closable="false"
       :esc-to-close="false"
       @before-close="reset"

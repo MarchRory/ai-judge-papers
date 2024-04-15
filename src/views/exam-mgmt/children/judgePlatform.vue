@@ -133,14 +133,14 @@
           <a-progress
             v-if="reviewIds && reviewDoneIds && loadingDataStatus === 'success'"
             class="w-full min-w-[16rem] mr-4"
-            :percent="reviewDoneIds.length / (reviewIds.length + reviewDoneIds.length)"
+            :percent="reviewDoneIds.length / +query.number!!"
           >
             <template #text="scope">
               <span
                 :title="`${(scope.percent * 100).toFixed(1)}%`"
                 class="cursor-help"
               >
-                阅卷进度 {{ reviewDoneIds.length }}/{{ reviewIds.length + reviewDoneIds.length }}</span
+                阅卷进度 {{ reviewDoneIds.length }}/{{ +query.number!! }}</span
               >
             </template>
           </a-progress>

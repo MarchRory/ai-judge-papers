@@ -140,7 +140,7 @@
             <a-doption>
               <a-space @click="handleLogout">
                 <icon-export />
-                <span> 登出登录 </span>
+                <span> 退出登录 </span>
               </a-space>
             </a-doption>
           </template>
