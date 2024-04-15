@@ -29,19 +29,28 @@
   const scrollIntoViewEmitter = mitt();
   provide('scrollIntoViewEmitter', scrollIntoViewEmitter);
 
+  // 当前题目信息
+  const activeQuestionInfo = ref<{ order: number; type: number }>();
+  const handleIsIntersecting = (e: { order: number; type: number }) => {
+    activeQuestionInfo.value = e;
+  };
+
+  const isScolling = ref(false); // 作为屏蔽信号
+  provide('isScolling', isScolling); // 要求已经滚动时，屏蔽子组件发出信号
+
   const onShouldScrollIntoView = (e: { type: number; order: number }) => {
     // 但注意由于需要确定第一个题目，此处使用 order 字段，而不是 problemId
+    isScolling.value = true;
+    activeQuestionInfo.value = e;
     scrollIntoViewEmitter.emit('scrollIntoView', e);
   };
 
-  const emit = defineEmits<{
-    isIntersecting: [{ id: number; type: number }];
-  }>();
-
-  // 当前题目信息
-  const activeQuestionInfo = ref<{ id: number; type: number }>();
-  const handleIsIntersecting = (e: { id: number; type: number }) => {
-    activeQuestionInfo.value = e;
+  let scrollTimer: ReturnType<typeof setTimeout> | undefined;
+  const onScroll = () => {
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => {
+      isScolling.value = false; // 滚动已停止
+    }, 200);
   };
 </script>
 
@@ -71,10 +80,7 @@
         v-for="([name, problems], type) in types"
         :key="name"
       >
-        <div
-          v-if="problems.length > 0"
-          @click="onShouldScrollIntoView({ type, order: 1 })"
-        >
+        <div v-if="problems.length > 0">
           <button
             class="w-full p-2 bg-zinc-50 hover:bg-zinc-100 transition-all rounded-lg cursor-pointer"
             border="solid 1 zinc-1"
@@ -82,6 +88,7 @@
               color: activeQuestionInfo?.type === type ? '#f1f5f9' : '',
               background: activeQuestionInfo?.type === type ? '#4080ff' : '',
             }"
+            @click="onShouldScrollIntoView({ type, order: 1 })"
           >
             {{ name }}
           </button>
@@ -94,8 +101,8 @@
               border="solid 1 zinc-1"
               text="center thin zinc-5"
               :style="{
-                color: activeQuestionInfo?.id === problemId ? '#f1f5f9' : '',
-                background: activeQuestionInfo?.id === problemId ? '#4080ff' : '',
+                color: activeQuestionInfo?.order === order ? '#f1f5f9' : '',
+                background: activeQuestionInfo?.order === order ? '#4080ff' : '',
               }"
               @click.stop="onShouldScrollIntoView({ type, order })"
             >
@@ -109,7 +116,10 @@
 
   <!-- 题目区域 -->
 
-  <a-scrollbar class="h-full overflow-auto px-6">
+  <a-scrollbar
+    class="h-full overflow-auto px-6"
+    @scroll="onScroll"
+  >
     <!-- TODO: 若实际上题目真的非常多再考虑虚拟列表 -->
     <template
       v-for="[name, questions] in types"
@@ -144,7 +154,6 @@
           v-for="question in questions"
           :key="question.problemId"
           :composite-question="question"
-          scroll-into-view
           @is-intersecting="handleIsIntersecting"
         />
       </div>
