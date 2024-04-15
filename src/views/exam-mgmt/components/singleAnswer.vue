@@ -3,7 +3,7 @@
    * 单个试题
    */
 
-  import { ref, inject, onMounted, onUnmounted } from 'vue';
+  import { ref, inject, onMounted, onUnmounted, Ref } from 'vue';
   import { Notification } from '@arco-design/web-vue';
   import { Emitter } from 'mitt';
   import { useIntersectionObserver } from '@vueuse/core';
@@ -18,33 +18,41 @@
   const props = defineProps<{
     compositeQuestion: PaperDetail & Question;
     /** 滚动当前元素到视窗顶部 */
-    scrollIntoView?: boolean;
   }>();
   const question = props.compositeQuestion;
 
   const emit = defineEmits<{
-    isIntersecting: [{ id: number; type: number }];
+    isIntersecting: [{ id: number; order: number; type: number }];
   }>();
 
   // 以下代码处理 scrollIntoView
+  const isScolling = inject('isScolling') as Ref<boolean>;
   const el = ref<HTMLElement>();
   const fnScrollIntoView = () => {
-    el.value?.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
+    el.value?.scrollIntoView({ block: 'start', inline: 'start', behavior: 'smooth' });
   };
   defineExpose({ scrollIntoView: fnScrollIntoView }); // 暂时备用
   const scrollIntoViewEmitter = inject('scrollIntoViewEmitter') as Emitter<{ scrollIntoView: { type: number; order: number } }>;
-  const handleSscrollIntoViewEvenet = ({ type, order }: { type: number; order: number }) => {
+  const handleSscrollIntoViewEvent = ({ type, order }: { type: number; order: number }) => {
     if (type === question.type && order === question.order) {
       fnScrollIntoView();
     }
   };
-  onMounted(() => scrollIntoViewEmitter.on('scrollIntoView', handleSscrollIntoViewEvenet));
-  onUnmounted(() => scrollIntoViewEmitter.off('scrollIntoView', handleSscrollIntoViewEvenet));
+  onMounted(() => scrollIntoViewEmitter.on('scrollIntoView', handleSscrollIntoViewEvent));
+  onUnmounted(() => scrollIntoViewEmitter.off('scrollIntoView', handleSscrollIntoViewEvent));
 
   // 通知当前组件已进入视图
-  useIntersectionObserver(el, ([{ isIntersecting }]) => {
-    if (isIntersecting) emit('isIntersecting', { id: question.problemId, type: question.type });
-  });
+  useIntersectionObserver(
+    el,
+    ([{ isIntersecting }]) => {
+      if (isIntersecting && !isScolling.value) {
+        emit('isIntersecting', question);
+      }
+    },
+    {
+      // threshold: 0, // into view from bottom
+    },
+  );
 
   // 修改数据
   const toFixed = (n: number) => Number(n.toFixed(1));

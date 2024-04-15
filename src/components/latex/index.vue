@@ -37,7 +37,7 @@
   }
 
   [aria-hidden] {
-    display: none;
+    display: none !important;
   }
 
   .katex .katex-mathml {
