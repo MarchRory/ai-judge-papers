@@ -8,11 +8,13 @@
   const { groupId } = examInfo as ExamListItem;
   const chartOpt = ref({});
   const range = [
-    { min: -1, max: 89, name: '90以下' },
-    { min: 90, max: 110, name: '90 ~ 110' },
-    { min: 111, max: 120, name: '111 ~ 120' },
-    { min: 121, max: 130, name: '121 ~ 130' },
-    { min: 131, max: 150, name: '130以上' },
+    { min: -1, max: 30, name: '30分以下' },
+    { min: 31, max: 60, name: '60分以下' },
+    { min: 61, max: 90, name: '90分以下' },
+    { min: 90, max: 110, name: '90 ~ 110分' },
+    { min: 111, max: 120, name: '111 ~ 120分' },
+    { min: 121, max: 130, name: '121 ~ 130分' },
+    { min: 131, max: 150, name: '130分以上' },
   ];
   const getOpt = (dataList) => {
     const option = {

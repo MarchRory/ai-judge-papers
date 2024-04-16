@@ -186,7 +186,7 @@
           <div class="flex justify-around items-center text-2xl">
             <span>{{ question.score.toFixed(1) }}</span>
             <span class="text-4xl font-thin">/</span>
-            <span>{{ question.totalScore }}</span>
+            <span>{{ question.totalScore.toFixed(1) }}</span>
           </div>
         </div>
         <div class="grid mt-4">

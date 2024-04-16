@@ -98,7 +98,7 @@
   watch(
     () => props.paperLoadState.isUpdate,
     (newVal) => {
-      if (newVal) {
+      if (newVal && currentState.value < ExamStateEnum.default) {
         init();
         emits('onRedraw');
       }
