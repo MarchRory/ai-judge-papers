@@ -33,7 +33,7 @@ export interface ClassScore {
 export interface FocusStu {
   classId: number;
   className: string;
-  coefficient: number;
+  coefficient: number | string;
   current: number;
   last: number;
   name: string;
@@ -58,7 +58,7 @@ export interface ChartQuestion {
 export interface ProgressStu {
   classId: number;
   className: string;
-  coefficient: number;
+  coefficient: number | string;
   current: number;
   last: number;
   name: string;

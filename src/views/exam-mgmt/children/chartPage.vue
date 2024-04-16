@@ -14,6 +14,7 @@
     ChartQuestion,
   } from '@/api/data';
   import { Message } from '@arco-design/web-vue';
+  import { QuestionTypeConfigMap } from '@/views/question-mgmt/config';
   import { questionTypeMap } from '../config';
 
   // chart components
@@ -167,7 +168,7 @@
             <AutoScrollTable
               title="重难点题目"
               :columns="[
-                { name: '题序号', dataIndex: 'order' },
+                { name: '题序', dataIndex: 'order' },
                 { name: '类型', dataIndex: 'type' },
                 { name: '分值', dataIndex: 'score' },
                 { name: '知识点', dataIndex: 'key' },
@@ -179,7 +180,7 @@
                 (item: ChartQuestion) => {
                   item.rate = ((item.rate as number) * 100).toFixed(2) + '%';
                   // @ts-ignore
-                  item.type = questionTypeMap[item.type];
+                  item.type = QuestionTypeConfigMap[item.type].label.slice(0, 2);
                 }
               "
             />
@@ -237,7 +238,7 @@
               :request-params="{ id: +query.id, subjectId: +query.subjectId, ...tableListPageParams }"
               :formart="
                 (item: ProgressStu) => {
-                  item.coefficient = +item.coefficient.toFixed(2);
+                  item.coefficient = (item.coefficient as number).toFixed(2);
                 }
               "
             />
@@ -256,7 +257,7 @@
               :request-params="{ id: +query.id, subjectId: +query.subjectId, ...tableListPageParams }"
               :formart="
                 (item: FocusStu) => {
-                  item.coefficient = +item.coefficient.toFixed(2);
+                  item.coefficient = (item.coefficient as number).toFixed(2);
                 }
               "
             />

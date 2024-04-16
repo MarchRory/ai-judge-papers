@@ -38,7 +38,7 @@
           title: {
             show: false,
             color: '#ffffff',
-            fontSize: 12,
+            fontSize: 24,
           },
           axisLine: {
             // 坐标轴线
@@ -49,7 +49,7 @@
                 [0.7, '#ebcc7b'],
                 [1, '#69d4b5'],
               ],
-              width: 10,
+              width: 40,
               shadowColor: '#2C58A6', // 默认透明
               shadowBlur: 10,
             },
@@ -60,7 +60,7 @@
             textStyle: {
               // 属性lineStyle控制线条样式
               fontWeight: 'normal',
-              fontSize: 12,
+              fontSize: 20,
               color: '#ffffff',
               shadowColor: '#2C58A6', // 默认透明
               shadowBlur: 20,
@@ -87,7 +87,7 @@
             borderWidth: 1,
             borderColor: '#d5d5d5',
             shadowColor: '#2C58A6', // 默认透明
-            shadowBlur: 20,
+            shadowBlur: 16,
             padding: [5, 8, 5, 8],
             offsetCenter: [0, '50%'], // x, y，单位px
             textStyle: {
