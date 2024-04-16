@@ -2,6 +2,8 @@
 
 [预览地址](https://ai-judge-papers.surge.sh/) [下载构建产物](https://ai-judge-papers.surge.sh/dist.tar.gz)
 
+> 持续集成
+
 ## 背景
 
 2024 服务外包项目
@@ -25,14 +27,14 @@
 | 语言             | TypeScript                           |
 | 后台模板         | Acro-Design-pro-vue                  |
 | 组件库           | Arco-Design-vue                      |
-| CSS 框架         | UnoCSS                               |
+| CSS 框架         | UnoCSS, 这种规模的项目用原子化方便    |
 | 图标集           | iconify 里挑一个, 感觉 tabler 还行   |
 | 第三方 hooks 库  | VueUse                               |
 | 网络请求库(待选) | axios / TanStack Query / msw / faker |
 
 ## vsocde 插件建议
 
-安装 `Git History`, 直接开盒
+安装 `Git History`, 为自己模块负责
 
 ## 项目团队编码规范
 
@@ -196,4 +198,15 @@ export function loginAPI(data: LoginParamsModel, expandConfig?: RequestExpandCon
 }
 ```
 
-### 6、其他规范需求可以进行补充
+### 6、自定义Hooks
+#### 6.1、效率和统一分类
+- useTable
+统一的load相关逻辑
+
+- useForm
+统一表单提交逻辑
+
+
+#### 6.2、功能封装
+- usePolling: 封装的轮询方法，引入竞态令牌，可控化轮询。
+
