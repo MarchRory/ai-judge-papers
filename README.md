@@ -1,7 +1,7 @@
 # 易智阅AI阅卷平台
 [预览地址](https://1713229008044-ai-judge-papers.surge.sh) [下载构建产物](https://ai-judge-papers.surge.sh/dist.tar.gz)
 
-> 持续集成
+> 持续集成, 不过得线下跑后端和AI才能正常用
 
 ## 背景
 
