@@ -119,16 +119,13 @@ todo...
 - 有行数较多或者逻辑较复杂、或自觉命名不太清晰的方法，要写上必要的注释
 
 ```html
-<script
-  lang="ts"
-  setup
->
+<script lang="ts" setup>
   /*
    * @author: 理塘王
    * @date: 2024-02-07
    */
   import { StudentType } from '@/types/student';
-  const stu: Array<StudentType> = [];
+  const stu: StudentType[] = [];
 </script>
 
 <template>
