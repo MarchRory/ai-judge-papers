@@ -1,21 +1,20 @@
 # 易智阅AI阅卷平台
-
-[预览地址](https://ai-judge-papers.surge.sh/) [下载构建产物](https://ai-judge-papers.surge.sh/dist.tar.gz)
+[预览地址](https://1713229008044-ai-judge-papers.surge.sh) [下载构建产物](https://ai-judge-papers.surge.sh/dist.tar.gz)
 
 > 持续集成
 
 ## 背景
 
-2024 服务外包项目
+2024 中国大学生服务外包创新创业大赛[A01]赛题
 
 ## 前端开发人员
 负责人: 杨荣兴
 
-### toB
+### 教师端
 - 杨荣兴
 - 杨瑞
 
-### toC
+### 学生端
 - 刘祎晗
 
 ## 前端技术栈
@@ -30,7 +29,7 @@
 | CSS 框架         | UnoCSS, 这种规模的项目用原子化方便    |
 | 图标集           | iconify 里挑一个, 感觉 tabler 还行   |
 | 第三方 hooks 库  | VueUse                               |
-| 网络请求库(待选) | axios / TanStack Query / msw / faker |
+| 网络请求库(待选) | axios |
 
 ## vsocde 插件建议
 
@@ -62,7 +61,7 @@
 
 <br/>
 
-- `Array<T>`和 `[]`的选择：TS 基本类型使用[]，**自定义复杂类型使用 Array\<T>**，如：
+
 
 ```ts
 // 使用 []
@@ -71,14 +70,14 @@ let ages: number[] = [18, 20];
 
 // 使用 Array<T>
 interface BaseStudent {
-  id: number | string;
+  id: string;
   name: string;
   school: string;
   grade: number;
   class: number;
 }
 
-let students: Array<BaseStudent> = [{ id: 1, name: '张三', school: '理塘纯真高中', grade: 2, class: 2 }];
+let students: BaseStudent[] = [{ id: 1, name: '张三', school: '理塘纯真高中', grade: 2, class: 2 }];
 ```
 
 <br/>
@@ -208,5 +207,5 @@ export function loginAPI(data: LoginParamsModel, expandConfig?: RequestExpandCon
 
 
 #### 6.2、功能封装
-- usePolling: 封装的轮询方法，引入竞态令牌，可控化轮询。
+- usePolling: 封装的短轮询方法，引入竞态令牌，可控化轮询。
 
