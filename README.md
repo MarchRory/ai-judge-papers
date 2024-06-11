@@ -47,7 +47,7 @@
 
 ### 2、试题库
 
-![image](https://github.com/MarchRory/ai-judge-papers/blob/dev_liushi/public/question-mgmt.png)
+![image](https://github.com/MarchRory/ai-judge-papers/blob/dev_liushi/public/questions-mgmt.png)
 
 ### 3、简答题参考答案配置
 
