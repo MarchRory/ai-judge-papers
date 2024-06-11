@@ -155,7 +155,7 @@
         });
     });
   };
-  // AI阅卷进度条, 待测试
+  // AI阅卷进度条
   let pollingCancelToken: CancellationToken | null = null;
   const beginWatchAiJuding = async () => {
     const updateAiJudingProgress = async () => {
